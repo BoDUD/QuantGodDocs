@@ -54,6 +54,14 @@ runtime/adaptive/QuantGod_USDJPYEADryRunDecisionLedger.csv
 
 计算。阻断时建议仓位永远是 `0`。
 
+机会入场现在额外经过 `centSamplingGate`：
+
+- `OPPORTUNITY_ENTRY` 只允许美分账户小仓采样；
+- USD 账户对机会入场只做 `PAPER_MIRROR_ONLY`；
+- 默认机会入场上限来自 `QG_CENT_OPPORTUNITY_LOT`，默认 `0.10` lot；
+- 点差轻微偏宽时继续降为美分账户小仓，不让 USD 实盘接探索单；
+- `centSamplingGate.recommendedLotBeforeCap` 和 `recommendedLotAfterCap` 会记录限仓前后差异。
+
 ## CLI
 
 ```powershell

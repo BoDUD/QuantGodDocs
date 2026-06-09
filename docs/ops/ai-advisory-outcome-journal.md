@@ -15,7 +15,7 @@ This feature is intentionally narrow:
 - keeps all new Telegram human-facing lines in Chinese
 
 It does not add order sending, position closing, cancellation, broker execution,
-credential storage, Telegram command handling, webhook receivers, Polymarket
+credential storage, Telegram command handling, webhook receivers, external market
 wallet integration, user accounts, or billing.
 
 ## Runtime files
@@ -92,6 +92,6 @@ telegramWebhookReceiverAllowed=false
 webhookReceiverAllowed=false
 emailDeliveryAllowed=false
 brokerExecutionAllowed=false
-polymarketOrderAllowed=false
+externalMarketOrderAllowed=false
 walletIntegrationAllowed=false
 ```

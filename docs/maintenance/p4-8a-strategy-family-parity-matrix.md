@@ -4,7 +4,7 @@ P4-8A completes the Production Evidence parity matrix so P4-6 no longer treats c
 
 ## Scope
 
-This maintenance pass updates the Backend production evidence audit only. It does not add trading execution, modify MT5 live presets, connect Polymarket wallets, or enable Telegram commands.
+This maintenance pass updates the Backend production evidence audit only. It does not add trading execution, modify MT5 live presets, connect external wallets, or enable Telegram commands.
 
 ## What Changed
 

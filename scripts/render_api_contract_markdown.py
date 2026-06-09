@@ -19,6 +19,18 @@ def endpoint_rows(endpoints: list[dict]) -> list[str]:
         path = endpoint.get("path", "")
         mode = endpoint.get("mode", "read-only")
         notes = endpoint.get("description") or endpoint.get("source") or ""
+        variants = endpoint.get("queryVariants") or []
+        if isinstance(variants, list) and variants:
+            rendered_variants = []
+            for variant in variants:
+                if not isinstance(variant, dict):
+                    continue
+                query = variant.get("query")
+                description = variant.get("description") or variant.get("mode") or ""
+                if query:
+                    rendered_variants.append(f"`?{query}`: {description}")
+            if rendered_variants:
+                notes = f"{notes} Query variants: {'; '.join(rendered_variants)}"
         rows.append(f"| {method} | `{path}` | `{mode}` | {notes} |")
     return rows
 

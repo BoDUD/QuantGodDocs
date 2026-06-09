@@ -30,4 +30,4 @@ python tools\run_production_evidence_validation.py --runtime-dir .\runtime build
 - 不改 live preset
 - 不改仓位规则
 - 不接 Telegram 交易命令
-- 不接 Polymarket 真钱
+- 不接 外部市场真钱

@@ -54,7 +54,7 @@ orderSendAllowed = false
 closeAllowed = false
 cancelAllowed = false
 livePresetMutationAllowed = false
-polymarketRealMoneyAllowed = false
+externalMarketRealMoneyAllowed = false
 ```
 
-The frontend panel is read-only plus a local collect button. It cannot submit orders, close positions, cancel orders, mutate MT5 live presets, or connect a Polymarket wallet.
+The frontend panel is read-only plus a local collect button. It cannot submit orders, close positions, cancel orders, mutate MT5 live presets, or connect a external wallet.

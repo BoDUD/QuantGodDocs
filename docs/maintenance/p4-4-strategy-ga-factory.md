@@ -52,7 +52,7 @@ No execution capability was added:
 - no MT5 live preset mutation;
 - no MT5 `OrderRequest` write;
 - no Telegram trading command;
-- no Polymarket wallet or real-money path.
+- no external wallet or real-money path.
 
 Factory output can only describe `SHADOW`, `FAST_SHADOW`, `TESTER_ONLY`, or `PAPER_LIVE_SIM` candidates.
 

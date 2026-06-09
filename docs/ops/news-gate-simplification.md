@@ -84,7 +84,7 @@ lossStreak >= 2
 dailyLossR <= -1R
 non-USDJPY live
 non-RSI live
-Polymarket real-money
+external market real-money
 maxLot > 2.0
 ```
 

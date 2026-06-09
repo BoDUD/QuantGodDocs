@@ -9,7 +9,7 @@ It validates four evidence areas:
 3. Live and shadow execution feedback field coverage.
 4. GA multi-generation stability evidence.
 
-This stage is read-only. It does not place orders, close positions, cancel orders, mutate live presets, connect Polymarket wallets, or receive Telegram trading commands.
+This stage is read-only. It does not place orders, close positions, cancel orders, mutate live presets, connect external wallets, or receive Telegram trading commands.
 
 ## CLI
 

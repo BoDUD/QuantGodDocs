@@ -36,7 +36,7 @@ No trading execution was added:
 - no cancel;
 - no live preset mutation;
 - no Telegram command receiver;
-- no Polymarket real-money path.
+- no external market real-money path.
 
 ## Operator Impact
 

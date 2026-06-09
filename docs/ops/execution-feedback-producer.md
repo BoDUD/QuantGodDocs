@@ -31,7 +31,7 @@ close / cancel
 MT5 live preset mutation
 MT5 OrderRequest writes
 Telegram trade commands
-Polymarket wallet / real-money trading
+external wallet / real-money trading
 ```
 
 ## Commands

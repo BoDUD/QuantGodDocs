@@ -49,7 +49,7 @@ P3-5 must not add:
 - webhook receiver
 - email delivery
 - broker execution
-- Polymarket wallet or orders
+- external wallet or order path
 - multi-user accounts
 - billing or credits
 

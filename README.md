@@ -11,7 +11,7 @@ QuantGod v2.6 is a local-first USDJPY autonomous research and execution-governan
 ```text
 Live Lane: USDJPYc / RSI_Reversal / LONG / cent account
 MT5 Shadow Lane: USDJPY multi-strategy simulation and tester research
-Polymarket Shadow Lane: simulated ledger and event-risk context
+HFM Crypto CFD Shadow Lane: local HFM symbol evidence, Moss backtest profile mapping, and shadow-only research
 Agent: autonomous daily todo, daily review, promotion, demotion, rollback
 GA Trace: Strategy JSON seeds, generations, fitness, blockers, elites, mutation, and crossover
 Hard guards: runtime freshness, fastlane quality, spread, high-impact news, loss, and rollback
@@ -52,6 +52,7 @@ Live narrow. Simulation broad. Promotion fast. Rollback hard.
 | Autonomous multi-lane Agent | [QuantGod v2.5 three-lane Agent](docs/ops/usdjpy-cent-autonomous-multilane-agent.md) |
 | Strategy JSON GA trace | [Strategy JSON GA evolution trace](docs/ops/strategy-json-ga-evolution-trace.md) |
 | Strategy GA Factory | [Strategy GA Factory](docs/ops/strategy-ga-factory.md) |
+| Trading Agent article gap audit | [Trading Agent Article Gap Audit](docs/ops/trading-agent-article-gap-audit.md) |
 | USDJPY GA Factory | [USDJPY GA Factory](docs/ops/usdjpy-ga-factory.md) |
 | Telegram Gateway observability | [Telegram Gateway observability](docs/ops/telegram-gateway-observability.md) |
 | Strategy JSON USDJPY backtest | [Strategy JSON USDJPY backtest](docs/ops/strategy-json-usdjpy-backtest.md) |
@@ -120,7 +121,7 @@ Documentation should consistently reflect these constraints:
 
 - Live Lane is limited to `USDJPYc / RSI_Reversal / LONG`.
 - MT5 Shadow Lane may simulate and rank multiple USDJPY strategies, but cannot seize the live route.
-- Polymarket is shadow-only and event-context-only; no real wallet, signing, USDC order, redeem, or private key.
+- HFM Crypto CFD is shadow-only; no broker order send, close, cancel, live preset mutation, wallet signing, or credential custody.
 - Telegram is push-only; Telegram command execution is out of scope.
 - DeepSeek explains, summarizes, and reviews; it does not approve live execution or override rollback.
 - `QG_AUTO_MAX_LOT=2.0` is an upper bound, not a fixed lot size.

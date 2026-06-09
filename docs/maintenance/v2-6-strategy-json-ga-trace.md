@@ -49,7 +49,7 @@ This makes repeated GA runs more auditable and less noisy:
 - The run limiter is off by default but can be enabled with `QG_GA_MIN_RUN_INTERVAL_SECONDS`.
 
 These additions do not add live execution, live preset mutation, Telegram commands,
-or Polymarket real-money access.
+or external real-money market access.
 
 New API surface:
 
@@ -104,7 +104,7 @@ place MT5 orders
 close or cancel orders
 modify MT5 live preset
 enter MICRO_LIVE directly
-connect a Polymarket real-money wallet
+connect a external wallet real-money path
 execute Telegram commands
 generate arbitrary code
 ```

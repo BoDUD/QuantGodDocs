@@ -55,7 +55,7 @@ No trading execution was added:
 - no MT5 live preset mutation;
 - no MT5 OrderRequest write;
 - no Telegram trading command receiver;
-- no Polymarket wallet or real-money path.
+- no external wallet or real-money path.
 
 Candidates remain shadow Strategy JSON candidates and GA seed hints. `PARITY_FAIL` remains a hard blocker.
 

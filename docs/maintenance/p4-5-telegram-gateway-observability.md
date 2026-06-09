@@ -48,7 +48,7 @@ position close
 order cancel
 MT5 live preset mutation
 MT5 OrderRequest writes
-Polymarket wallet or real-money trading
+external wallet or real-money trading
 ```
 
 ## Validation

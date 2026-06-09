@@ -72,7 +72,7 @@ The frontend uses `src/services/caseMemoryApi.js` and the Evolution workspace pa
 - No cancel.
 - No MT5 live preset mutation.
 - No Telegram trading command.
-- No Polymarket real-money path.
+- No external market real-money path.
 - Candidates remain `SHADOW_STRATEGY_JSON_CANDIDATE`.
 - Candidates remain GA seed hints until replay, backtest, parity, and promotion evidence accept them.
 - `PARITY_FAIL` blocks candidate generation and promotion evidence.

@@ -41,7 +41,7 @@ The backtest layer does not:
 - cancel orders
 - mutate live preset
 - write MT5 order requests
-- connect a Polymarket wallet
+- connect a external wallet
 - receive Telegram trade commands
 
 It only writes local research evidence under `runtime/backtest`.

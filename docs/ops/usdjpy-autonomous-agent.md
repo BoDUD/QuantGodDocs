@@ -48,7 +48,7 @@ python tools\run_usdjpy_autonomous_agent.py --runtime-dir .\runtime telegram-tex
 - 高冲击新闻窗口；
 - 连续亏损达到 2 笔；
 - 当日亏损达到 `-1.0R`；
-- Polymarket 真钱交易。
+- 外部市场真钱交易。
 
 ## 允许写什么
 

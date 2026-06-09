@@ -21,6 +21,7 @@ PLACEHOLDER_PATHS = {
     "/api/mt5-trading/:endpoint",
     "/api/mt5/order/:ticket",
     "/api/mt5-readonly/:endpoint",
+    "/api/mt5-readonly-secondary/:endpoint",
     "/api/mt5-symbol-registry/:endpoint",
     "/api/mt5/:endpoint",
 }
@@ -41,7 +42,8 @@ OPTIONAL_SAFETY_FALSE_KEYS = [
 
 REQUIRED_ENDPOINT_GROUPS = {
     "backend-core-and-control",
-    "polymarket-research",
+    "hfm-crypto-cfd",
+    "live-automation-readiness",
     "mt5-readonly",
     "ai-analysis-v1",
     "phase2-file-facade",
@@ -61,6 +63,8 @@ BACKEND_ROUTE_FILES = [
     "Dashboard/strategy_ga_factory_api_routes.js",
     "Dashboard/ga_factory_api_routes.js",
     "Dashboard/telegram_gateway_ops_api_routes.js",
+    "Dashboard/hfm_crypto_cfd_api_routes.js",
+    "Dashboard/live_automation_readiness_api_routes.js",
 ]
 
 
@@ -128,6 +132,44 @@ def check_safety(contract: dict) -> list[str]:
     return errors
 
 
+def check_hfm_summary_contract(contract: dict) -> list[str]:
+    errors: list[str] = []
+    status_endpoint = None
+    for group in endpoint_groups(contract):
+        if not isinstance(group, dict):
+            continue
+        for endpoint in group.get("endpoints", []):
+            if isinstance(endpoint, dict) and endpoint.get("path") == "/api/hfm-crypto/status":
+                status_endpoint = endpoint
+                break
+        if status_endpoint:
+            break
+
+    if not isinstance(status_endpoint, dict):
+        return ["missing /api/hfm-crypto/status endpoint"]
+
+    variants = status_endpoint.get("queryVariants") or []
+    summary_variant = next(
+        (
+            variant
+            for variant in variants
+            if isinstance(variant, dict) and variant.get("query") == "view=summary"
+        ),
+        None,
+    )
+    if not summary_variant:
+        errors.append("missing /api/hfm-crypto/status?view=summary query variant")
+    status_text = json.dumps(status_endpoint, ensure_ascii=False)
+    summary_text = json.dumps(summary_variant or {}, ensure_ascii=False)
+    if "brokerSymbolDiagnostics" not in status_text or "brokerSymbolDiagnostics" not in summary_text:
+        errors.append("HFM summary contract must preserve brokerSymbolDiagnostics")
+    if "operatorChecklist" not in status_text or "operatorChecklist" not in summary_text:
+        errors.append("HFM summary contract must preserve operatorChecklist")
+    if "safety" not in summary_text:
+        errors.append("HFM summary contract must preserve safety flags")
+    return errors
+
+
 def normalize_backend_path(path: str) -> str:
     clean = path.rstrip("/") or path
 
@@ -149,6 +191,8 @@ def normalize_backend_path(path: str) -> str:
         return "/api/mt5/order/:ticket"
     if clean.startswith("/api/mt5-readonly/"):
         return "/api/mt5-readonly/:endpoint"
+    if clean.startswith("/api/mt5-readonly-secondary/"):
+        return "/api/mt5-readonly-secondary/:endpoint"
     if clean.startswith("/api/mt5-symbol-registry/"):
         return "/api/mt5-symbol-registry/:endpoint"
     if clean.startswith("/api/mt5/"):
@@ -229,6 +273,7 @@ def validate_contract(contract: dict, min_endpoints: int = 100) -> list[str]:
 
     errors.extend(check_required_groups(contract))
     errors.extend(check_safety(contract))
+    errors.extend(check_hfm_summary_contract(contract))
     return errors
 
 

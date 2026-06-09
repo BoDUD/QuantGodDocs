@@ -38,7 +38,7 @@ closeAllowed=false
 cancelAllowed=false
 livePresetMutationAllowed=false
 telegramCommandExecutionAllowed=false
-polymarketRealMoneyAllowed=false
+externalMarketRealMoneyAllowed=false
 ```
 
 The module is a local Strategy JSON research plane only.

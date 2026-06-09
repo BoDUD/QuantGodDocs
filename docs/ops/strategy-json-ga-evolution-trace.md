@@ -26,7 +26,7 @@ USDJPY Live Lane execution
 MT5 OrderSend / CTrade
 close / cancel / order modification
 live preset mutation
-Polymarket real-money wallet
+external wallet real-money path
 Telegram trade commands
 ```
 
@@ -147,7 +147,7 @@ maxLot above 2.0
 OrderSend / CTrade / TRADE_ACTION_DEAL
 eval / exec / import / function bodies
 privateKey / wallet / Telegram command execution
-Polymarket real-money permissions
+external real-money market permissions
 ```
 
 The validator accepts explicit `false` safety fields, for example `orderSendAllowed=false`. Those fields are required as safety declarations and must not be confused with permission grants.

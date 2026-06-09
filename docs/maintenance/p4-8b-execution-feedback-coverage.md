@@ -34,7 +34,7 @@ closeAllowed=false
 cancelAllowed=false
 livePresetMutationAllowed=false
 telegramCommandExecutionAllowed=false
-polymarketRealMoneyAllowed=false
+externalMarketRealMoneyAllowed=false
 ```
 
 ## Frontend

@@ -10,6 +10,7 @@ P3-7 快通道质量
 → USDJPY Strategy Lab 策略政策
 → USDJPY EA 干跑决策
 → USDJPY Live Loop 实盘恢复状态
+→ 入场延迟归因
 → 中文 Telegram 巡检
 → Dashboard 可视化
 ```
@@ -20,6 +21,8 @@ P3-7 快通道质量
 runtime/adaptive/QuantGod_USDJPYAutoExecutionPolicy.json
 runtime/adaptive/QuantGod_USDJPYEADryRunDecision.json
 runtime/live/QuantGod_USDJPYLiveLoopStatus.json
+runtime/latency/QuantGod_EntryLatencyReport.json
+runtime/latency/QuantGod_EntryLatencyLedger.csv
 ```
 
 通用 `QuantGod_AutoExecutionPolicy.json` 只保留兼容写出，不再作为前端和 Telegram 的主状态来源。
@@ -117,6 +120,8 @@ Dashboard 新增“自动化链路”面板，显示：
 - 标准入场数量；
 - 机会入场数量；
 - 当前建议仓位；
+- 入场慢点归因；
+- market data / policy / EA guard / order attempt 时间线；
 - 运行一次按钮。
 
 前端仍然只能通过 `/api/*` 读取，不允许直接读取 `QuantGod_*.json/csv`。

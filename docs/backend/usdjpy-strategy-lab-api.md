@@ -35,9 +35,9 @@
 | `GET /api/usdjpy-strategy-lab/autonomous-agent/decision` | 读取自主晋级决策 |
 | `GET /api/usdjpy-strategy-lab/autonomous-agent/patch` | 读取受控 config patch |
 | `GET /api/usdjpy-strategy-lab/autonomous-agent/lifecycle` | 读取 v2.5 三车道自主生命周期 |
-| `GET /api/usdjpy-strategy-lab/autonomous-agent/lanes` | 读取 Live / MT5 Shadow / Polymarket Shadow 三车道摘要 |
+| `GET /api/usdjpy-strategy-lab/autonomous-agent/lanes` | 读取 Live / MT5 Shadow / HFM Crypto CFD Shadow 三车道摘要 |
 | `GET /api/usdjpy-strategy-lab/autonomous-agent/mt5-shadow` | 读取 MT5 多策略模拟车道排名 |
-| `GET /api/usdjpy-strategy-lab/autonomous-agent/polymarket-shadow` | 读取 Polymarket 模拟账本和事件风险车道 |
+| `GET /api/usdjpy-strategy-lab/autonomous-agent/hfm-crypto-shadow` | 读取 HFM Crypto CFD 品种证据、Moss 回测 profile 和 shadow-only 状态 |
 | `GET /api/usdjpy-strategy-lab/autonomous-agent/ea-repro` | 读取 EA source / preset / input / ex5 对账证据 |
 | `GET /api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2` | 读取 Daily Autopilot 2.0 中文计划和复盘 |
 | `POST /api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2/run` | 重建 Daily Autopilot 2.0 |
@@ -69,13 +69,17 @@
 | `POST /api/case-memory/build` | 生成 shadow Strategy JSON candidate 与 GA seed hint；PARITY_FAIL 阻断 |
 | `GET /api/case-memory/telegram-text` | 生成 Case Memory 策略结构候选中文 Telegram 文案 |
 | `GET /api/strategy-ga-factory/status` | 读取 P4-4 Strategy JSON GA Factory 状态 |
-| `POST /api/strategy-ga-factory/build` | 生成 elite archive、strategy graveyard、lineage tree 和 factory ledger |
+| `POST /api/strategy-ga-factory/build` | 生成 elite archive、strategy graveyard、lineage tree、reflection report 和 factory ledger |
+| `GET /api/strategy-ga-factory/intent-plan` | 读取自然语言 Strategy Factory intent plan |
+| `POST /api/strategy-ga-factory/intent-plan/build?prompt=...` | 从大白话生成 shadow-only Strategy JSON seed、五维信号计划、30+ 参数和性格锁进化计划 |
+| `GET /api/strategy-ga-factory/hyperliquid-shadow` | 读取 Hyperliquid/Moss 只读影子车道状态 |
+| `POST /api/strategy-ga-factory/hyperliquid-shadow/build?targetAgentUrl=...&targetAgentProfileJson=...` | 写入 Moss agent 链接和可选本地 profile JSON 到只读 shadow mapping，不授权钱包、不下单 |
 | `GET /api/strategy-ga-factory/telegram-text` | 生成 GA Factory 中文 Telegram 文案 |
 | `GET /api/ga-factory/status` | `strategy-ga-factory/status` 的短别名 |
 | `POST /api/ga-factory/build` | `strategy-ga-factory/build` 的短别名 |
 | `GET /api/ga-factory/telegram-text` | `strategy-ga-factory/telegram-text` 的短别名 |
 | `GET /api/telegram-gateway/status` | 读取 P4-5 Telegram Gateway 运维观测状态 |
-| `POST /api/telegram-gateway/collect` | 收集日报、GA、Agent 和 Polymarket 报告进入 push-only Gateway 队列 |
+| `POST /api/telegram-gateway/collect` | 收集日报、GA、Agent 和 HFM Crypto CFD 报告进入 push-only Gateway 队列 |
 | `GET /api/telegram-gateway/telegram-text` | 生成 Telegram Gateway 运维中文预览 |
 | `GET /api/usdjpy-strategy-lab/agent-ops-health` | 读取 Agent ops health 状态别名 |
 | `GET /api/usdjpy-strategy-lab/agent-ops-health/status` | 读取 Agent loop、Evidence OS、Telegram Gateway 和 runtime 健康状态 |
@@ -96,7 +100,7 @@
 - `QuantGod_GALineage.json` 记录 case-memory origin、mutation parent 和 crossover parents；
 - `QuantGod_GARunLimiter.json` 记录最近一次 generation，部署可用 `QG_GA_MIN_RUN_INTERVAL_SECONDS` 控制频率；
 - 候选只能进入 MT5 Shadow、tester-only、paper-live-sim 或 autonomous evidence；
-- GA 不得直接进入 live、不得改 live preset、不得发 MT5 订单、不得连接 Polymarket真钱钱包。
+- GA 不得直接进入 live、不得改 live preset、不得发 MT5 订单、不得打开 HFM Crypto CFD 执行授权。
 
 ## v2.8 Strategy JSON → EA 只读契约端点
 
@@ -138,7 +142,7 @@
 - 连续亏损、日亏损、runtime 陈旧、快通道异常、点差异常和高冲击新闻会自动暂停或回滚；
 - 普通新闻风险进入 Daily Autopilot 和 replay 复盘，但不作为常态硬阻断；
 - DeepSeek 只解释，不批准 live、不取消回滚、不提高仓位上限；
-- Polymarket 永远 shadow-only。
+- HFM Crypto CFD 永远 shadow-only。
 
 ## P3-21 三车道自主生命周期端点
 
@@ -146,7 +150,7 @@
 
 - Live Lane 只允许 `USDJPYc / RSI_Reversal / LONG` 进入 `MICRO_LIVE` 或 `LIVE_LIMITED`；
 - MT5 Shadow Lane 继续跑多策略模拟、回放、tester 和 ranking；
-- Polymarket Shadow Lane 只做模拟账本、跟单模拟和事件风险上下文；
+- HFM Crypto CFD Shadow Lane 只做本地品种证据扫描、Moss 回测 profile 映射和 shadow-only 研究；
 - 美分账户加速允许更快采样，但不能绕过 runtime、fastlane、spread、高冲击新闻和亏损回滚；
 - `patchWritable=true` 只表示 Agent 可以写受控 patch，`liveMutationAllowed=false` 表示不能直接改 live preset；
 - Daily Autopilot 2.0 生成中文早盘计划、Agent 今日待办、Agent 每日复盘和 Telegram 文案，不执行交易。

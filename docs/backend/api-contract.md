@@ -5,7 +5,7 @@
 
 ## Contract 摘要
 
-- Endpoint 总数：`256`。
+- Endpoint 总数：`319`。
 - Backend API base：`http://127.0.0.1:8080/api`。
 - 任何新增、删除或重命名 `/api/*` route，都必须同步更新 JSON contract、本文档和 Frontend service wrapper。
 
@@ -63,46 +63,108 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | ANY | `/api/mt5/:endpoint` | `guarded-control` | Compatibility alias for MT5 trading bridge sub-endpoints. |
 | DELETE | `/api/mt5/order/:ticket` | `guarded-control` | Order cancel route; must remain blocked/guarded unless explicitly authorized. |
 
-### polymarket-research
+### hfm-crypto-cfd
 
 - Phase / Domain：`backend-core`。
 - Endpoint 数量：`28`。
 
 | Method | Path | Mode | Notes |
 |---|---|---|---|
-| GET | `/api/polymarket/history` | `read-only` | Polymarket research history. |
-| GET | `/api/polymarket/real-trades` | `read-only` | Polymarket real/canary trades view. |
-| GET | `/api/polymarket/radar` | `read-only` | Market radar JSON. |
-| GET | `/api/polymarket/radar-ledger` | `read-only-csv` | Polymarket radar ledger. |
-| GET | `/api/polymarket/markets` | `read-only` | Market search/list. |
-| GET | `/api/polymarket/market` | `read-only` | Market detail. |
-| GET | `/api/polymarket/book` | `read-only` | Order book / book snapshot. |
-| GET | `/api/polymarket/asset-opportunities` | `read-only` | Asset opportunity list. |
-| GET | `/api/polymarket/radar-worker` | `read-only` | Radar worker status. |
-| GET | `/api/polymarket/radar-worker-ledger` | `read-only-csv` | Radar worker ledger. |
-| GET | `/api/polymarket/cross-linkage` | `read-only` | Cross-market linkage output. |
-| GET | `/api/polymarket/cross-market-linkage-ledger` | `read-only-csv` | Cross-market linkage ledger. |
-| GET | `/api/polymarket/canary-executor-contract` | `read-only` | Canary executor contract/status. |
-| GET | `/api/polymarket/canary-executor-ledger` | `read-only-csv` | Canary executor ledger. |
-| GET | `/api/polymarket/auto-governance` | `read-only` | Polymarket auto-governance evidence. |
-| GET | `/api/polymarket/auto-governance-ledger` | `read-only-csv` | Polymarket auto-governance ledger. |
-| GET | `/api/polymarket/canary-executor-run` | `read-only` | Canary executor run output. |
-| GET | `/api/polymarket/ai-score` | `read-only` | Polymarket AI score. |
-| GET | `/api/polymarket/ai-score-ledger` | `read-only-csv` | Polymarket AI score ledger. |
-| GET | `/api/polymarket/canary-exit-ledger` | `read-only-csv` | Canary exit ledger. |
-| GET | `/api/polymarket/canary-order-audit-ledger` | `read-only-csv` | Canary order audit ledger. |
-| GET | `/api/polymarket/canary-position-ledger` | `read-only-csv` | Canary position ledger. |
-| GET | `/api/polymarket/analyze/history` | `read-only` | Single-market analysis history. |
-| GET | `/api/polymarket/search` | `read-only` | Polymarket search endpoint. |
-| POST | `/api/polymarket/single-market-request` | `research-only` | Queue/request single-market research analysis. |
-| POST | `/api/polymarket/analyze` | `research-only` | Compatibility alias for single-market research request. |
-| GET | `/api/polymarket/single-market-analysis` | `read-only` | Latest single-market analysis output. |
-| GET | `/api/polymarket/single-market-analysis-ledger` | `read-only-csv` | Single-market analysis ledger. |
+| GET | `/api/hfm-crypto` | `read-only` | HFM Crypto CFD shadow lane status alias; scans local MT5/HFM symbol evidence and Moss backtest profile metadata. |
+| GET | `/api/hfm-crypto/status` | `read-only` | Read HFM Crypto CFD shadow lane status, detected crypto CFD symbols, Moss backtest profile summary, account brokerSymbolDiagnostics, operatorChecklist, blockers, and safety flags. Frontend first paint must use compact `?view=summary`; HFM crypto account routing may pass `scope=secondary` / `scope=live16` to use the configured Live16 MT5 Files directory. Query variants: `?view=summary`: compact account diagnostics; `?view=summary&scope=secondary`: same read-only payload from the HFM Live16 crypto CFD account. |
+| GET | `/api/hfm-crypto/symbols` | `read-only` | Read detected HFM Crypto CFD symbol evidence from local MT5 Bases roots; no order execution. |
+| GET | `/api/hfm-crypto/contract-spec-export` | `read-only` | Read the HFM Crypto CFD contract-spec export that converts MT5 symbol registry data into review input. |
+| GET | `/api/hfm-crypto/execution-spec` | `read-only` | Read the HFM Crypto CFD contract-spec review generated from local MT5/HFM broker symbol specs. |
+| GET | `/api/hfm-crypto/simulation-profile` | `read-only` | Read the HFM Crypto CFD simulation-profile review for ROI, Sharpe, drawdown, trade count, and liquidation evidence. |
+| GET | `/api/hfm-crypto/evidence-kit` | `read-only` | Read the HFM Crypto CFD evidence kit with contract-spec templates and read-only collection commands. |
+| GET | `/api/hfm-crypto/evidence-bootstrap` | `read-only` | Read the HFM evidence bootstrap artifact with draft input paths, filled-input validation, and sim-to-live blocker summary. |
+| GET | `/api/hfm-crypto/mt5-exporter-review` | `read-only` | Read the MT5 EA exporter review that checks whether the installed QuantGod EA can emit HFM crypto symbol specs. |
+| GET | `/api/hfm-crypto/mt5-upgrade-bundle` | `read-only` | Read the staged MT5 EA exporter upgrade bundle manifest; it is manual-only and does not mutate MT5 files. |
+| GET | `/api/hfm-crypto/mt5-exporter-deploy-plan` | `read-only` | Read the manual MT5 exporter deploy and rollback plan; it describes operator steps only and does not copy files, compile, or mutate MT5. |
+| GET | `/api/hfm-crypto/standalone-exporter-bundle` | `read-only` | Read the standalone read-only HFM crypto symbol-spec exporter bundle for manual MT5 review; it does not select symbols, send orders, or change presets. |
+| GET | `/api/hfm-crypto/mt5-post-upgrade-verify` | `read-only` | Read the post-upgrade verifier that checks installed EA source, compiled ex5, exported HFM crypto specs, and contract-spec review status. |
+| GET | `/api/hfm-crypto/post-upgrade-controller` | `read-only` | Read the HFM post-upgrade controller that coordinates exporter review, manual upgrade bundle, post-upgrade verify, and local contract-spec refresh. |
+| GET | `/api/hfm-crypto/filled-input-validator` | `read-only` | Read the HFM review-input validator that checks manual filled specs/profile or passing contract-spec/simulation review artifacts before promotion review. |
+| POST | `/api/hfm-crypto/build` | `read-only` | Rebuild HFM Crypto CFD shadow state and optional Moss backtest profile mapping; writes local evidence only. |
+| POST | `/api/hfm-crypto/contract-spec-export/build` | `read-only` | Build a local HFM Crypto CFD contract-spec export from MT5 symbol registry JSON or optional live read-only MT5 registry access. |
+| POST | `/api/hfm-crypto/execution-spec/build` | `read-only` | Build the HFM Crypto CFD contract-spec review from a local JSON/CSV export; does not create MT5 order requests. |
+| POST | `/api/hfm-crypto/simulation-profile/build` | `read-only` | Build the HFM Crypto CFD simulation-profile review from an explicit local Moss/backtest JSON or auto-discovered saved HFM profile artifact; does not unlock execution. |
+| POST | `/api/hfm-crypto/evidence-kit/build` | `read-only` | Write local HFM Crypto CFD evidence-kit JSON/CSV templates; no MT5 mutation or broker call is made. |
+| POST | `/api/hfm-crypto/evidence-bootstrap/build` | `read-only` | Write local HFM evidence bootstrap drafts and review artifact summaries without writing filled inputs, MT5 request files, or broker calls. |
+| POST | `/api/hfm-crypto/mt5-exporter-review/build` | `read-only` | Build the local MT5 EA exporter review; it does not copy files into MT5, compile an EA, change presets, or send orders. |
+| POST | `/api/hfm-crypto/mt5-upgrade-bundle/build` | `read-only` | Stage the reviewed QuantGod EA source and manifest under runtime for manual MT5 upgrade; no installed files are modified. |
+| POST | `/api/hfm-crypto/mt5-exporter-deploy-plan/build` | `read-only` | Build the manual MT5 exporter deploy and rollback plan; it writes local review evidence only and does not mutate MT5. |
+| POST | `/api/hfm-crypto/standalone-exporter-bundle/build` | `read-only` | Build the standalone read-only HFM crypto symbol-spec exporter bundle for manual review; it writes local review evidence only and cannot send orders. |
+| POST | `/api/hfm-crypto/mt5-post-upgrade-verify/build` | `read-only` | Build the post-upgrade verifier and, when specs are present, refresh local contract-spec review artifacts without mutating MT5 or sending orders. |
+| POST | `/api/hfm-crypto/post-upgrade-controller/build` | `read-only` | Run the HFM post-upgrade controller; it may write local review artifacts but never copies into MT5, compiles an EA, changes presets, or sends orders. |
+| POST | `/api/hfm-crypto/filled-input-validator/build` | `read-only` | Build the HFM review-input validator artifact from manual filled specs/profile or already passing auto review artifacts; it writes review evidence only and cannot create order requests. |
+
+### live-automation-readiness
+
+- Phase / Domain：`backend-core`。
+- Endpoint 数量：`54`。
+
+| Method | Path | Mode | Notes |
+|---|---|---|---|
+| GET | `/api/live-automation` | `read-only` | Live automation readiness dossier alias; summarizes sim-to-live review status without writing orders. |
+| GET | `/api/live-automation/status` | `read-only` | Build a current read-only live automation readiness dossier from USDJPY MT5 gates and HFM crypto shadow evidence; HFM account-no-crypto blockers, accountCryptoAvailability, and operatorChecklist must pass through without enabling execution. |
+| GET | `/api/live-automation/readiness` | `read-only` | Build a transient live automation readiness view from USDJPY MT5 gates and HFM crypto shadow evidence. |
+| POST | `/api/live-automation/build` | `read-only` | Write a local readiness dossier for review; must keep orderSendAllowed and live preset mutation disabled. |
+| GET | `/api/live-automation/review-packet` | `read-only` | Read the local live execution review packet with dry-run order intent specs and blockers. |
+| POST | `/api/live-automation/review-packet/build` | `read-only` | Write a local live execution review packet; it must not create MT5 order requests, presets, or credentials. |
+| GET | `/api/live-automation/approval-draft` | `read-only` | Read the local operator approval draft that lists required final-review acknowledgements. |
+| POST | `/api/live-automation/approval-draft/build` | `read-only` | Write a local operator approval draft; it does not accept secrets or unlock live execution. |
+| GET | `/api/live-automation/approval-evidence` | `read-only` | Read the local operator approval evidence review; accepted evidence still cannot unlock live execution. |
+| POST | `/api/live-automation/approval-evidence/build` | `read-only` | Validate a local operator approval JSON against the review packet hash and required acknowledgements without writing orders. |
+| GET | `/api/live-automation/dry-run-plan` | `read-only` | Read the dry-run live execution plan; it must keep MT5 pending order writes disabled. |
+| POST | `/api/live-automation/dry-run-plan/build` | `read-only` | Write the dry-run live execution plan for review; no real order files or broker calls are produced. |
+| GET | `/api/live-automation/execution-lane-spec` | `read-only` | Read the future MT5 execution lane implementation spec; it remains non-executing. |
+| POST | `/api/live-automation/execution-lane-spec/build` | `read-only` | Write the future execution lane handoff spec after approval evidence and dry-run intents; it still forbids order files and broker calls. |
+| GET | `/api/live-automation/dry-run-replay` | `read-only` | Read the dry-run intent replay review; replay success still cannot write orders. |
+| POST | `/api/live-automation/dry-run-replay/build` | `read-only` | Replay approved dry-run intents against the execution lane spec without creating MT5 order files or broker calls. |
+| GET | `/api/live-automation/runtime-preflight` | `read-only` | Read the runtime preflight probe that checks fresh MT5 dashboard, live-pilot mode, account, symbol, spread, trade permission, and kill switch evidence without writing orders. |
+| POST | `/api/live-automation/runtime-preflight/build` | `read-only` | Build the runtime preflight probe from approved dry-run replay and live-pilot MT5 dashboard evidence; it still forbids order files and broker calls. |
+| GET | `/api/live-automation/order-request-contract` | `read-only` | Read the MT5 order request contract that defines future reviewed request and receipt fields without creating request files. |
+| POST | `/api/live-automation/order-request-contract/build` | `read-only` | Build the MT5 order request contract from runtime preflight evidence; it remains contract-only and cannot write broker request files. |
+| GET | `/api/live-automation/pipeline` | `read-only` | Read the sim-to-live automation pipeline that summarizes every review stage without enabling execution. |
+| POST | `/api/live-automation/pipeline/build` | `read-only` | Run the full sim-to-live review pipeline and write local review artifacts; it still cannot write MT5 request files or broker calls. |
+| GET | `/api/live-automation/adapter-review` | `read-only` | Read the execution adapter review shell that validates future request and receipt contracts without side effects. |
+| POST | `/api/live-automation/adapter-review/build` | `read-only` | Build the execution adapter review shell from the sim-to-live pipeline and MT5 request contract; no request files or broker calls are produced. |
+| GET | `/api/live-automation/evidence-intake` | `read-only` | Read the live evidence intake summary for missing HFM crypto files, review artifacts, MT5 dashboard evidence, and safe refresh commands. |
+| POST | `/api/live-automation/evidence-intake/build` | `read-only` | Build the live evidence intake artifact and optional local review artifacts; it cannot write MT5 request files or make broker calls. |
+| GET | `/api/live-automation/promotion-candidates` | `read-only` | Read the live promotion candidate selector that ranks simulation-qualified lanes for operator review without enabling execution. |
+| POST | `/api/live-automation/promotion-candidates/build` | `read-only` | Build the live promotion candidate selector from readiness, evidence intake, review packet, and pipeline artifacts; no order request files or broker calls are produced. |
+| GET | `/api/live-automation/promotion-controller` | `read-only` | Read the sim-to-live promotion controller that automates operator review packet generation when a lane is simulation-qualified. |
+| POST | `/api/live-automation/promotion-controller/build` | `read-only` | Build the promotion controller and, when candidates exist, write review packet, approval draft, dry-run plan, and pipeline artifacts without enabling execution. |
+| GET | `/api/live-automation/adapter-sandbox` | `read-only` | Read the adapter sandbox review bundle that validates future MT5 request and receipt serialization without writing MT5 request files. |
+| POST | `/api/live-automation/adapter-sandbox/build` | `read-only` | Build a local review-only adapter sandbox bundle with sample request and receipt payloads; it cannot call a broker or write request files. |
+| GET | `/api/live-automation/adapter-contract-validator` | `read-only` | Read the adapter contract validator artifact that checks future MT5 request JSON against the approved request and receipt contract without side effects. |
+| POST | `/api/live-automation/adapter-contract-validator/build` | `read-only` | Build the review-only adapter contract validator; it validates request JSON and emits review-only receipts without writing MT5 request files or calling a broker. |
+| GET | `/api/live-automation/orchestrator` | `read-only` | Read the sim-to-live orchestrator state machine across evidence, promotion, approval, dry-run, preflight, request contract, adapter review gates, and post-adapter live execution review stages. |
+| POST | `/api/live-automation/orchestrator/build` | `read-only` | Run the full sim-to-live orchestrator and write local review artifacts, including liveExecutionStages for disabled harness, live pilot activation, receipt reconciliation, and EA request reader runtime review; it never writes MT5 request files or calls a broker. |
+| GET | `/api/live-automation/adapter-harness` | `read-only` | Read the disabled execution adapter harness that plans request and receipt paths for review without writing MT5 Files. |
+| POST | `/api/live-automation/adapter-harness/build` | `read-only` | Build the disabled adapter harness with idempotency, atomic-write, and review-only receipt checks; it never writes request files or calls a broker. |
+| GET | `/api/live-automation/live-pilot-activation-review` | `read-only` | Read the live pilot activation review packet that summarizes orchestrator, preflight, adapter harness, and deployment runbook gates without enabling execution. |
+| POST | `/api/live-automation/live-pilot-activation-review/build` | `read-only` | Build the live pilot activation review packet; it never writes MT5 request files, mutates presets, stores credentials, or calls a broker. |
+| GET | `/api/live-automation/receipt-reconciliation-review` | `read-only` | Read the receipt reconciliation review artifact that matches review-only receipts to planned requests and describes auto-disable rules without side effects. |
+| POST | `/api/live-automation/receipt-reconciliation-review/build` | `read-only` | Build the receipt reconciliation review artifact from the disabled harness or a local receipt JSON; it never writes receipt files, mutates auto-disable state, or calls a broker. |
+| GET | `/api/live-automation/ea-request-reader-review` | `read-only` | Read the EA request reader review artifact that checks source safety markers and upstream review readiness without consuming request files. |
+| POST | `/api/live-automation/ea-request-reader-review/build` | `read-only` | Build the EA request reader review artifact; it inspects source markers, upstream review artifacts, and optional EA runtime status JSON/dashboard evidence, but never reads MT5 request files, writes receipts, mutates presets, or calls a broker. |
+| GET | `/api/live-automation/live-execution-cutover-review` | `read-only` | Read the final live execution cutover review artifact that summarizes all review-only prerequisites before a separate implementation review. |
+| POST | `/api/live-automation/live-execution-cutover-review/build` | `read-only` | Build the final cutover review artifact from orchestrator, activation, receipt, EA reader, preflight, approval, order contract, and disabled harness evidence; it never writes request or receipt files, consumes MT5 requests, mutates presets, or calls a broker. |
+| GET | `/api/live-automation/live-execution-implementation-spec` | `read-only` | Read the live execution implementation spec that splits post-cutover work into separate adapter, EA reader, broker send, receipt, and rollback implementation review contracts. |
+| POST | `/api/live-automation/live-execution-implementation-spec/build` | `read-only` | Build the post-cutover implementation spec; it writes a review artifact only and never writes request files, consumes MT5 requests, writes receipts, mutates presets, or calls a broker. |
+| GET | `/api/live-automation/live-execution-adapter-write-review` | `read-only` | Read the adapter writer review artifact with canonical request serialization, idempotency hashes, and atomic write planning. |
+| POST | `/api/live-automation/live-execution-adapter-write-review/build` | `read-only` | Build the adapter writer review artifact; it embeds serialized request payloads for review but never writes MT5 request files, writes receipts, consumes requests, mutates presets, or calls a broker. |
+| GET | `/api/live-automation/ea-request-consumption-review` | `read-only` | Read the EA request consumption review artifact that aligns adapter writer plans with the EA reader contract and disabled runtime status. |
+| POST | `/api/live-automation/ea-request-consumption-review/build` | `read-only` | Build the EA request consumption review artifact; it creates reject-only consumption plans but never reads request files, writes receipts, consumes requests, mutates presets, or calls a broker. |
+| GET | `/api/live-automation/broker-order-send-review` | `read-only` | Read the broker order send wrapper review artifact that binds reviewed EA consumption plans to account, symbol, risk, and receipt obligations. |
+| POST | `/api/live-automation/broker-order-send-review/build` | `read-only` | Build the broker order send wrapper review artifact; it creates blocked broker-send contract plans but never calls a broker, writes request files, writes receipts, mutates presets, or enables order sending. |
 
 ### mt5-readonly
 
 - Phase / Domain：`phase1`。
-- Endpoint 数量：`11`。
+- Endpoint 数量：`13`。
 
 | Method | Path | Mode | Notes |
 |---|---|---|---|
@@ -117,6 +179,8 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | GET | `/api/mt5-readonly/trades` | `read-only` | Trade markers for chart overlay. |
 | GET | `/api/mt5-readonly/shadow-signals` | `read-only` | Shadow signal markers for chart overlay. |
 | GET | `/api/shadow-signals` | `read-only` | Compatibility alias for shadow signal overlay. |
+| GET | `/api/mt5-readonly-secondary` | `read-only` | Secondary MT5 read-only bridge snapshot alias for the secondary account. |
+| GET | `/api/mt5-readonly-secondary/:endpoint` | `read-only` | Secondary MT5 read-only bridge sub-endpoint wrapper. |
 
 ### ai-analysis-v1
 
@@ -250,7 +314,7 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 ### P3-14 USDJPY 单品种多策略实验室
 
 - Phase / Domain：`unknown`。
-- Endpoint 数量：`113`。
+- Endpoint 数量：`117`。
 
 | Method | Path | Mode | Notes |
 |---|---|---|---|
@@ -298,10 +362,10 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | POST | `/api/usdjpy-strategy-lab/autonomous-agent/run` | `read-only` | 运行 USDJPY 自主治理门；只写受控 patch 和回滚证据，不执行交易。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/decision` | `read-only` | 读取 USDJPY 自主晋级决策。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/patch` | `read-only` | 读取 USDJPY 受控 config patch。 |
-| GET | `/api/usdjpy-strategy-lab/autonomous-agent/lifecycle` | `read-only` | 读取 QuantGod v2.5 三车道自主生命周期，包含 Live Lane、MT5 Shadow Lane、Polymarket Shadow Lane、美分账户、EA 对账摘要和下一阶段任务状态。 |
-| GET | `/api/usdjpy-strategy-lab/autonomous-agent/lanes` | `read-only` | 读取 Live / MT5 Shadow / Polymarket Shadow 三车道摘要；实盘只允许 USDJPY RSI LONG，模拟继续多策略。 |
+| GET | `/api/usdjpy-strategy-lab/autonomous-agent/lifecycle` | `read-only` | 读取 QuantGod v2.5 三车道自主生命周期，包含 Live Lane、MT5 Shadow Lane、HFM Crypto CFD Shadow Lane、美分账户、EA 对账摘要和下一阶段任务状态。 |
+| GET | `/api/usdjpy-strategy-lab/autonomous-agent/lanes` | `read-only` | 读取 Live / MT5 Shadow / HFM Crypto CFD Shadow 三车道摘要；实盘只允许 USDJPY RSI LONG，模拟继续多策略。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/mt5-shadow` | `read-only` | 读取 MT5 多策略模拟车道排名和升降级阶段；shadow 策略不能直接进入实盘路线。 |
-| GET | `/api/usdjpy-strategy-lab/autonomous-agent/polymarket-shadow` | `read-only` | 读取 Polymarket 模拟账本和事件风险车道；只做 shadow / paper context，不连接真实钱包。 |
+| GET | `/api/usdjpy-strategy-lab/autonomous-agent/hfm-crypto-shadow` | `read-only` | 读取 HFM Crypto CFD 品种证据、Moss 回测 profile 和 shadow-only 状态；不连接钱包、不保存 broker 凭证、不下单。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/ea-repro` | `read-only` | 读取 EA source、preset、input 和 ex5 hash 对账证据，帮助确认当前实盘 EA 是否来自受控版本。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2` | `read-only` | 读取 Daily Autopilot 2.0 中文早盘计划、夜盘复盘、三车道今日动作，以及 Strategy JSON GA Trace 状态和 Telegram Gateway 下一阶段任务。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2/status` | `read-only` | 读取 Daily Autopilot 2.0 状态别名，包含下一阶段任务等待状态。 |
@@ -347,13 +411,17 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/telegram-text` | `read-only` | 生成或发送 USDJPY 自主治理中文 Telegram 文案。 |
 | GET | `/api/telegram-gateway` | `read-only` | 读取 P4-5 Telegram Gateway 运维观测状态别名；只做 push-only 队列、去重、限频、ledger 观测。 |
 | GET | `/api/telegram-gateway/status` | `read-only` | 读取 P4-5 Telegram Gateway 运维观测状态，包含队列、待投递、真实发送、抑制、失败和 topic 视图。 |
-| POST | `/api/telegram-gateway/collect` | `push-preview` | 收集 Daily Autopilot、GA、Agent 和 Polymarket 报告进入 push-only Gateway 队列；不接收 Telegram 命令。 |
+| POST | `/api/telegram-gateway/collect` | `push-preview` | 收集 Daily Autopilot、GA、Agent 和 HFM Crypto CFD 报告进入 push-only Gateway 队列；不接收 Telegram 命令。 |
 | GET | `/api/telegram-gateway/telegram-text` | `push-preview` | 生成 Telegram Gateway 运维中文预览；仍只推送，不接 Telegram 命令。 |
 | GET | `/api/usdjpy-strategy-lab/agent-ops-health` | `read-only` | 读取 USDJPY Agent operations health 状态别名；只汇总本地证据与心跳，不执行交易。 |
 | GET | `/api/usdjpy-strategy-lab/agent-ops-health/status` | `read-only` | 读取 USDJPY Agent loop、Evidence OS、Telegram Gateway 和本地 runtime 健康状态。 |
 | GET | `/api/strategy-ga-factory` | `read-only` | 读取 P4-4 Strategy JSON GA Factory 状态别名；只做工厂归档，不执行交易。 |
 | GET | `/api/strategy-ga-factory/status` | `read-only` | 读取 GA Factory state、elite archive、strategy graveyard 和 lineage tree 摘要。 |
-| POST | `/api/strategy-ga-factory/build` | `read-only` | 生成 GA Factory state、elite archive、strategy graveyard、lineage tree 和 ledger；不下单、不改 preset。 |
+| POST | `/api/strategy-ga-factory/build` | `read-only` | 生成 GA Factory state、elite archive、strategy graveyard、lineage tree、reflection report 和 ledger；不下单、不改 preset。 |
+| GET | `/api/strategy-ga-factory/intent-plan` | `read-only` | 读取自然语言 Strategy Factory intent plan；只生成 shadow-only Strategy JSON 和性格锁计划。 |
+| POST | `/api/strategy-ga-factory/intent-plan/build` | `read-only` | 从大白话生成 shadow-only Strategy JSON seed、五维信号计划、30+ 参数和性格锁进化计划；不触发交易。 |
+| GET | `/api/strategy-ga-factory/hyperliquid-shadow` | `read-only` | 读取 Hyperliquid/Moss 只读影子车道状态。 |
+| POST | `/api/strategy-ga-factory/hyperliquid-shadow/build` | `read-only` | 写入 Moss agent 链接和可选本地 profile JSON 到只读 shadow mapping；不授权钱包、不下单。 |
 | GET | `/api/strategy-ga-factory/telegram-text` | `push-preview` | 生成 GA Factory 中文 Telegram 文案；push-only，不接交易命令。 |
 | GET | `/api/ga-factory` | `read-only` | 读取 GA Factory 状态短别名；等同 /api/strategy-ga-factory。 |
 | GET | `/api/ga-factory/status` | `read-only` | 读取 GA Factory 状态短别名；等同 /api/strategy-ga-factory/status。 |
@@ -367,6 +435,17 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | GET | `/api/usdjpy-strategy-lab/strategy-contract/status` | `read-only` | 读取 Strategy JSON → MQL5 EA 只读契约状态、所选 seed、fingerprint 和 EA 回执；只用于 shadow/tester/paper lane 评估。 |
 | POST | `/api/usdjpy-strategy-lab/strategy-contract/build` | `read-only` | 生成 EA 可读取的 Strategy JSON contract 文件；不下单、不改 live preset。 |
 | GET | `/api/usdjpy-strategy-lab/strategy-contract/telegram-text` | `read-only` | 生成 Strategy JSON → EA 只读契约中文摘要；Telegram 仍只推送，不接命令。 |
+
+### P4-6 Production Evidence Validation
+
+- Phase / Domain：`unknown`。
+- Endpoint 数量：`3`。
+
+| Method | Path | Mode | Notes |
+|---|---|---|---|
+| GET | `/api/production-evidence-validation/status` | `read-only` |  |
+| POST | `/api/production-evidence-validation/run` | `read-only` |  |
+| GET | `/api/production-evidence-validation/telegram-text` | `read-only` |  |
 
 ## 更新清单
 

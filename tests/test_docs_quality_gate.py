@@ -44,6 +44,18 @@ class DocsQualityGateTests(unittest.TestCase):
             root = Path(tmp)
             (root / "docs/contracts").mkdir(parents=True)
             endpoints = [{"path": f"/api/example/{idx}"} for idx in range(100)]
+            endpoints.append(
+                {
+                    "path": "/api/hfm-crypto/status",
+                    "queryVariants": [
+                        {
+                            "query": "view=summary",
+                            "description": "Preserves operatorChecklist, brokerSymbolDiagnostics and safety for compact first paint.",
+                        }
+                    ],
+                    "description": "HFM status includes operatorChecklist and brokerSymbolDiagnostics.",
+                }
+            )
             contract = {
                 "endpointGroups": [{"name": "example", "endpoints": endpoints}],
                 "safetyDefaults": {
@@ -60,6 +72,30 @@ class DocsQualityGateTests(unittest.TestCase):
             errors = []
             module.check_api_contract(root, errors)
             self.assertEqual(errors, [])
+
+    def test_api_contract_rejects_missing_hfm_summary_contract(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "docs/contracts").mkdir(parents=True)
+            endpoints = [{"path": f"/api/example/{idx}"} for idx in range(100)]
+            endpoints.append({"path": "/api/hfm-crypto/status"})
+            contract = {
+                "endpointGroups": [{"name": "example", "endpoints": endpoints}],
+                "safetyDefaults": {
+                    "orderSendAllowed": False,
+                    "closeAllowed": False,
+                    "cancelAllowed": False,
+                    "credentialStorageAllowed": False,
+                    "livePresetMutationAllowed": False,
+                    "canOverrideKillSwitch": False,
+                    "telegramCommandExecutionAllowed": False,
+                },
+            }
+            (root / "docs/contracts/api-contract.json").write_text(json.dumps(contract), encoding="utf-8")
+            errors = []
+            module.check_api_contract(root, errors)
+            self.assertTrue(any("status?view=summary" in error for error in errors))
 
     def test_markdown_compression_is_rejected(self):
         module = load_module()

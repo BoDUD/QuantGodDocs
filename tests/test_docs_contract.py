@@ -57,6 +57,31 @@ class DocsContractTests(unittest.TestCase):
         )
         self.assertEqual(errors, [])
 
+    def test_contract_requires_hfm_summary_variant(self) -> None:
+        errors = api_check.check_hfm_summary_contract(
+            {
+                "endpointGroups": [
+                    {
+                        "name": "hfm-crypto-cfd",
+                        "endpoints": [
+                            {
+                                "method": "GET",
+                                "path": "/api/hfm-crypto/status",
+                                "description": "Includes operatorChecklist and brokerSymbolDiagnostics.",
+                                "queryVariants": [
+                                    {
+                                        "query": "view=summary",
+                                        "description": "Preserves operatorChecklist, brokerSymbolDiagnostics and safety.",
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ]
+            }
+        )
+        self.assertEqual(errors, [])
+
     def test_docs_checker_detects_collapsed_python(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

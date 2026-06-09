@@ -42,7 +42,7 @@ telegramWebhookReceiverAllowed=false
 webhookReceiverAllowed=false
 emailDeliveryAllowed=false
 walletIntegrationAllowed=false
-polymarketOrderAllowed=false
+externalMarketOrderAllowed=false
 ```
 
 ## Local setup
@@ -113,7 +113,7 @@ MT5 DeepSeek Telegram advisory fusion
 AI Analysis V2 local multi-agent engine
 Vibe Coding research/backtest
 future journal/outcome summaries
-future Polymarket read-only event context
+future external market read-only event context
 ```
 
 The router prevents each feature from inventing its own API-key handling and safety checks.

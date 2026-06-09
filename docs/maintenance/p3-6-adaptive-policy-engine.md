@@ -46,7 +46,7 @@ python -m unittest discover tests -v
 - Telegram 命令接收；
 - webhook 接收；
 - 邮件投递；
-- 钱包或 Polymarket 下单；
+- 钱包或 外部市场下单；
 - 多用户、计费或积分系统。
 
 ## 运行原则

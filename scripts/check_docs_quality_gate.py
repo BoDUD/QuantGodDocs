@@ -74,7 +74,6 @@ SECRET_PATTERNS = [
     re.compile(r"TELEGRAM_BOT_TOKEN\s*=\s*['\"][^'\"]+['\"]", re.I),
 ]
 
-
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
@@ -176,6 +175,38 @@ def check_api_contract(root: Path, errors: list[str]) -> None:
     invalid = [endpoint for endpoint in endpoints if not endpoint.startswith("/api/")]
     if invalid:
         fail(errors, f"api contract contains non-/api endpoint(s): {invalid[:5]}")
+    hfm_status = None
+    for group in contract.get("endpointGroups", []):
+        if not isinstance(group, dict):
+            continue
+        for endpoint in group.get("endpoints", []):
+            if isinstance(endpoint, dict) and endpoint.get("path") == "/api/hfm-crypto/status":
+                hfm_status = endpoint
+                break
+        if hfm_status:
+            break
+    if not isinstance(hfm_status, dict):
+        fail(errors, "api contract must include /api/hfm-crypto/status")
+    else:
+        variants = hfm_status.get("queryVariants") or []
+        summary = next(
+            (
+                variant
+                for variant in variants
+                if isinstance(variant, dict) and variant.get("query") == "view=summary"
+            ),
+            None,
+        )
+        if not summary:
+            fail(errors, "api contract must document /api/hfm-crypto/status?view=summary")
+        summary_text = json.dumps(summary or {}, ensure_ascii=False)
+        status_text = json.dumps(hfm_status, ensure_ascii=False)
+        if "brokerSymbolDiagnostics" not in status_text or "brokerSymbolDiagnostics" not in summary_text:
+            fail(errors, "HFM summary contract must preserve brokerSymbolDiagnostics")
+        if "operatorChecklist" not in status_text or "operatorChecklist" not in summary_text:
+            fail(errors, "HFM summary contract must preserve operatorChecklist")
+        if "safety" not in summary_text:
+            fail(errors, "HFM summary contract must preserve safety flags")
 
     safety = contract.get("safetyDefaults") or contract.get("safety") or {}
     if not isinstance(safety, dict):

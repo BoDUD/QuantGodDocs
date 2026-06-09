@@ -27,7 +27,7 @@ Safety:
 - no close/cancel/modify action;
 - no live preset mutation;
 - no Telegram command receiver;
-- no Polymarket real-money path;
+- no external market real-money path;
 - GA candidates remain limited to shadow/tester/paper lane evaluation.
 
 Verification:

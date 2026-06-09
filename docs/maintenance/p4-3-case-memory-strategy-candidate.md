@@ -24,7 +24,7 @@ No trading execution was added:
 - no cancel;
 - no live preset mutation;
 - no Telegram command receiver;
-- no Polymarket wallet or real-money path.
+- no external wallet or real-money path.
 
 `PARITY_FAIL` remains a hard blocker. A strategy cannot enter shadow, GA elite, or micro-live promotion evidence while Strategy JSON / Python replay / MQL5 EA parity is failing.
 

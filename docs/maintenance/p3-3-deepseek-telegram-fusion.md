@@ -13,7 +13,7 @@ MT5/HFM runtime evidence
 ```
 
 It replaces the earlier multi-market broker-adapter idea.  It does not introduce
-multi-user accounts, billing, broker execution, Polymarket trading, wallet
+multi-user accounts, billing, broker execution, external market trading, wallet
 integration, webhook receivers, or Telegram command execution.
 
 ## Files owned by this gate
@@ -106,7 +106,7 @@ After this gate, useful single-user improvements are:
 
 ```text
 P3-4 AI journal / outcome scoring
-P3-5 Polymarket read-only context watcher
+P3-5 external market read-only context watcher
 P3-6 Vibe Coding DeepSeek research-only generator
 ```
 

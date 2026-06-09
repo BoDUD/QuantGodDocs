@@ -2,7 +2,7 @@
 
 USDJPY Evidence OS is the first Perfect Edition evidence layer. It connects the Strategy JSON backtest, Python replay, MQL5 EA diagnostics, live execution feedback, Case Memory, and a push-only Telegram Gateway into one auditable chain.
 
-It is still a research and audit plane. It does not send orders, close positions, cancel orders, mutate live presets, connect Polymarket real money, or receive Telegram trading commands.
+It is still a research and audit plane. It does not send orders, close positions, cancel orders, mutate live presets, connect external real-money market access, or receive Telegram trading commands.
 
 ## Evidence Flow
 

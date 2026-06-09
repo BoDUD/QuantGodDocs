@@ -38,7 +38,7 @@ docs/maintenance/v2-5-1-news-gate.md
 
 ## Safety
 
-This change does not add order execution, close, cancel, order modification, Telegram command receiving, Polymarket real-money trading, or live preset mutation.
+This change does not add order execution, close, cancel, order modification, Telegram command receiving, external real-money market trading, or live preset mutation.
 
 Hard guards remain active for runtime freshness, fastlane quality, spread, loss streak, daily loss, symbol/strategy scope, and max lot.
 

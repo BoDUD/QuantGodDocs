@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "project": "QuantGod",
   "generatedFrom": "Phase 1/2/3 design and current backend route surfaces",
-  "lastReviewed": "2026-05-12",
+  "lastReviewed": "2026-05-31",
   "repositories": {
     "backend": "QuantGodBackend",
     "frontend": "QuantGodFrontend",
@@ -168,176 +168,518 @@
       ]
     },
     {
-      "name": "polymarket-research",
+      "name": "hfm-crypto-cfd",
       "phase": "backend-core",
       "endpoints": [
         {
           "method": "GET",
-          "path": "/api/polymarket/history",
+          "path": "/api/hfm-crypto",
           "mode": "read-only",
-          "description": "Polymarket research history."
+          "description": "HFM Crypto CFD shadow lane status alias; scans local MT5/HFM symbol evidence and Moss backtest profile metadata."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/real-trades",
+          "path": "/api/hfm-crypto/status",
           "mode": "read-only",
-          "description": "Polymarket real/canary trades view."
+          "description": "Read HFM Crypto CFD shadow lane status, detected crypto CFD symbols, Moss backtest profile summary, account brokerSymbolDiagnostics, operatorChecklist, blockers, and safety flags. Frontend first paint must use the compact view=summary variant and may pass scope=secondary/live16 to use the HFM Live16 crypto CFD account.",
+          "queryVariants": [
+            {
+              "query": "view=summary",
+              "mode": "compact-read-only",
+              "description": "Preserves status, statusZh, nextRequiredActionZh, operatorChecklist, symbolEvidence.brokerSymbolDiagnostics, blockers, sourceFiles, and safety while omitting bulky review bundles for fast account diagnostics."
+            },
+            {
+              "query": "view=summary&scope=secondary",
+              "mode": "compact-read-only",
+              "description": "Uses the configured secondary/Live16 MT5 Files directory for HFM crypto CFD evidence while preserving the same read-only safety boundary. Aliases include scope=live16 and scope=hfm-live16."
+            }
+          ]
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/radar",
+          "path": "/api/hfm-crypto/symbols",
           "mode": "read-only",
-          "description": "Market radar JSON."
+          "description": "Read detected HFM Crypto CFD symbol evidence from local MT5 Bases roots; no order execution."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/radar-ledger",
-          "mode": "read-only-csv",
-          "description": "Polymarket radar ledger."
-        },
-        {
-          "method": "GET",
-          "path": "/api/polymarket/markets",
+          "path": "/api/hfm-crypto/contract-spec-export",
           "mode": "read-only",
-          "description": "Market search/list."
+          "description": "Read the HFM Crypto CFD contract-spec export that converts MT5 symbol registry data into review input."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/market",
+          "path": "/api/hfm-crypto/execution-spec",
           "mode": "read-only",
-          "description": "Market detail."
+          "description": "Read the HFM Crypto CFD contract-spec review generated from local MT5/HFM broker symbol specs."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/book",
+          "path": "/api/hfm-crypto/simulation-profile",
           "mode": "read-only",
-          "description": "Order book / book snapshot."
+          "description": "Read the HFM Crypto CFD simulation-profile review for ROI, Sharpe, drawdown, trade count, and liquidation evidence."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/asset-opportunities",
+          "path": "/api/hfm-crypto/evidence-kit",
           "mode": "read-only",
-          "description": "Asset opportunity list."
+          "description": "Read the HFM Crypto CFD evidence kit with contract-spec templates and read-only collection commands."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/radar-worker",
+          "path": "/api/hfm-crypto/evidence-bootstrap",
           "mode": "read-only",
-          "description": "Radar worker status."
+          "description": "Read the HFM evidence bootstrap artifact with draft input paths, filled-input validation, and sim-to-live blocker summary."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/radar-worker-ledger",
-          "mode": "read-only-csv",
-          "description": "Radar worker ledger."
-        },
-        {
-          "method": "GET",
-          "path": "/api/polymarket/cross-linkage",
+          "path": "/api/hfm-crypto/mt5-exporter-review",
           "mode": "read-only",
-          "description": "Cross-market linkage output."
+          "description": "Read the MT5 EA exporter review that checks whether the installed QuantGod EA can emit HFM crypto symbol specs."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/cross-market-linkage-ledger",
-          "mode": "read-only-csv",
-          "description": "Cross-market linkage ledger."
-        },
-        {
-          "method": "GET",
-          "path": "/api/polymarket/canary-executor-contract",
+          "path": "/api/hfm-crypto/mt5-upgrade-bundle",
           "mode": "read-only",
-          "description": "Canary executor contract/status."
+          "description": "Read the staged MT5 EA exporter upgrade bundle manifest; it is manual-only and does not mutate MT5 files."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/canary-executor-ledger",
-          "mode": "read-only-csv",
-          "description": "Canary executor ledger."
-        },
-        {
-          "method": "GET",
-          "path": "/api/polymarket/auto-governance",
+          "path": "/api/hfm-crypto/mt5-exporter-deploy-plan",
           "mode": "read-only",
-          "description": "Polymarket auto-governance evidence."
+          "description": "Read the manual MT5 exporter deploy and rollback plan; it describes operator steps only and does not copy files, compile, or mutate MT5."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/auto-governance-ledger",
-          "mode": "read-only-csv",
-          "description": "Polymarket auto-governance ledger."
-        },
-        {
-          "method": "GET",
-          "path": "/api/polymarket/canary-executor-run",
+          "path": "/api/hfm-crypto/standalone-exporter-bundle",
           "mode": "read-only",
-          "description": "Canary executor run output."
+          "description": "Read the standalone read-only HFM crypto symbol-spec exporter bundle for manual MT5 review; it does not select symbols, send orders, or change presets."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/ai-score",
+          "path": "/api/hfm-crypto/mt5-post-upgrade-verify",
           "mode": "read-only",
-          "description": "Polymarket AI score."
+          "description": "Read the post-upgrade verifier that checks installed EA source, compiled ex5, exported HFM crypto specs, and contract-spec review status."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/ai-score-ledger",
-          "mode": "read-only-csv",
-          "description": "Polymarket AI score ledger."
-        },
-        {
-          "method": "GET",
-          "path": "/api/polymarket/canary-exit-ledger",
-          "mode": "read-only-csv",
-          "description": "Canary exit ledger."
-        },
-        {
-          "method": "GET",
-          "path": "/api/polymarket/canary-order-audit-ledger",
-          "mode": "read-only-csv",
-          "description": "Canary order audit ledger."
-        },
-        {
-          "method": "GET",
-          "path": "/api/polymarket/canary-position-ledger",
-          "mode": "read-only-csv",
-          "description": "Canary position ledger."
-        },
-        {
-          "method": "GET",
-          "path": "/api/polymarket/analyze/history",
+          "path": "/api/hfm-crypto/post-upgrade-controller",
           "mode": "read-only",
-          "description": "Single-market analysis history."
+          "description": "Read the HFM post-upgrade controller that coordinates exporter review, manual upgrade bundle, post-upgrade verify, and local contract-spec refresh."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/search",
+          "path": "/api/hfm-crypto/filled-input-validator",
           "mode": "read-only",
-          "description": "Polymarket search endpoint."
+          "description": "Read the HFM review-input validator that checks manual filled specs/profile or passing contract-spec/simulation review artifacts before promotion review."
         },
         {
           "method": "POST",
-          "path": "/api/polymarket/single-market-request",
-          "mode": "research-only",
-          "description": "Queue/request single-market research analysis."
+          "path": "/api/hfm-crypto/build",
+          "mode": "read-only",
+          "description": "Rebuild HFM Crypto CFD shadow state and optional Moss backtest profile mapping; writes local evidence only."
         },
         {
           "method": "POST",
-          "path": "/api/polymarket/analyze",
-          "mode": "research-only",
-          "description": "Compatibility alias for single-market research request."
-        },
-        {
-          "method": "GET",
-          "path": "/api/polymarket/single-market-analysis",
+          "path": "/api/hfm-crypto/contract-spec-export/build",
           "mode": "read-only",
-          "description": "Latest single-market analysis output."
+          "description": "Build a local HFM Crypto CFD contract-spec export from MT5 symbol registry JSON or optional live read-only MT5 registry access."
+        },
+        {
+          "method": "POST",
+          "path": "/api/hfm-crypto/execution-spec/build",
+          "mode": "read-only",
+          "description": "Build the HFM Crypto CFD contract-spec review from a local JSON/CSV export; does not create MT5 order requests."
+        },
+        {
+          "method": "POST",
+          "path": "/api/hfm-crypto/simulation-profile/build",
+          "mode": "read-only",
+          "description": "Build the HFM Crypto CFD simulation-profile review from an explicit local Moss/backtest JSON or auto-discovered saved HFM profile artifact; does not unlock execution."
+        },
+        {
+          "method": "POST",
+          "path": "/api/hfm-crypto/evidence-kit/build",
+          "mode": "read-only",
+          "description": "Write local HFM Crypto CFD evidence-kit JSON/CSV templates; no MT5 mutation or broker call is made."
+        },
+        {
+          "method": "POST",
+          "path": "/api/hfm-crypto/evidence-bootstrap/build",
+          "mode": "read-only",
+          "description": "Write local HFM evidence bootstrap drafts and review artifact summaries without writing filled inputs, MT5 request files, or broker calls."
+        },
+        {
+          "method": "POST",
+          "path": "/api/hfm-crypto/mt5-exporter-review/build",
+          "mode": "read-only",
+          "description": "Build the local MT5 EA exporter review; it does not copy files into MT5, compile an EA, change presets, or send orders."
+        },
+        {
+          "method": "POST",
+          "path": "/api/hfm-crypto/mt5-upgrade-bundle/build",
+          "mode": "read-only",
+          "description": "Stage the reviewed QuantGod EA source and manifest under runtime for manual MT5 upgrade; no installed files are modified."
+        },
+        {
+          "method": "POST",
+          "path": "/api/hfm-crypto/mt5-exporter-deploy-plan/build",
+          "mode": "read-only",
+          "description": "Build the manual MT5 exporter deploy and rollback plan; it writes local review evidence only and does not mutate MT5."
+        },
+        {
+          "method": "POST",
+          "path": "/api/hfm-crypto/standalone-exporter-bundle/build",
+          "mode": "read-only",
+          "description": "Build the standalone read-only HFM crypto symbol-spec exporter bundle for manual review; it writes local review evidence only and cannot send orders."
+        },
+        {
+          "method": "POST",
+          "path": "/api/hfm-crypto/mt5-post-upgrade-verify/build",
+          "mode": "read-only",
+          "description": "Build the post-upgrade verifier and, when specs are present, refresh local contract-spec review artifacts without mutating MT5 or sending orders."
+        },
+        {
+          "method": "POST",
+          "path": "/api/hfm-crypto/post-upgrade-controller/build",
+          "mode": "read-only",
+          "description": "Run the HFM post-upgrade controller; it may write local review artifacts but never copies into MT5, compiles an EA, changes presets, or sends orders."
+        },
+        {
+          "method": "POST",
+          "path": "/api/hfm-crypto/filled-input-validator/build",
+          "mode": "read-only",
+          "description": "Build the HFM review-input validator artifact from manual filled specs/profile or already passing auto review artifacts; it writes review evidence only and cannot create order requests."
+        }
+      ]
+    },
+    {
+      "name": "live-automation-readiness",
+      "phase": "backend-core",
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/live-automation",
+          "mode": "read-only",
+          "description": "Live automation readiness dossier alias; summarizes sim-to-live review status without writing orders."
         },
         {
           "method": "GET",
-          "path": "/api/polymarket/single-market-analysis-ledger",
-          "mode": "read-only-csv",
-          "description": "Single-market analysis ledger."
+          "path": "/api/live-automation/status",
+          "mode": "read-only",
+          "description": "Build a current read-only live automation readiness dossier from USDJPY MT5 gates and HFM crypto shadow evidence; HFM account-no-crypto blockers, accountCryptoAvailability, and operatorChecklist must pass through without enabling execution."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/readiness",
+          "mode": "read-only",
+          "description": "Build a transient live automation readiness view from USDJPY MT5 gates and HFM crypto shadow evidence."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/build",
+          "mode": "read-only",
+          "description": "Write a local readiness dossier for review; must keep orderSendAllowed and live preset mutation disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/review-packet",
+          "mode": "read-only",
+          "description": "Read the local live execution review packet with dry-run order intent specs and blockers."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/review-packet/build",
+          "mode": "read-only",
+          "description": "Write a local live execution review packet; it must not create MT5 order requests, presets, or credentials."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/approval-draft",
+          "mode": "read-only",
+          "description": "Read the local operator approval draft that lists required final-review acknowledgements."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/approval-draft/build",
+          "mode": "read-only",
+          "description": "Write a local operator approval draft; it does not accept secrets or unlock live execution."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/approval-evidence",
+          "mode": "read-only",
+          "description": "Read the local operator approval evidence review; accepted evidence still cannot unlock live execution."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/approval-evidence/build",
+          "mode": "read-only",
+          "description": "Validate a local operator approval JSON against the review packet hash and required acknowledgements without writing orders."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/dry-run-plan",
+          "mode": "read-only",
+          "description": "Read the dry-run live execution plan; it must keep MT5 pending order writes disabled."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/dry-run-plan/build",
+          "mode": "read-only",
+          "description": "Write the dry-run live execution plan for review; no real order files or broker calls are produced."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/execution-lane-spec",
+          "mode": "read-only",
+          "description": "Read the future MT5 execution lane implementation spec; it remains non-executing."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/execution-lane-spec/build",
+          "mode": "read-only",
+          "description": "Write the future execution lane handoff spec after approval evidence and dry-run intents; it still forbids order files and broker calls."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/dry-run-replay",
+          "mode": "read-only",
+          "description": "Read the dry-run intent replay review; replay success still cannot write orders."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/dry-run-replay/build",
+          "mode": "read-only",
+          "description": "Replay approved dry-run intents against the execution lane spec without creating MT5 order files or broker calls."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/runtime-preflight",
+          "mode": "read-only",
+          "description": "Read the runtime preflight probe that checks fresh MT5 dashboard, live-pilot mode, account, symbol, spread, trade permission, and kill switch evidence without writing orders."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/runtime-preflight/build",
+          "mode": "read-only",
+          "description": "Build the runtime preflight probe from approved dry-run replay and live-pilot MT5 dashboard evidence; it still forbids order files and broker calls."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/order-request-contract",
+          "mode": "read-only",
+          "description": "Read the MT5 order request contract that defines future reviewed request and receipt fields without creating request files."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/order-request-contract/build",
+          "mode": "read-only",
+          "description": "Build the MT5 order request contract from runtime preflight evidence; it remains contract-only and cannot write broker request files."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/pipeline",
+          "mode": "read-only",
+          "description": "Read the sim-to-live automation pipeline that summarizes every review stage without enabling execution."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/pipeline/build",
+          "mode": "read-only",
+          "description": "Run the full sim-to-live review pipeline and write local review artifacts; it still cannot write MT5 request files or broker calls."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/adapter-review",
+          "mode": "read-only",
+          "description": "Read the execution adapter review shell that validates future request and receipt contracts without side effects."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/adapter-review/build",
+          "mode": "read-only",
+          "description": "Build the execution adapter review shell from the sim-to-live pipeline and MT5 request contract; no request files or broker calls are produced."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/evidence-intake",
+          "mode": "read-only",
+          "description": "Read the live evidence intake summary for missing HFM crypto files, review artifacts, MT5 dashboard evidence, and safe refresh commands."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/evidence-intake/build",
+          "mode": "read-only",
+          "description": "Build the live evidence intake artifact and optional local review artifacts; it cannot write MT5 request files or make broker calls."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/promotion-candidates",
+          "mode": "read-only",
+          "description": "Read the live promotion candidate selector that ranks simulation-qualified lanes for operator review without enabling execution."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/promotion-candidates/build",
+          "mode": "read-only",
+          "description": "Build the live promotion candidate selector from readiness, evidence intake, review packet, and pipeline artifacts; no order request files or broker calls are produced."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/promotion-controller",
+          "mode": "read-only",
+          "description": "Read the sim-to-live promotion controller that automates operator review packet generation when a lane is simulation-qualified."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/promotion-controller/build",
+          "mode": "read-only",
+          "description": "Build the promotion controller and, when candidates exist, write review packet, approval draft, dry-run plan, and pipeline artifacts without enabling execution."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/adapter-sandbox",
+          "mode": "read-only",
+          "description": "Read the adapter sandbox review bundle that validates future MT5 request and receipt serialization without writing MT5 request files."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/adapter-sandbox/build",
+          "mode": "read-only",
+          "description": "Build a local review-only adapter sandbox bundle with sample request and receipt payloads; it cannot call a broker or write request files."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/adapter-contract-validator",
+          "mode": "read-only",
+          "description": "Read the adapter contract validator artifact that checks future MT5 request JSON against the approved request and receipt contract without side effects."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/adapter-contract-validator/build",
+          "mode": "read-only",
+          "description": "Build the review-only adapter contract validator; it validates request JSON and emits review-only receipts without writing MT5 request files or calling a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/orchestrator",
+          "mode": "read-only",
+          "description": "Read the sim-to-live orchestrator state machine across evidence, promotion, approval, dry-run, preflight, request contract, adapter review gates, and post-adapter live execution review stages."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/orchestrator/build",
+          "mode": "read-only",
+          "description": "Run the full sim-to-live orchestrator and write local review artifacts, including liveExecutionStages for disabled harness, live pilot activation, receipt reconciliation, and EA request reader runtime review; it never writes MT5 request files or calls a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/adapter-harness",
+          "mode": "read-only",
+          "description": "Read the disabled execution adapter harness that plans request and receipt paths for review without writing MT5 Files."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/adapter-harness/build",
+          "mode": "read-only",
+          "description": "Build the disabled adapter harness with idempotency, atomic-write, and review-only receipt checks; it never writes request files or calls a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/live-pilot-activation-review",
+          "mode": "read-only",
+          "description": "Read the live pilot activation review packet that summarizes orchestrator, preflight, adapter harness, and deployment runbook gates without enabling execution."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/live-pilot-activation-review/build",
+          "mode": "read-only",
+          "description": "Build the live pilot activation review packet; it never writes MT5 request files, mutates presets, stores credentials, or calls a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/receipt-reconciliation-review",
+          "mode": "read-only",
+          "description": "Read the receipt reconciliation review artifact that matches review-only receipts to planned requests and describes auto-disable rules without side effects."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/receipt-reconciliation-review/build",
+          "mode": "read-only",
+          "description": "Build the receipt reconciliation review artifact from the disabled harness or a local receipt JSON; it never writes receipt files, mutates auto-disable state, or calls a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/ea-request-reader-review",
+          "mode": "read-only",
+          "description": "Read the EA request reader review artifact that checks source safety markers and upstream review readiness without consuming request files."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/ea-request-reader-review/build",
+          "mode": "read-only",
+          "description": "Build the EA request reader review artifact; it inspects source markers, upstream review artifacts, and optional EA runtime status JSON/dashboard evidence, but never reads MT5 request files, writes receipts, mutates presets, or calls a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/live-execution-cutover-review",
+          "mode": "read-only",
+          "description": "Read the final live execution cutover review artifact that summarizes all review-only prerequisites before a separate implementation review."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/live-execution-cutover-review/build",
+          "mode": "read-only",
+          "description": "Build the final cutover review artifact from orchestrator, activation, receipt, EA reader, preflight, approval, order contract, and disabled harness evidence; it never writes request or receipt files, consumes MT5 requests, mutates presets, or calls a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/live-execution-implementation-spec",
+          "mode": "read-only",
+          "description": "Read the live execution implementation spec that splits post-cutover work into separate adapter, EA reader, broker send, receipt, and rollback implementation review contracts."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/live-execution-implementation-spec/build",
+          "mode": "read-only",
+          "description": "Build the post-cutover implementation spec; it writes a review artifact only and never writes request files, consumes MT5 requests, writes receipts, mutates presets, or calls a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/live-execution-adapter-write-review",
+          "mode": "read-only",
+          "description": "Read the adapter writer review artifact with canonical request serialization, idempotency hashes, and atomic write planning."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/live-execution-adapter-write-review/build",
+          "mode": "read-only",
+          "description": "Build the adapter writer review artifact; it embeds serialized request payloads for review but never writes MT5 request files, writes receipts, consumes requests, mutates presets, or calls a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/ea-request-consumption-review",
+          "mode": "read-only",
+          "description": "Read the EA request consumption review artifact that aligns adapter writer plans with the EA reader contract and disabled runtime status."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/ea-request-consumption-review/build",
+          "mode": "read-only",
+          "description": "Build the EA request consumption review artifact; it creates reject-only consumption plans but never reads request files, writes receipts, consumes requests, mutates presets, or calls a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/broker-order-send-review",
+          "mode": "read-only",
+          "description": "Read the broker order send wrapper review artifact that binds reviewed EA consumption plans to account, symbol, risk, and receipt obligations."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/broker-order-send-review/build",
+          "mode": "read-only",
+          "description": "Build the broker order send wrapper review artifact; it creates blocked broker-send contract plans but never calls a broker, writes request files, writes receipts, mutates presets, or enables order sending."
         }
       ]
     },
@@ -410,6 +752,18 @@
           "path": "/api/shadow-signals",
           "mode": "read-only",
           "description": "Compatibility alias for shadow signal overlay."
+        },
+        {
+          "method": "GET",
+          "path": "/api/mt5-readonly-secondary",
+          "mode": "read-only",
+          "description": "Secondary MT5 read-only bridge snapshot alias for the secondary account."
+        },
+        {
+          "method": "GET",
+          "path": "/api/mt5-readonly-secondary/:endpoint",
+          "mode": "read-only",
+          "description": "Secondary MT5 read-only bridge sub-endpoint wrapper."
         }
       ]
     },
@@ -1789,7 +2143,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/autonomous-agent/lifecycle",
-          "description": "读取 QuantGod v2.5 三车道自主生命周期，包含 Live Lane、MT5 Shadow Lane、Polymarket Shadow Lane、美分账户、EA 对账摘要和下一阶段任务状态。",
+          "description": "读取 QuantGod v2.5 三车道自主生命周期，包含 Live Lane、MT5 Shadow Lane、HFM Crypto CFD Shadow Lane、美分账户、EA 对账摘要和下一阶段任务状态。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -1806,7 +2160,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
           }
@@ -1814,7 +2168,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/autonomous-agent/lanes",
-          "description": "读取 Live / MT5 Shadow / Polymarket Shadow 三车道摘要；实盘只允许 USDJPY RSI LONG，模拟继续多策略。",
+          "description": "读取 Live / MT5 Shadow / HFM Crypto CFD Shadow 三车道摘要；实盘只允许 USDJPY RSI LONG，模拟继续多策略。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -1831,7 +2185,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
           }
@@ -1856,15 +2210,15 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
           }
         },
         {
           "method": "GET",
-          "path": "/api/usdjpy-strategy-lab/autonomous-agent/polymarket-shadow",
-          "description": "读取 Polymarket 模拟账本和事件风险车道；只做 shadow / paper context，不连接真实钱包。",
+          "path": "/api/usdjpy-strategy-lab/autonomous-agent/hfm-crypto-shadow",
+          "description": "读取 HFM Crypto CFD 品种证据、Moss 回测 profile 和 shadow-only 状态；不连接钱包、不保存 broker 凭证、不下单。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -1881,8 +2235,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
           }
@@ -1907,7 +2261,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
           }
@@ -1932,7 +2286,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
           }
@@ -1957,7 +2311,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
           }
@@ -1982,7 +2336,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
           }
@@ -2007,7 +2361,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
           }
@@ -2030,8 +2384,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2054,8 +2408,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2078,8 +2432,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2102,8 +2456,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2126,8 +2480,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2149,7 +2503,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2171,7 +2525,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2193,7 +2547,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2215,7 +2569,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false
           }
         },
@@ -2236,7 +2590,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false
           }
         },
@@ -2257,7 +2611,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false
           }
         },
@@ -2335,7 +2689,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false
           }
         },
@@ -2361,7 +2715,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false
           }
         },
@@ -2387,7 +2741,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false
           }
         },
@@ -2413,7 +2767,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false
           }
         },
@@ -2435,8 +2789,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2459,8 +2813,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2485,8 +2839,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2509,8 +2863,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2533,8 +2887,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2557,8 +2911,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2581,8 +2935,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2605,8 +2959,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2629,8 +2983,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2653,8 +3007,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
-            "polymarketOrderAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
           }
@@ -2681,7 +3035,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false
+            "externalMarketRealMoneyAllowed": false
           }
         },
         {
@@ -2706,7 +3060,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false
+            "externalMarketRealMoneyAllowed": false
           }
         },
         {
@@ -2731,7 +3085,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false
+            "externalMarketRealMoneyAllowed": false
           }
         },
         {
@@ -2756,7 +3110,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false
+            "externalMarketRealMoneyAllowed": false
           }
         },
         {
@@ -2781,7 +3135,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false
+            "externalMarketRealMoneyAllowed": false
           }
         },
         {
@@ -2806,7 +3160,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false
+            "externalMarketRealMoneyAllowed": false
           }
         },
         {
@@ -2831,7 +3185,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false
+            "externalMarketRealMoneyAllowed": false
           }
         },
         {
@@ -2856,7 +3210,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false
+            "externalMarketRealMoneyAllowed": false
           }
         },
         {
@@ -2901,7 +3255,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false
+            "externalMarketRealMoneyAllowed": false
           }
         },
         {
@@ -2922,14 +3276,14 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false
+            "externalMarketRealMoneyAllowed": false
           }
         },
         {
           "method": "POST",
           "path": "/api/telegram-gateway/collect",
           "mode": "push-preview",
-          "description": "收集 Daily Autopilot、GA、Agent 和 Polymarket 报告进入 push-only Gateway 队列；不接收 Telegram 命令。",
+          "description": "收集 Daily Autopilot、GA、Agent 和 HFM Crypto CFD 报告进入 push-only Gateway 队列；不接收 Telegram 命令。",
           "safety": {
             "localOnly": true,
             "readOnlyDataPlane": true,
@@ -2943,7 +3297,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false
+            "externalMarketRealMoneyAllowed": false
           }
         },
         {
@@ -2964,7 +3318,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false
+            "externalMarketRealMoneyAllowed": false
           }
         },
         {
@@ -2985,7 +3339,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false
           }
         },
@@ -3007,7 +3361,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false
           }
         },
@@ -3030,7 +3384,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "gaFactoryDirectLiveAllowed": false,
             "allowedPromotionStages": [
@@ -3060,7 +3414,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "gaFactoryDirectLiveAllowed": false,
             "allowedPromotionStages": [
@@ -3075,7 +3429,7 @@
           "method": "POST",
           "path": "/api/strategy-ga-factory/build",
           "mode": "read-only",
-          "description": "生成 GA Factory state、elite archive、strategy graveyard、lineage tree 和 ledger；不下单、不改 preset。",
+          "description": "生成 GA Factory state、elite archive、strategy graveyard、lineage tree、reflection report 和 ledger；不下单、不改 preset。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -3090,7 +3444,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "gaFactoryDirectLiveAllowed": false,
             "allowedPromotionStages": [
@@ -3099,6 +3453,98 @@
               "TESTER_ONLY",
               "PAPER_LIVE_SIM"
             ]
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/strategy-ga-factory/intent-plan",
+          "mode": "read-only",
+          "description": "读取自然语言 Strategy Factory intent plan；只生成 shadow-only Strategy JSON 和性格锁计划。",
+          "safety": {
+            "localOnly": true,
+            "focusOnly": true,
+            "focusSymbol": "USDJPYc",
+            "readOnlyDataPlane": true,
+            "advisoryOnly": true,
+            "strategyJsonOnly": true,
+            "gaFactoryAuditOnly": true,
+            "plainLanguageFactoryAuditOnly": true,
+            "orderSendAllowed": false,
+            "closeAllowed": false,
+            "cancelAllowed": false,
+            "livePresetMutationAllowed": false,
+            "writesMt5OrderRequest": false,
+            "telegramCommandExecutionAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "liveMutationAllowed": false,
+            "gaFactoryDirectLiveAllowed": false
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/strategy-ga-factory/intent-plan/build",
+          "mode": "read-only",
+          "description": "从大白话生成 shadow-only Strategy JSON seed、五维信号计划、30+ 参数和性格锁进化计划；不触发交易。",
+          "safety": {
+            "localOnly": true,
+            "focusOnly": true,
+            "focusSymbol": "USDJPYc",
+            "readOnlyDataPlane": true,
+            "advisoryOnly": true,
+            "strategyJsonOnly": true,
+            "gaFactoryAuditOnly": true,
+            "plainLanguageFactoryAuditOnly": true,
+            "orderSendAllowed": false,
+            "closeAllowed": false,
+            "cancelAllowed": false,
+            "livePresetMutationAllowed": false,
+            "writesMt5OrderRequest": false,
+            "telegramCommandExecutionAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
+            "liveMutationAllowed": false,
+            "gaFactoryDirectLiveAllowed": false
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/strategy-ga-factory/hyperliquid-shadow",
+          "mode": "read-only",
+          "description": "读取 Hyperliquid/Moss 只读影子车道状态。",
+          "safety": {
+            "localOnly": true,
+            "readOnlyDataPlane": true,
+            "advisoryOnly": true,
+            "shadowTradingOnly": true,
+            "orderSendAllowed": false,
+            "closeAllowed": false,
+            "cancelAllowed": false,
+            "walletAuthorizationAllowed": false,
+            "credentialStorageAllowed": false,
+            "apiTradingAllowed": false,
+            "copyTradeExecutionAllowed": false,
+            "hyperliquidOrderSendAllowed": false,
+            "mossFollowExecutionAllowed": false
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/strategy-ga-factory/hyperliquid-shadow/build",
+          "mode": "read-only",
+          "description": "写入 Moss agent 链接和可选本地 profile JSON 到只读 shadow mapping；不授权钱包、不下单。",
+          "safety": {
+            "localOnly": true,
+            "readOnlyDataPlane": true,
+            "advisoryOnly": true,
+            "shadowTradingOnly": true,
+            "orderSendAllowed": false,
+            "closeAllowed": false,
+            "cancelAllowed": false,
+            "walletAuthorizationAllowed": false,
+            "credentialStorageAllowed": false,
+            "apiTradingAllowed": false,
+            "copyTradeExecutionAllowed": false,
+            "hyperliquidOrderSendAllowed": false,
+            "mossFollowExecutionAllowed": false
           }
         },
         {
@@ -3120,7 +3566,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "gaFactoryDirectLiveAllowed": false,
             "allowedPromotionStages": [
@@ -3150,7 +3596,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "gaFactoryDirectLiveAllowed": false,
             "allowedPromotionStages": [
@@ -3180,7 +3626,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "gaFactoryDirectLiveAllowed": false,
             "allowedPromotionStages": [
@@ -3210,7 +3656,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "gaFactoryDirectLiveAllowed": false,
             "allowedPromotionStages": [
@@ -3240,7 +3686,7 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
-            "polymarketRealMoneyAllowed": false,
+            "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "gaFactoryDirectLiveAllowed": false,
             "allowedPromotionStages": [
@@ -3394,7 +3840,7 @@
         "cancelAllowed": false,
         "livePresetMutationAllowed": false,
         "telegramCommandExecutionAllowed": false,
-        "polymarketRealMoneyAllowed": false
+        "externalMarketRealMoneyAllowed": false
       },
       "endpoints": [
         {
