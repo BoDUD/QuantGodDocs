@@ -129,6 +129,22 @@ class DocsContractTests(unittest.TestCase):
             loaded = api_check.load_contract(path)
             self.assertEqual(api_check.contract_endpoints(loaded), {"/api/x"})
 
+    def test_backend_route_scan_includes_production_evidence_validation(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        backend = root.parent / "QuantGodBackend"
+        paths = api_check.backend_paths(backend)
+
+        self.assertIn("/api/production-evidence-validation/status", paths)
+        self.assertIn("/api/production-evidence-validation/run", paths)
+        self.assertIn("/api/production-evidence-validation/telegram-text", paths)
+
+    def test_ga_factory_alias_children_are_covered_by_base_route(self) -> None:
+        actual = {"/api/ga-factory"}
+
+        self.assertTrue(api_check.path_is_covered_by_alias("/api/ga-factory/status", actual))
+        self.assertTrue(api_check.path_is_covered_by_alias("/api/ga-factory/build", actual))
+        self.assertFalse(api_check.path_is_covered_by_alias("/api/strategy-ga-factory/status", actual))
+
 
 if __name__ == "__main__":
     unittest.main()

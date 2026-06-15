@@ -5,7 +5,7 @@
 
 ## Contract 摘要
 
-- Endpoint 总数：`319`。
+- Endpoint 总数：`380`。
 - Backend API base：`http://127.0.0.1:8080/api`。
 - 任何新增、删除或重命名 `/api/*` route，都必须同步更新 JSON contract、本文档和 Frontend service wrapper。
 
@@ -71,7 +71,7 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | Method | Path | Mode | Notes |
 |---|---|---|---|
 | GET | `/api/hfm-crypto` | `read-only` | HFM Crypto CFD shadow lane status alias; scans local MT5/HFM symbol evidence and Moss backtest profile metadata. |
-| GET | `/api/hfm-crypto/status` | `read-only` | Read HFM Crypto CFD shadow lane status, detected crypto CFD symbols, Moss backtest profile summary, account brokerSymbolDiagnostics, operatorChecklist, blockers, and safety flags. Frontend first paint must use compact `?view=summary`; HFM crypto account routing may pass `scope=secondary` / `scope=live16` to use the configured Live16 MT5 Files directory. Query variants: `?view=summary`: compact account diagnostics; `?view=summary&scope=secondary`: same read-only payload from the HFM Live16 crypto CFD account. |
+| GET | `/api/hfm-crypto/status` | `read-only` | Read HFM Crypto CFD shadow lane status, detected crypto CFD symbols, Moss backtest profile summary, account brokerSymbolDiagnostics, operatorChecklist, blockers, and safety flags. Frontend first paint must use the compact view=summary variant and may pass scope=secondary/live16 to use the HFM Live16 crypto CFD account. Query variants: `?view=summary`: Preserves status, statusZh, nextRequiredActionZh, operatorChecklist, symbolEvidence.brokerSymbolDiagnostics, blockers, sourceFiles, and safety while omitting bulky review bundles for fast account diagnostics.; `?view=summary&scope=secondary`: Uses the configured secondary/Live16 MT5 Files directory for HFM crypto CFD evidence while preserving the same read-only safety boundary. Aliases include scope=live16 and scope=hfm-live16. |
 | GET | `/api/hfm-crypto/symbols` | `read-only` | Read detected HFM Crypto CFD symbol evidence from local MT5 Bases roots; no order execution. |
 | GET | `/api/hfm-crypto/contract-spec-export` | `read-only` | Read the HFM Crypto CFD contract-spec export that converts MT5 symbol registry data into review input. |
 | GET | `/api/hfm-crypto/execution-spec` | `read-only` | Read the HFM Crypto CFD contract-spec review generated from local MT5/HFM broker symbol specs. |
@@ -102,7 +102,7 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 ### live-automation-readiness
 
 - Phase / Domain：`backend-core`。
-- Endpoint 数量：`54`。
+- Endpoint 数量：`108`。
 
 | Method | Path | Mode | Notes |
 |---|---|---|---|
@@ -160,6 +160,60 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | POST | `/api/live-automation/ea-request-consumption-review/build` | `read-only` | Build the EA request consumption review artifact; it creates reject-only consumption plans but never reads request files, writes receipts, consumes requests, mutates presets, or calls a broker. |
 | GET | `/api/live-automation/broker-order-send-review` | `read-only` | Read the broker order send wrapper review artifact that binds reviewed EA consumption plans to account, symbol, risk, and receipt obligations. |
 | POST | `/api/live-automation/broker-order-send-review/build` | `read-only` | Build the broker order send wrapper review artifact; it creates blocked broker-send contract plans but never calls a broker, writes request files, writes receipts, mutates presets, or enables order sending. |
+| GET | `/api/live-automation/champion-promotion-gate` | `read-only` | Read the champion promotion gate review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/champion-tester-forward-request` | `read-only` | Read the champion tester forward request review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/champion-tester-run-gate` | `read-only` | Read the champion tester run gate review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/champion-tester-lock-draft` | `read-only` | Read the champion tester lock draft review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/live-execution-rollback-review` | `read-only` | Read the live execution rollback review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/release-readiness-refresh` | `read-only` | Read the release readiness refresh review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/release-minimal-diff-review` | `read-only` | Read the release minimal diff review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/release-token-evidence-review` | `read-only` | Read the release token evidence review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/release-token-signoff-draft` | `read-only` | Read the release token signoff draft review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/release-token-signoff-input-template` | `read-only` | Read the release token signoff input template review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/release-token-signoff-input-review` | `read-only` | Read the release token signoff input review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/release-token-signoff-handoff` | `read-only` | Read the release token signoff handoff review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/release-token-signoff-evidence-matrix` | `read-only` | Read the release token signoff evidence matrix review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/lane-selector` | `read-only` | Read the lane selector review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/forex-live12-runtime-handoff` | `read-only` | Read the forex live12 runtime handoff review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/forex-live12-capacity-expansion-review` | `read-only` | Read the forex live12 capacity expansion review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/forex-live12-capacity-expansion-roadmap` | `read-only` | Read the forex live12 capacity expansion roadmap review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/forex-live12-micro-expansion-review` | `read-only` | Read the forex live12 micro expansion review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/forex-live12-rsi-repair-plan` | `read-only` | Read the forex live12 RSI repair plan review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/forex-live12-rsi-shadow-candidate` | `read-only` | Read the forex live12 RSI shadow candidate review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/forex-live12-rsi-tester-request` | `read-only` | Read the forex live12 RSI tester request review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/forex-live12-rsi-tester-run-gate` | `read-only` | Read the forex live12 RSI tester run gate review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/forex-live12-rsi-candidate-promotion-gate` | `read-only` | Read the forex live12 RSI candidate promotion gate review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/forex-live12-rsi-tester-lock-draft` | `read-only` | Read the forex live12 RSI tester lock draft review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/sim-target-execution-review-summary` | `read-only` | Read the sim target execution review summary artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/ace-execution-candidate-pack` | `read-only` | Read the ace execution candidate pack review artifact or status; exposes evidence only and must keep execution disabled. |
+| GET | `/api/live-automation/ace-upgrade-action-plan` | `read-only` | Read the ace upgrade action plan review artifact or status; exposes evidence only and must keep execution disabled. |
+| POST | `/api/live-automation/champion-promotion-gate/build` | `read-only` | Build or refresh the champion promotion gate review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/champion-tester-forward-request/build` | `read-only` | Build or refresh the champion tester forward request review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/champion-tester-run-gate/build` | `read-only` | Build or refresh the champion tester run gate review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/champion-tester-lock-draft/build` | `read-only` | Build or refresh the champion tester lock draft review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/live-execution-rollback-review/build` | `read-only` | Build or refresh the live execution rollback review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/release-readiness-refresh/build` | `read-only` | Build or refresh the release readiness refresh review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/release-minimal-diff-review/build` | `read-only` | Build or refresh the release minimal diff review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/release-token-evidence-review/build` | `read-only` | Build or refresh the release token evidence review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/release-token-signoff-draft/build` | `read-only` | Build or refresh the release token signoff draft review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/release-token-signoff-input-template/build` | `read-only` | Build or refresh the release token signoff input template review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/release-token-signoff-input-review/build` | `read-only` | Build or refresh the release token signoff input review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/release-token-signoff-handoff/build` | `read-only` | Build or refresh the release token signoff handoff review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/release-token-signoff-evidence-matrix/build` | `read-only` | Build or refresh the release token signoff evidence matrix review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/lane-selector/build` | `read-only` | Build or refresh the lane selector review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/forex-live12-runtime-handoff/build` | `read-only` | Build or refresh the forex live12 runtime handoff review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/forex-live12-capacity-expansion-review/build` | `read-only` | Build or refresh the forex live12 capacity expansion review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/forex-live12-capacity-expansion-roadmap/build` | `read-only` | Build or refresh the forex live12 capacity expansion roadmap review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/forex-live12-micro-expansion-review/build` | `read-only` | Build or refresh the forex live12 micro expansion review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/forex-live12-rsi-repair-plan/build` | `read-only` | Build or refresh the forex live12 RSI repair plan review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/forex-live12-rsi-shadow-candidate/build` | `read-only` | Build or refresh the forex live12 RSI shadow candidate review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/forex-live12-rsi-tester-request/build` | `read-only` | Build or refresh the forex live12 RSI tester request review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/forex-live12-rsi-tester-run-gate/build` | `read-only` | Build or refresh the forex live12 RSI tester run gate review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/forex-live12-rsi-candidate-promotion-gate/build` | `read-only` | Build or refresh the forex live12 RSI candidate promotion gate review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/forex-live12-rsi-tester-lock-draft/build` | `read-only` | Build or refresh the forex live12 RSI tester lock draft review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/sim-target-execution-review-summary/build` | `read-only` | Build or refresh the sim target execution review summary artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/ace-execution-candidate-pack/build` | `read-only` | Build or refresh the ace execution candidate pack review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
+| POST | `/api/live-automation/ace-upgrade-action-plan/build` | `read-only` | Build or refresh the ace upgrade action plan review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker. |
 
 ### mt5-readonly
 
@@ -439,13 +493,20 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 ### P4-6 Production Evidence Validation
 
 - Phase / Domain：`unknown`。
-- Endpoint 数量：`3`。
+- Endpoint 数量：`10`。
 
 | Method | Path | Mode | Notes |
 |---|---|---|---|
-| GET | `/api/production-evidence-validation/status` | `read-only` |  |
-| POST | `/api/production-evidence-validation/run` | `read-only` |  |
-| GET | `/api/production-evidence-validation/telegram-text` | `read-only` |  |
+| GET | `/api/production-evidence-validation` | `read-only` | Read the production evidence validation status alias across history, parity, execution feedback, and GA stability. |
+| GET | `/api/production-evidence-validation/status` | `read-only` | Read the production evidence validation status across history, parity, execution feedback, and GA stability. |
+| POST | `/api/production-evidence-validation/run` | `review-only-build` | Build local production evidence validation artifacts; review-only and must not write orders, mutate presets, or call a broker. |
+| GET | `/api/production-evidence-validation/burn-in` | `read-only` | Read the production burn-in evidence report without enabling execution. |
+| GET | `/api/production-evidence-validation/burn-in/status` | `read-only` | Read the production burn-in evidence status without enabling execution. |
+| POST | `/api/production-evidence-validation/burn-in/run` | `review-only-build` | Build local burn-in evidence artifacts; review-only and must not write orders, mutate presets, or call a broker. |
+| GET | `/api/production-evidence-validation/rsi-lineage-closure` | `read-only` | Read the guarded RSI lineage closure evidence without enabling execution. |
+| GET | `/api/production-evidence-validation/rsi-lineage-closure/status` | `read-only` | Read the guarded RSI lineage closure status without enabling execution. |
+| POST | `/api/production-evidence-validation/rsi-lineage-closure/run` | `review-only-build` | Build local guarded RSI lineage closure evidence; review-only and must not write orders, mutate presets, or call a broker. |
+| GET | `/api/production-evidence-validation/telegram-text` | `read-only` | Preview production evidence Telegram text; push preview only, no command execution. |
 
 ## 更新清单
 

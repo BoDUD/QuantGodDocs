@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "project": "QuantGod",
   "generatedFrom": "Phase 1/2/3 design and current backend route surfaces",
-  "lastReviewed": "2026-05-31",
+  "lastReviewed": "2026-06-15",
   "repositories": {
     "backend": "QuantGodBackend",
     "frontend": "QuantGodFrontend",
@@ -680,6 +680,330 @@
           "path": "/api/live-automation/broker-order-send-review/build",
           "mode": "read-only",
           "description": "Build the broker order send wrapper review artifact; it creates blocked broker-send contract plans but never calls a broker, writes request files, writes receipts, mutates presets, or enables order sending."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/champion-promotion-gate",
+          "mode": "read-only",
+          "description": "Read the champion promotion gate review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/champion-tester-forward-request",
+          "mode": "read-only",
+          "description": "Read the champion tester forward request review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/champion-tester-run-gate",
+          "mode": "read-only",
+          "description": "Read the champion tester run gate review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/champion-tester-lock-draft",
+          "mode": "read-only",
+          "description": "Read the champion tester lock draft review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/live-execution-rollback-review",
+          "mode": "read-only",
+          "description": "Read the live execution rollback review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/release-readiness-refresh",
+          "mode": "read-only",
+          "description": "Read the release readiness refresh review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/release-minimal-diff-review",
+          "mode": "read-only",
+          "description": "Read the release minimal diff review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/release-token-evidence-review",
+          "mode": "read-only",
+          "description": "Read the release token evidence review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/release-token-signoff-draft",
+          "mode": "read-only",
+          "description": "Read the release token signoff draft review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/release-token-signoff-input-template",
+          "mode": "read-only",
+          "description": "Read the release token signoff input template review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/release-token-signoff-input-review",
+          "mode": "read-only",
+          "description": "Read the release token signoff input review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/release-token-signoff-handoff",
+          "mode": "read-only",
+          "description": "Read the release token signoff handoff review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/release-token-signoff-evidence-matrix",
+          "mode": "read-only",
+          "description": "Read the release token signoff evidence matrix review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/lane-selector",
+          "mode": "read-only",
+          "description": "Read the lane selector review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/forex-live12-runtime-handoff",
+          "mode": "read-only",
+          "description": "Read the forex live12 runtime handoff review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/forex-live12-capacity-expansion-review",
+          "mode": "read-only",
+          "description": "Read the forex live12 capacity expansion review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/forex-live12-capacity-expansion-roadmap",
+          "mode": "read-only",
+          "description": "Read the forex live12 capacity expansion roadmap review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/forex-live12-micro-expansion-review",
+          "mode": "read-only",
+          "description": "Read the forex live12 micro expansion review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/forex-live12-rsi-repair-plan",
+          "mode": "read-only",
+          "description": "Read the forex live12 RSI repair plan review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/forex-live12-rsi-shadow-candidate",
+          "mode": "read-only",
+          "description": "Read the forex live12 RSI shadow candidate review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/forex-live12-rsi-tester-request",
+          "mode": "read-only",
+          "description": "Read the forex live12 RSI tester request review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/forex-live12-rsi-tester-run-gate",
+          "mode": "read-only",
+          "description": "Read the forex live12 RSI tester run gate review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/forex-live12-rsi-candidate-promotion-gate",
+          "mode": "read-only",
+          "description": "Read the forex live12 RSI candidate promotion gate review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/forex-live12-rsi-tester-lock-draft",
+          "mode": "read-only",
+          "description": "Read the forex live12 RSI tester lock draft review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/sim-target-execution-review-summary",
+          "mode": "read-only",
+          "description": "Read the sim target execution review summary artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/ace-execution-candidate-pack",
+          "mode": "read-only",
+          "description": "Read the ace execution candidate pack review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "GET",
+          "path": "/api/live-automation/ace-upgrade-action-plan",
+          "mode": "read-only",
+          "description": "Read the ace upgrade action plan review artifact or status; exposes evidence only and must keep execution disabled."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/champion-promotion-gate/build",
+          "mode": "read-only",
+          "description": "Build or refresh the champion promotion gate review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/champion-tester-forward-request/build",
+          "mode": "read-only",
+          "description": "Build or refresh the champion tester forward request review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/champion-tester-run-gate/build",
+          "mode": "read-only",
+          "description": "Build or refresh the champion tester run gate review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/champion-tester-lock-draft/build",
+          "mode": "read-only",
+          "description": "Build or refresh the champion tester lock draft review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/live-execution-rollback-review/build",
+          "mode": "read-only",
+          "description": "Build or refresh the live execution rollback review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/release-readiness-refresh/build",
+          "mode": "read-only",
+          "description": "Build or refresh the release readiness refresh review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/release-minimal-diff-review/build",
+          "mode": "read-only",
+          "description": "Build or refresh the release minimal diff review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/release-token-evidence-review/build",
+          "mode": "read-only",
+          "description": "Build or refresh the release token evidence review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/release-token-signoff-draft/build",
+          "mode": "read-only",
+          "description": "Build or refresh the release token signoff draft review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/release-token-signoff-input-template/build",
+          "mode": "read-only",
+          "description": "Build or refresh the release token signoff input template review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/release-token-signoff-input-review/build",
+          "mode": "read-only",
+          "description": "Build or refresh the release token signoff input review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/release-token-signoff-handoff/build",
+          "mode": "read-only",
+          "description": "Build or refresh the release token signoff handoff review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/release-token-signoff-evidence-matrix/build",
+          "mode": "read-only",
+          "description": "Build or refresh the release token signoff evidence matrix review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/lane-selector/build",
+          "mode": "read-only",
+          "description": "Build or refresh the lane selector review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/forex-live12-runtime-handoff/build",
+          "mode": "read-only",
+          "description": "Build or refresh the forex live12 runtime handoff review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/forex-live12-capacity-expansion-review/build",
+          "mode": "read-only",
+          "description": "Build or refresh the forex live12 capacity expansion review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/forex-live12-capacity-expansion-roadmap/build",
+          "mode": "read-only",
+          "description": "Build or refresh the forex live12 capacity expansion roadmap review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/forex-live12-micro-expansion-review/build",
+          "mode": "read-only",
+          "description": "Build or refresh the forex live12 micro expansion review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/forex-live12-rsi-repair-plan/build",
+          "mode": "read-only",
+          "description": "Build or refresh the forex live12 RSI repair plan review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/forex-live12-rsi-shadow-candidate/build",
+          "mode": "read-only",
+          "description": "Build or refresh the forex live12 RSI shadow candidate review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/forex-live12-rsi-tester-request/build",
+          "mode": "read-only",
+          "description": "Build or refresh the forex live12 RSI tester request review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/forex-live12-rsi-tester-run-gate/build",
+          "mode": "read-only",
+          "description": "Build or refresh the forex live12 RSI tester run gate review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/forex-live12-rsi-candidate-promotion-gate/build",
+          "mode": "read-only",
+          "description": "Build or refresh the forex live12 RSI candidate promotion gate review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/forex-live12-rsi-tester-lock-draft/build",
+          "mode": "read-only",
+          "description": "Build or refresh the forex live12 RSI tester lock draft review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/sim-target-execution-review-summary/build",
+          "mode": "read-only",
+          "description": "Build or refresh the sim target execution review summary artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/ace-execution-candidate-pack/build",
+          "mode": "read-only",
+          "description": "Build or refresh the ace execution candidate pack review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
+        },
+        {
+          "method": "POST",
+          "path": "/api/live-automation/ace-upgrade-action-plan/build",
+          "mode": "read-only",
+          "description": "Build or refresh the ace upgrade action plan review artifact; review-only and must not write MT5 order requests, mutate presets, store credentials, or call a broker."
         }
       ]
     },
@@ -3845,15 +4169,63 @@
       "endpoints": [
         {
           "method": "GET",
-          "path": "/api/production-evidence-validation/status"
-        },
-        {
-          "method": "POST",
-          "path": "/api/production-evidence-validation/run"
+          "path": "/api/production-evidence-validation",
+          "mode": "read-only",
+          "description": "Read the production evidence validation status alias across history, parity, execution feedback, and GA stability."
         },
         {
           "method": "GET",
-          "path": "/api/production-evidence-validation/telegram-text"
+          "path": "/api/production-evidence-validation/status",
+          "mode": "read-only",
+          "description": "Read the production evidence validation status across history, parity, execution feedback, and GA stability."
+        },
+        {
+          "method": "POST",
+          "path": "/api/production-evidence-validation/run",
+          "mode": "review-only-build",
+          "description": "Build local production evidence validation artifacts; review-only and must not write orders, mutate presets, or call a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/production-evidence-validation/burn-in",
+          "mode": "read-only",
+          "description": "Read the production burn-in evidence report without enabling execution."
+        },
+        {
+          "method": "GET",
+          "path": "/api/production-evidence-validation/burn-in/status",
+          "mode": "read-only",
+          "description": "Read the production burn-in evidence status without enabling execution."
+        },
+        {
+          "method": "POST",
+          "path": "/api/production-evidence-validation/burn-in/run",
+          "mode": "review-only-build",
+          "description": "Build local burn-in evidence artifacts; review-only and must not write orders, mutate presets, or call a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/production-evidence-validation/rsi-lineage-closure",
+          "mode": "read-only",
+          "description": "Read the guarded RSI lineage closure evidence without enabling execution."
+        },
+        {
+          "method": "GET",
+          "path": "/api/production-evidence-validation/rsi-lineage-closure/status",
+          "mode": "read-only",
+          "description": "Read the guarded RSI lineage closure status without enabling execution."
+        },
+        {
+          "method": "POST",
+          "path": "/api/production-evidence-validation/rsi-lineage-closure/run",
+          "mode": "review-only-build",
+          "description": "Build local guarded RSI lineage closure evidence; review-only and must not write orders, mutate presets, or call a broker."
+        },
+        {
+          "method": "GET",
+          "path": "/api/production-evidence-validation/telegram-text",
+          "mode": "read-only",
+          "description": "Preview production evidence Telegram text; push preview only, no command execution."
         }
       ]
     }

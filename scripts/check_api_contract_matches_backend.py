@@ -65,7 +65,12 @@ BACKEND_ROUTE_FILES = [
     "Dashboard/telegram_gateway_ops_api_routes.js",
     "Dashboard/hfm_crypto_cfd_api_routes.js",
     "Dashboard/live_automation_readiness_api_routes.js",
+    "Dashboard/production_evidence_validation_api_routes.js",
 ]
+
+ALIAS_PREFIX_COVERAGE = {
+    "/api/ga-factory/": "/api/ga-factory",
+}
 
 
 def load_contract(path: Path) -> dict:
@@ -216,6 +221,13 @@ def backend_paths(backend_root: Path) -> set[str]:
     return found
 
 
+def path_is_covered_by_alias(path: str, actual: set[str]) -> bool:
+    for prefix, base in ALIAS_PREFIX_COVERAGE.items():
+        if path.startswith(prefix) and base in actual:
+            return True
+    return False
+
+
 def compare_backend_routes(contract: dict, backend_root: Path, strict_extra: bool) -> list[str]:
     documented = contract_endpoints(contract)
     actual = backend_paths(backend_root)
@@ -241,6 +253,8 @@ def compare_backend_routes(contract: dict, backend_root: Path, strict_extra: boo
             if path in actual:
                 continue
             if path in PLACEHOLDER_PATHS:
+                continue
+            if path_is_covered_by_alias(path, actual):
                 continue
             # A literal contract path (e.g. /api/mt5-readonly/account) is covered
             # if the corresponding wildcard (e.g. /api/mt5-readonly/:endpoint) is in
