@@ -23,9 +23,12 @@ runtime/ga_factory/QuantGod_GAStrategyGraveyard.json
 runtime/ga_factory/QuantGod_GALineageTree.json
 runtime/ga_factory/QuantGod_GAFactoryReflectionReport.json
 runtime/ga_factory/QuantGod_GAFactoryLedger.csv
+runtime/ga_factory/QuantGod_GAFactoryArtifactManifest.json
 runtime/ga_factory/QuantGod_StrategyFactoryIntentPlan.json
 runtime/hyperliquid_shadow/QuantGod_HyperliquidShadowLane.json
 ```
+
+The artifact manifest is the audit index for the archive. It keeps workspace-relative paths plus sha256 hashes for the GA Factory state, elite archive, strategy graveyard, lineage tree, reflection report and ledger, so promotion reviews can compare exact files instead of trusting stale absolute paths.
 
 The factory reads from:
 

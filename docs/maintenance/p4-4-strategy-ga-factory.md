@@ -39,8 +39,12 @@ runtime/ga_factory/QuantGod_GAFactoryState.json
 runtime/ga_factory/QuantGod_GAEliteArchive.json
 runtime/ga_factory/QuantGod_GAStrategyGraveyard.json
 runtime/ga_factory/QuantGod_GALineageTree.json
+runtime/ga_factory/QuantGod_GAFactoryReflectionReport.json
 runtime/ga_factory/QuantGod_GAFactoryLedger.csv
+runtime/ga_factory/QuantGod_GAFactoryArtifactManifest.json
 ```
+
+`QuantGod_GAFactoryArtifactManifest.json` is the file-level integrity index for the factory archive. It records schema, schemaVersion, workspace-relative artifact paths, file sizes and sha256 hashes for the state, elite archive, graveyard, lineage tree, reflection report and ledger. Operators should use this manifest when checking that GA Factory evidence has not drifted between build, API readout and downstream promotion review.
 
 ## Safety Boundary
 
