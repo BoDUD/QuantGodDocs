@@ -16,4 +16,6 @@ node --test tests\node\test_production_evidence_validation_guard.mjs
 - `WARN`: the system can continue observing but should not promote weak candidates.
 - `FAIL`: fix parity or evidence blockers before promotion.
 
+History production is strict: M1, M5, M15, and H1 must all pass coverage, density, and latest-bar freshness. If only the SQLite tables exist but `QuantGod_USDJPYHistoryProductionStatus.json` reports stale bars, P4-6 must remain `WARN` and GA/promotion should stay blocked.
+
 P4-6 does not change strategy stages by itself. Daily Autopilot and GA promotion gates may consume the report in later phases.

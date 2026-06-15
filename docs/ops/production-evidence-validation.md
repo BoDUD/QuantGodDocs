@@ -11,6 +11,25 @@ It validates four evidence areas:
 
 This stage is read-only. It does not place orders, close positions, cancel orders, mutate live presets, connect external wallets, or receive Telegram trading commands.
 
+## History Production Gate
+
+The history section is now a strict GA / promotion prerequisite. It requires all core USDJPY timeframes to pass together:
+
+```text
+M1
+M5
+M15
+H1
+```
+
+Each timeframe must satisfy:
+
+- `spanOk`: enough 6-12 month lookback coverage.
+- `densityOk`: enough bars for that timeframe.
+- `freshnessOk`: latest bar lag is within the production threshold.
+
+The report also reads `runtime/backtest/QuantGod_USDJPYHistoryProductionStatus.json`. If that artifact says `historyTargetSatisfied=false`, P4-6 keeps `historyProduction.status=WARN` even when the SQLite tables exist. A common interpretation is: coverage may be good, but the background history sync is stale, so GA and promotion must stay blocked until `sync-klines` refreshes M1/M5/M15/H1.
+
 ## CLI
 
 ```powershell
