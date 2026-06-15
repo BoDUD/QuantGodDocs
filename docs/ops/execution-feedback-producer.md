@@ -7,9 +7,13 @@ It writes:
 ```text
 runtime/execution/QuantGod_LiveExecutionFeedback.jsonl
 runtime/execution/QuantGod_LiveExecutionFeedbackProducerReport.json
+runtime/execution/QuantGod_LiveExecutionFeedbackArtifactManifest.json
 ```
 
 The producer is designed to help P4-8B coverage reporting move from `NO_SAMPLES` toward usable evidence once real or shadow outcomes exist.
+The artifact manifest records each generated evidence file with a runtime-relative
+path, byte size, and `sha256`, so operators can verify the ledger and producer
+report without trusting stale absolute paths.
 
 ## Scope
 
