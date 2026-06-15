@@ -59,6 +59,15 @@ No trading execution was added:
 
 Candidates remain shadow Strategy JSON candidates and GA seed hints. `PARITY_FAIL` remains a hard blocker.
 
+## Artifact Manifest
+
+The Case Memory build writes `runtime/case_memory/QuantGod_CaseMemoryArtifactManifest.json`.
+The manifest schema is `quantgod.case_memory_artifact_manifest.v1`. It records
+`QuantGod_CaseMemoryStrategyCandidates.json` and
+`QuantGod_CaseMemoryStrategyCandidateLedger.jsonl` with runtime-relative paths,
+byte sizes, and `sha256` hashes. This keeps the evidence chain auditable without
+trusting stale machine-specific absolute paths.
+
 ## Validation
 
 Required checks:

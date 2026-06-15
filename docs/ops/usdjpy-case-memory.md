@@ -25,8 +25,14 @@ runtime/evidence_os/QuantGod_CaseMemory.jsonl
 runtime/evidence_os/QuantGod_CaseMemorySummary.json
 runtime/case_memory/QuantGod_CaseMemoryStrategyCandidates.json
 runtime/case_memory/QuantGod_CaseMemoryStrategyCandidateLedger.jsonl
+runtime/case_memory/QuantGod_CaseMemoryArtifactManifest.json
 runtime/strategy-json/candidates/*.json
 ```
+
+`QuantGod_CaseMemoryArtifactManifest.json` records the candidate report and
+candidate ledger with runtime-relative paths, byte sizes, and `sha256` hashes.
+It is an audit manifest only; it does not change candidate scoring or execution
+eligibility.
 
 The P4-7 compatibility layer is exposed through:
 
