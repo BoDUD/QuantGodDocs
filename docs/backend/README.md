@@ -6,6 +6,7 @@ Backend 是 QuantGod 的本地交易研究与受控执行仓库，负责 MT5/HFM
 
 - [API Contract](api-contract.md)
 - [安全边界](safety-boundaries.md)
+- [Runtime Evidence Integrity](../ops/runtime-evidence-integrity.md)
 
 ## Backend 维护原则
 
