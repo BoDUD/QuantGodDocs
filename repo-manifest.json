@@ -14,10 +14,10 @@
     "MQL5 live preset mutations"
   ],
   "linkedRepos": {
-    "backend": "https://github.com/Boowenn/QuantGodBackend",
-    "frontend": "https://github.com/Boowenn/QuantGodFrontend",
-    "infra": "https://github.com/Boowenn/QuantGodInfra",
-    "docs": "https://github.com/Boowenn/QuantGodDocs"
+    "backend": "https://github.com/BoDUD/QuantGodBackend",
+    "frontend": "https://github.com/BoDUD/QuantGodFrontend",
+    "infra": "https://github.com/BoDUD/QuantGodInfra",
+    "docs": "https://github.com/BoDUD/QuantGodDocs"
   },
   "schemaVersion": "1-docs",
   "workspace": "QuantGod",
