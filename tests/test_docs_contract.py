@@ -138,6 +138,29 @@ class DocsContractTests(unittest.TestCase):
         self.assertIn("/api/production-evidence-validation/run", paths)
         self.assertIn("/api/production-evidence-validation/telegram-text", paths)
 
+    def test_backend_paths_prefers_backend_route_registry(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            backend = Path(tmp)
+            (backend / "tools").mkdir()
+            (backend / "Dashboard").mkdir()
+            (backend / "Dashboard" / "dashboard_server.js").write_text(
+                "app.get('/api/from-fallback-scan', handler)",
+                encoding="utf-8",
+            )
+            (backend / "tools" / "api_route_registry.py").write_text(
+                "\n".join(
+                    [
+                        "import json",
+                        'print(json.dumps({"paths": ["/api/from-backend-registry"]}))',
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            paths = api_check.backend_paths(backend)
+
+            self.assertEqual(paths, {"/api/from-backend-registry"})
+
     def test_ga_factory_alias_children_are_covered_by_base_route(self) -> None:
         actual = {"/api/ga-factory"}
 

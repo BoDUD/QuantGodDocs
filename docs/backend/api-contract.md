@@ -7,6 +7,7 @@
 
 - Endpoint 总数：`380`。
 - Backend API base：`http://127.0.0.1:8080/api`。
+- Backend `/api/*` route surface 以 `QuantGodBackend/tools/api_route_registry.py` 输出为准。
 - 任何新增、删除或重命名 `/api/*` route，都必须同步更新 JSON contract、本文档和 Frontend service wrapper。
 
 ## 通用安全语义
@@ -513,10 +514,11 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 Backend route surface 变化时，按下面顺序维护：
 
 1. 先更新 Backend route 和 Node/Python contract tests。
-2. 再更新 `docs/contracts/api-contract.json`。
-3. 运行 `python scripts/render_api_contract_markdown.py` 重新生成本文。
-4. 更新 Frontend service wrapper，确保前端仍只走 `/api/*`。
-5. 运行跨仓库对齐检查：
+2. 运行 `python ../QuantGodBackend/tools/api_route_registry.py --format json` 确认 Backend route registry 已暴露新路由。
+3. 再更新 `docs/contracts/api-contract.json`。
+4. 运行 `python scripts/render_api_contract_markdown.py` 重新生成本文。
+5. 更新 Frontend service wrapper，确保前端仍只走 `/api/*`。
+6. 运行跨仓库对齐检查：
 
 ```powershell
 python scripts\check_api_contract_matches_backend.py `

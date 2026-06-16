@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -206,7 +207,7 @@ def normalize_backend_path(path: str) -> str:
     return clean
 
 
-def backend_paths(backend_root: Path) -> set[str]:
+def scan_backend_route_files(backend_root: Path) -> set[str]:
     found: set[str] = set()
     for rel in BACKEND_ROUTE_FILES:
         path = backend_root / rel
@@ -219,6 +220,45 @@ def backend_paths(backend_root: Path) -> set[str]:
             found.add(raw)
             found.add(normalized)
     return found
+
+
+def backend_route_registry_paths(backend_root: Path) -> set[str] | None:
+    registry_script = backend_root / "tools" / "api_route_registry.py"
+    if not registry_script.exists():
+        return None
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(registry_script),
+            "--backend-root",
+            str(backend_root),
+            "--format",
+            "json",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=15,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            "Backend API route registry failed: "
+            + (result.stderr.strip() or result.stdout.strip() or f"exit {result.returncode}")
+        )
+
+    payload = json.loads(result.stdout)
+    paths = payload.get("paths")
+    if not isinstance(paths, list) or not all(isinstance(path, str) for path in paths):
+        raise ValueError("Backend API route registry must expose a string list at `paths`")
+    return set(paths)
+
+
+def backend_paths(backend_root: Path) -> set[str]:
+    registry_paths = backend_route_registry_paths(backend_root)
+    if registry_paths is not None:
+        return registry_paths
+    return scan_backend_route_files(backend_root)
 
 
 def path_is_covered_by_alias(path: str, actual: set[str]) -> bool:
