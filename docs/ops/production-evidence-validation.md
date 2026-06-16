@@ -53,6 +53,25 @@ Each timeframe must satisfy:
 
 The report also reads `runtime/backtest/QuantGod_USDJPYHistoryProductionStatus.json`. If that artifact says `historyTargetSatisfied=false`, P4-6 keeps `historyProduction.status=WARN` even when the SQLite tables exist. A common interpretation is: coverage may be good, but the background history sync is stale, so GA and promotion must stay blocked until `sync-klines` refreshes M1/M5/M15/H1.
 
+P4-6 now exposes a per-timeframe recovery queue so stale history does not appear as a vague blocker:
+
+```text
+historyProduction.staleTimeframes
+historyProduction.freshnessRecoveryQueue
+historyProduction.nextRecoveryActionZh
+```
+
+Each `freshnessRecoveryQueue` row includes the timeframe, priority, current lag, max allowed lag, source artifacts, a `sync-klines` refresh command, a `production-status` verify command, acceptance criteria, allowed lanes, and forbidden side effects. Treat this queue as an evidence recovery plan only. It may refresh local SQLite/backtest artifacts, but it must not place orders, close positions, mutate live presets, write MT5 order request/receipt files, authorize wallets, or bypass `orderSendAllowed=false`.
+
+When coverage and density are already true but freshness is stale, the expected recovery path is:
+
+```bash
+python3 tools/run_usdjpy_strategy_backtest.py --runtime-dir ./runtime sync-klines --months 12 --timeframes M1,M5,M15,H1
+python3 tools/run_usdjpy_strategy_backtest.py --runtime-dir ./runtime production-status --months 12 --max-latest-lag-hours 96
+```
+
+Only after all queue rows show `spanOk=true`, `densityOk=true`, `freshnessOk=true`, `passed=true`, and `historyTargetSatisfied=true` can history stop blocking GA or champion promotion.
+
 ## Case Memory Coverage Gate
 
 Case Memory promotion evidence is separate from core file integrity. A manifest can pass schema and hash checks while the promotion gate still blocks because the learning set is too narrow.

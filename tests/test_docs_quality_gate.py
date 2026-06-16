@@ -183,6 +183,23 @@ class DocsQualityGateTests(unittest.TestCase):
         self.assertIn("Do not satisfy these gaps by editing live presets", case_memory)
         self.assertIn("They must not place orders", production)
 
+    def test_history_freshness_recovery_queue_is_documented(self):
+        production = (ROOT / "docs/ops/production-evidence-validation.md").read_text(encoding="utf-8")
+
+        for marker in [
+            "historyProduction.staleTimeframes",
+            "historyProduction.freshnessRecoveryQueue",
+            "historyProduction.nextRecoveryActionZh",
+            "sync-klines --months 12 --timeframes M1,M5,M15,H1",
+            "production-status --months 12 --max-latest-lag-hours 96",
+            "freshnessOk=true",
+            "historyTargetSatisfied=true",
+            "orderSendAllowed=false",
+        ]:
+            self.assertIn(marker, production)
+
+        self.assertIn("must not place orders", production)
+
 
 if __name__ == "__main__":
     unittest.main()
