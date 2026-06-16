@@ -8,6 +8,7 @@ structured documentation hub before the project advances to the next roadmap ite
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
@@ -217,6 +218,37 @@ def check_api_contract(root: Path, errors: list[str]) -> None:
             fail(errors, f"api contract safety default must be false: {field}")
 
 
+def render_api_contract_markdown(contract: dict) -> str:
+    renderer_path = Path(__file__).resolve().parent / "render_api_contract_markdown.py"
+    spec = importlib.util.spec_from_file_location("render_api_contract_markdown", renderer_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load API contract markdown renderer: {renderer_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.render(contract)
+
+
+def check_api_contract_markdown_sync(root: Path, errors: list[str]) -> None:
+    contract_path = root / "docs/contracts/api-contract.json"
+    markdown_path = root / "docs/backend/api-contract.md"
+    if not contract_path.exists() or not markdown_path.exists():
+        return
+    try:
+        contract = json.loads(read_text(contract_path))
+        expected = render_api_contract_markdown(contract)
+    except Exception as exc:  # pragma: no cover - surfaced as quality-gate failure
+        fail(errors, f"api contract markdown render failed: {exc}")
+        return
+
+    actual = read_text(markdown_path)
+    if actual != expected:
+        fail(
+            errors,
+            "docs/backend/api-contract.md is not synchronized with "
+            "docs/contracts/api-contract.json; run scripts/render_api_contract_markdown.py",
+        )
+
+
 def check_phase_docs(root: Path, errors: list[str]) -> None:
     expected_terms = {
         "docs/phases/phase1.md": ["AI", "K", "CI"],
@@ -247,6 +279,7 @@ def main() -> int:
     check_markdown_readability(root, errors)
     check_all_markdown_basic(root, errors)
     check_api_contract(root, errors)
+    check_api_contract_markdown_sync(root, errors)
     check_phase_docs(root, errors)
 
     if errors:

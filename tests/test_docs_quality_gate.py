@@ -97,6 +97,56 @@ class DocsQualityGateTests(unittest.TestCase):
             module.check_api_contract(root, errors)
             self.assertTrue(any("status?view=summary" in error for error in errors))
 
+    def test_api_contract_markdown_sync_accepts_rendered_markdown(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "docs/contracts").mkdir(parents=True)
+            (root / "docs/backend").mkdir(parents=True)
+            contract = {
+                "backendApiBaseUrl": "http://127.0.0.1:8080/api",
+                "safetyDefaults": {"orderSendAllowed": False},
+                "endpointGroups": [
+                    {
+                        "name": "core",
+                        "phase": "backend",
+                        "endpoints": [{"method": "GET", "path": "/api/latest", "mode": "read-only"}],
+                    }
+                ],
+            }
+            (root / "docs/contracts/api-contract.json").write_text(json.dumps(contract), encoding="utf-8")
+            (root / "docs/backend/api-contract.md").write_text(
+                module.render_api_contract_markdown(contract),
+                encoding="utf-8",
+            )
+
+            errors = []
+            module.check_api_contract_markdown_sync(root, errors)
+
+            self.assertEqual(errors, [])
+
+    def test_api_contract_markdown_sync_rejects_stale_markdown(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "docs/contracts").mkdir(parents=True)
+            (root / "docs/backend").mkdir(parents=True)
+            contract = {
+                "endpointGroups": [
+                    {
+                        "name": "core",
+                        "endpoints": [{"method": "GET", "path": "/api/latest"}],
+                    }
+                ],
+            }
+            (root / "docs/contracts/api-contract.json").write_text(json.dumps(contract), encoding="utf-8")
+            (root / "docs/backend/api-contract.md").write_text("# Stale API contract\n", encoding="utf-8")
+
+            errors = []
+            module.check_api_contract_markdown_sync(root, errors)
+
+            self.assertTrue(any("api-contract.md is not synchronized" in error for error in errors))
+
     def test_markdown_compression_is_rejected(self):
         module = load_module()
         with tempfile.TemporaryDirectory() as tmp:
