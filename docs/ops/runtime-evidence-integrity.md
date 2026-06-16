@@ -36,6 +36,37 @@ The output is an audit artifact only. It does not write MT5 order requests, muta
 - `case_memory/QuantGod_CaseMemoryArtifactManifest.json`
 - `production_validation/QuantGod_ProductionEvidenceValidationReport.json`
 
+## Promotion Recovery Queue
+
+The manifest separates file integrity from promotion readiness. A run can have
+`status=PASS` while `promotionGateStatus=BLOCKED` when the runtime files are
+present and hashed, but history freshness or Case Memory taxonomy coverage is
+not good enough for GA/champion promotion review.
+
+When that happens, read:
+
+```text
+promotionBlockers
+promotionRecoveryQueueCount
+promotionRecoveryQueue
+```
+
+`promotionRecoveryQueue` is the operator-facing repair plan consumed by the
+dashboard. It merges:
+
+- history freshness rows for `M1`, `M5`, `M15`, and `H1`, including the
+  `sync-klines` refresh command, `production-status` verify command, lag, and
+  acceptance criteria;
+- Case Memory missing-category rows, including the taxonomy category, source
+  artifacts, collection endpoint, target sample count, and acceptance criteria;
+- a missing candidate-report row when the Case Memory candidate report cannot
+  be read.
+
+Every row is evidence-only. Allowed lanes remain `READ_ONLY_RESEARCH`,
+`SHADOW`, and `TESTER_ONLY`; forbidden side effects include order sending,
+position closing, live preset mutation, MT5 request/receipt writes, and wallet
+authorization.
+
 ## Safety Invariant
 
 The manifest safety block must keep every execution flag false:
@@ -49,4 +80,3 @@ The manifest safety block must keep every execution flag false:
 - `walletIntegrationAllowed`
 
 Use this guard as evidence quality input. It is not proof that live trading should start.
-
