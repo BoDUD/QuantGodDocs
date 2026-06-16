@@ -497,8 +497,8 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 
 | Method | Path | Mode | Notes |
 |---|---|---|---|
-| GET | `/api/production-evidence-validation` | `read-only` | Read the production evidence validation status alias across history, parity, execution feedback, and GA stability. |
-| GET | `/api/production-evidence-validation/status` | `read-only` | Read the production evidence validation status across history, parity, execution feedback, and GA stability. |
+| GET | `/api/production-evidence-validation` | `read-only` | Read the production evidence validation status alias across core runtime evidence integrity, history, parity, execution feedback, and GA stability. |
+| GET | `/api/production-evidence-validation/status` | `read-only` | Read the production evidence validation status across core runtime evidence integrity, history, parity, execution feedback, and GA stability. |
 | POST | `/api/production-evidence-validation/run` | `review-only-build` | Build local production evidence validation artifacts; review-only and must not write orders, mutate presets, or call a broker. |
 | GET | `/api/production-evidence-validation/burn-in` | `read-only` | Read the production burn-in evidence report without enabling execution. |
 | GET | `/api/production-evidence-validation/burn-in/status` | `read-only` | Read the production burn-in evidence status without enabling execution. |

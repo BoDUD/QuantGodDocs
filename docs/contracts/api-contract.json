@@ -4154,7 +4154,7 @@
     {
       "id": "p4-6-production-evidence-validation",
       "name": "P4-6 Production Evidence Validation",
-      "description": "Read-only production evidence validation across USDJPY history, parity, execution feedback, and GA stability.",
+      "description": "Read-only production evidence validation across core runtime evidence integrity, USDJPY history, parity, execution feedback, and GA stability.",
       "safetyDefaults": {
         "localOnly": true,
         "readOnlyDataPlane": true,
@@ -4171,13 +4171,13 @@
           "method": "GET",
           "path": "/api/production-evidence-validation",
           "mode": "read-only",
-          "description": "Read the production evidence validation status alias across history, parity, execution feedback, and GA stability."
+          "description": "Read the production evidence validation status alias across core runtime evidence integrity, history, parity, execution feedback, and GA stability."
         },
         {
           "method": "GET",
           "path": "/api/production-evidence-validation/status",
           "mode": "read-only",
-          "description": "Read the production evidence validation status across history, parity, execution feedback, and GA stability."
+          "description": "Read the production evidence validation status across core runtime evidence integrity, history, parity, execution feedback, and GA stability."
         },
         {
           "method": "POST",
