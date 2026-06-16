@@ -159,6 +159,8 @@ This keeps P3-2.1 inside the same advisory-only and push-only boundary as P3-2.
 
 If the status command reports `missing_runtime_snapshot`, confirm the EA is writing one of the supported file names into `QG_RUNTIME_DIR`.
 
+If `/api/mt5-readonly/snapshot` reports `MISSING_EA_SNAPSHOT`, the frontend has enough evidence to stop showing a vague waiting state. Restore the matching HFM/MT5 terminal and EA dashboard writer, confirm `QuantGod_Dashboard.json` exists in `QG_RUNTIME_DIR` / `QG_MT5_FILES_DIR`, then refresh until `_freshness.status` becomes `FRESH_EA_SNAPSHOT`.
+
 If it reports `stale_runtime_snapshot`, confirm MT5/HFM is running and the EA is updating `generatedAt` or `current_price.timeIso`.
 
 If Telegram still shows `mt5_python_unavailable`, run the snapshot command. If the snapshot command returns `fallback: true`, the AI monitor is correctly refusing missing or stale runtime evidence and falling back to its existing safe path.
