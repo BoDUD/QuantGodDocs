@@ -71,6 +71,56 @@ GET  /api/case-memory/telegram-text
 
 The frontend uses `src/services/caseMemoryApi.js` and the Evolution workspace panel. It does not read runtime files directly.
 
+## Coverage Plan
+
+`/api/case-memory/status` exposes `coveragePlan` so the operator can see exactly why Case Memory still blocks GA or champion promotion. The gate is not satisfied by a raw case count alone; it requires coverage across the taxonomy that can explain bad entries, missed opportunities, early exits, spread or news damage, and GA overfit.
+
+Important fields:
+
+```text
+coveragePlan.status
+coveragePlan.missingCategories
+coveragePlan.missingRows
+coveragePlan.nextCollectionQueue
+coveragePlan.targetSampleCount
+coveragePlan.observedSampleCount
+coveragePlan.remainingTargetSampleCount
+```
+
+`missingRows` is the table-friendly view. Each row includes:
+
+```text
+category
+observedCount
+targetCount
+remainingCount
+priority
+sourceArtifacts
+collectionEndpoint
+nextActionZh
+acceptanceZh
+```
+
+`nextCollectionQueue` is the operator work queue sorted by priority and remaining evidence. It should be read as an evidence collection plan, not as a trading instruction. Current high-priority examples are:
+
+- `BAD_ENTRY`: collect entry-context feedback or bar-replay samples where MAE expands quickly, MFE stays weak, or a reverse signal appears after entry.
+- `GA_OVERFIT`: collect GA candidates that look good in train but fail walk-forward, forward, or champion retest.
+- `MISSED_OPPORTUNITY`: collect shadow signals that were blocked by spread, session, news, or cooldown and then moved profitably.
+- `EARLY_EXIT`: collect exits where price continues favorably after close, with MFE giveback and profit-capture ratio.
+- `NEWS_DAMAGE`: collect news-window loss or missed-opportunity replay cases with the gate decision and later market impact.
+
+Allowed collection endpoints are read-only or tester/shadow evidence surfaces such as:
+
+```text
+/api/usdjpy-strategy-lab/evidence-os/execution-feedback
+/api/usdjpy-strategy-lab/ga/blockers
+/api/usdjpy-strategy-lab/bar-replay/entry
+/api/usdjpy-strategy-lab/bar-replay/exit
+/api/usdjpy-strategy-lab/bar-replay/status
+```
+
+Do not satisfy these gaps by editing live presets, forcing entries, writing MT5 order request files, or enabling live execution. The right fix is to collect better replay, shadow, tester, and execution-feedback evidence until the required categories and sample targets are met.
+
 ## Safety
 
 - No order send.

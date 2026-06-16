@@ -157,6 +157,32 @@ class DocsQualityGateTests(unittest.TestCase):
             module.check_markdown_readability(root, errors)
             self.assertTrue(any("too short" in error for error in errors))
 
+    def test_case_memory_coverage_queue_is_documented(self):
+        case_memory = (ROOT / "docs/ops/usdjpy-case-memory.md").read_text(encoding="utf-8")
+        production = (ROOT / "docs/ops/production-evidence-validation.md").read_text(encoding="utf-8")
+        combined = f"{case_memory}\n{production}"
+
+        for marker in [
+            "coveragePlan.nextCollectionQueue",
+            "coveragePlan.missingRows",
+            "caseMemoryCoverage.nextCollectionQueue",
+            "caseMemoryCoverage.missingRows",
+            "targetSampleCount",
+            "remainingTargetSampleCount",
+            "/api/usdjpy-strategy-lab/evidence-os/execution-feedback",
+            "/api/usdjpy-strategy-lab/bar-replay/entry",
+            "BAD_ENTRY",
+            "MISSED_OPPORTUNITY",
+            "EARLY_EXIT",
+            "NEWS_DAMAGE",
+            "GA_OVERFIT",
+            "orderSendAllowed=false",
+        ]:
+            self.assertIn(marker, combined)
+
+        self.assertIn("Do not satisfy these gaps by editing live presets", case_memory)
+        self.assertIn("They must not place orders", production)
+
 
 if __name__ == "__main__":
     unittest.main()
