@@ -2,14 +2,35 @@
 
 P4-6 verifies whether the current QuantGod production evidence is strong enough to trust the autonomous USDJPY workflow.
 
-It validates four evidence areas:
+It validates five evidence areas:
 
-1. USDJPY historical data production status.
-2. Strategy JSON / Python / EA parity coverage by strategy family.
-3. Live and shadow execution feedback field coverage.
-4. GA multi-generation stability evidence.
+1. Core runtime evidence integrity.
+2. USDJPY historical data production status.
+3. Strategy JSON / Python / EA parity coverage by strategy family.
+4. Live and shadow execution feedback field coverage.
+5. GA multi-generation stability evidence.
 
 This stage is read-only. It does not place orders, close positions, cancel orders, mutate live presets, connect external wallets, or receive Telegram trading commands.
+
+## Core Runtime Evidence Integrity
+
+The first section now embeds the core evidence manifest produced by `runtime_evidence_integrity`.
+It hashes and schema-checks the files that downstream promotion relies on:
+
+```text
+runtime/live/QuantGod_USDJPYLiveLoopStatus.json
+runtime/live/QuantGod_USDJPYLiveLoopLedger.csv
+runtime/agent/QuantGod_ProductionExecutionPolicy.json
+runtime/adaptive/QuantGod_AutoExecutionPolicy.json
+runtime/adaptive/QuantGod_AutoExecutionPolicyLedger.csv
+runtime/ga_factory/QuantGod_GAFactoryArtifactManifest.json
+runtime/execution/QuantGod_LiveExecutionQualityReport.json
+runtime/execution/QuantGod_LiveExecutionFeedback.jsonl
+runtime/case_memory/QuantGod_CaseMemoryArtifactManifest.json
+runtime/production_validation/QuantGod_ProductionEvidenceValidationReport.json
+```
+
+If any required file is missing, declares the wrong schema, lacks artifact hashes, or still contains a legacy `/Users/.../Quard/QuantGod/...` absolute path, the production evidence report becomes `FAIL`. This keeps stale or split-brain runtime evidence from entering GA, case memory, or promotion review.
 
 ## History Production Gate
 
@@ -52,6 +73,7 @@ runtime/production_validation/QuantGod_ProductionEvidenceValidationReport.json
 runtime/production_validation/QuantGod_StrategyFamilyParityMatrix.json
 runtime/production_validation/QuantGod_LiveExecutionFeedbackCoverage.json
 runtime/production_validation/QuantGod_GAMultiGenerationStabilityReport.json
+runtime/integrity/QuantGod_CoreRuntimeEvidenceManifest.json
 ```
 
 ## Strategy Family Parity Matrix
