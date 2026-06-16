@@ -52,6 +52,18 @@ REQUIRED_ENDPOINT_GROUPS = {
     "phase3-vibe-ai-kline",
 }
 
+ALLOWED_ENDPOINT_MODES = {
+    "advisory",
+    "guarded-control",
+    "local-advisory-control",
+    "push-only",
+    "push-preview",
+    "read-only",
+    "read-only-csv",
+    "research-only",
+    "review-only-build",
+}
+
 BACKEND_ROUTE_FILES = [
     "Dashboard/phase1_api_routes.js",
     "Dashboard/phase2_api_routes.js",
@@ -173,6 +185,26 @@ def check_hfm_summary_contract(contract: dict) -> list[str]:
         errors.append("HFM summary contract must preserve operatorChecklist")
     if "safety" not in summary_text:
         errors.append("HFM summary contract must preserve safety flags")
+    return errors
+
+
+def check_endpoint_modes(contract: dict) -> list[str]:
+    errors: list[str] = []
+    for group in endpoint_groups(contract):
+        group_name = group.get("name") if isinstance(group, dict) else "unknown"
+        for endpoint in group.get("endpoints", []):
+            if not isinstance(endpoint, dict):
+                continue
+            path = endpoint.get("path")
+            mode = endpoint.get("mode")
+            if not isinstance(mode, str) or not mode.strip():
+                errors.append(f"{group_name}:{path}: endpoint mode is required")
+                continue
+            if mode not in ALLOWED_ENDPOINT_MODES:
+                errors.append(
+                    f"{group_name}:{path}: invalid endpoint mode {mode!r}; "
+                    f"expected one of {sorted(ALLOWED_ENDPOINT_MODES)}"
+                )
     return errors
 
 
@@ -327,6 +359,7 @@ def validate_contract(contract: dict, min_endpoints: int = 100) -> list[str]:
 
     errors.extend(check_required_groups(contract))
     errors.extend(check_safety(contract))
+    errors.extend(check_endpoint_modes(contract))
     errors.extend(check_hfm_summary_contract(contract))
     return errors
 

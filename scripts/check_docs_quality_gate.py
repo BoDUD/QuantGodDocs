@@ -68,6 +68,18 @@ EXECUTION_FALSE_FIELDS = [
     "telegramCommandExecutionAllowed",
 ]
 
+ALLOWED_ENDPOINT_MODES = {
+    "advisory",
+    "guarded-control",
+    "local-advisory-control",
+    "push-only",
+    "push-preview",
+    "read-only",
+    "read-only-csv",
+    "research-only",
+    "review-only-build",
+}
+
 SECRET_PATTERNS = [
     re.compile(r"ghp_[A-Za-z0-9_]{20,}"),
     re.compile(r"xox[baprs]-[A-Za-z0-9-]{20,}"),
@@ -176,6 +188,25 @@ def check_api_contract(root: Path, errors: list[str]) -> None:
     invalid = [endpoint for endpoint in endpoints if not endpoint.startswith("/api/")]
     if invalid:
         fail(errors, f"api contract contains non-/api endpoint(s): {invalid[:5]}")
+    missing_modes: list[str] = []
+    invalid_modes: list[str] = []
+    for group in contract.get("endpointGroups", []):
+        if not isinstance(group, dict):
+            continue
+        group_name = group.get("name", "unknown")
+        for endpoint in group.get("endpoints", []):
+            if not isinstance(endpoint, dict):
+                continue
+            mode = endpoint.get("mode")
+            label = f"{group_name}:{endpoint.get('path')}"
+            if not isinstance(mode, str) or not mode.strip():
+                missing_modes.append(label)
+            elif mode not in ALLOWED_ENDPOINT_MODES:
+                invalid_modes.append(f"{label}={mode}")
+    if missing_modes:
+        fail(errors, f"api contract endpoint mode missing: {missing_modes[:8]}")
+    if invalid_modes:
+        fail(errors, f"api contract endpoint mode invalid: {invalid_modes[:8]}")
     hfm_status = None
     for group in contract.get("endpointGroups", []):
         if not isinstance(group, dict):

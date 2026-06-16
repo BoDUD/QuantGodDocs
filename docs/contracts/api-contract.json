@@ -1632,7 +1632,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -1648,7 +1649,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -1664,7 +1666,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -1680,7 +1683,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -1696,7 +1700,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "push-preview"
         },
         {
           "method": "POST",
@@ -1712,7 +1717,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -1728,7 +1734,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -1744,7 +1751,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -1760,7 +1768,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -1776,7 +1785,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -1792,7 +1802,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -1808,7 +1819,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -1824,7 +1836,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -1840,7 +1853,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -1856,7 +1870,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -1876,7 +1891,8 @@
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": true,
             "shadowTradingOnly": true
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -1896,7 +1912,8 @@
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": true,
             "shadowTradingOnly": true
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -1916,7 +1933,8 @@
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": false,
             "shadowTradingOnly": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -1936,7 +1954,8 @@
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": false,
             "shadowTradingOnly": false
-          }
+          },
+          "mode": "local-advisory-control"
         },
         {
           "method": "GET",
@@ -1956,7 +1975,8 @@
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": false,
             "shadowTradingOnly": false
-          }
+          },
+          "mode": "push-preview"
         },
         {
           "method": "GET",
@@ -1976,7 +1996,8 @@
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": true,
             "shadowTradingOnly": true
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -1996,7 +2017,8 @@
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": true,
             "shadowTradingOnly": true
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -2016,7 +2038,8 @@
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": true,
             "shadowTradingOnly": true
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -2036,7 +2059,8 @@
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": true,
             "shadowTradingOnly": true
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2056,7 +2080,8 @@
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": true,
             "shadowTradingOnly": true
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2076,7 +2101,8 @@
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": true,
             "shadowTradingOnly": true
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2096,7 +2122,8 @@
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": true,
             "shadowTradingOnly": true
-          }
+          },
+          "mode": "push-preview"
         },
         {
           "method": "GET",
@@ -2117,7 +2144,8 @@
             "dryRunOnly": true,
             "shadowTradingOnly": true,
             "posteriorMayAffectTrigger": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2138,7 +2166,8 @@
             "dryRunOnly": true,
             "shadowTradingOnly": true,
             "posteriorMayAffectTrigger": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -2159,7 +2188,8 @@
             "dryRunOnly": true,
             "shadowTradingOnly": true,
             "posteriorMayAffectTrigger": false
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -2180,7 +2210,8 @@
             "dryRunOnly": true,
             "shadowTradingOnly": true,
             "posteriorMayAffectTrigger": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2201,7 +2232,8 @@
             "dryRunOnly": true,
             "shadowTradingOnly": true,
             "posteriorMayAffectTrigger": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2222,7 +2254,8 @@
             "dryRunOnly": true,
             "shadowTradingOnly": true,
             "posteriorMayAffectTrigger": false
-          }
+          },
+          "mode": "push-preview"
         },
         {
           "method": "GET",
@@ -2242,7 +2275,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2262,7 +2296,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -2282,7 +2317,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -2302,7 +2338,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2322,7 +2359,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2342,7 +2380,8 @@
             "livePresetMutationAllowed": false,
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "push-preview"
         },
         {
           "method": "GET",
@@ -2366,7 +2405,8 @@
             "liveMutationAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2390,7 +2430,8 @@
             "liveMutationAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -2414,7 +2455,8 @@
             "liveMutationAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -2438,7 +2480,8 @@
             "liveMutationAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2462,7 +2505,8 @@
             "liveMutationAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2487,7 +2531,8 @@
             "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2512,7 +2557,8 @@
             "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2537,7 +2583,8 @@
             "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2563,7 +2610,8 @@
             "externalMarketOrderAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2588,7 +2636,8 @@
             "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2613,7 +2662,8 @@
             "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2638,7 +2688,8 @@
             "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -2663,7 +2714,8 @@
             "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -2688,7 +2740,8 @@
             "externalMarketRealMoneyAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "push-preview"
         },
         {
           "method": "GET",
@@ -2712,7 +2765,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2736,7 +2790,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -2760,7 +2815,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "POST",
@@ -2784,7 +2840,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -2808,7 +2865,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "push-preview"
         },
         {
           "method": "POST",
@@ -2830,7 +2888,8 @@
             "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -2852,7 +2911,8 @@
             "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2874,7 +2934,8 @@
             "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2895,7 +2956,8 @@
             "telegramCommandExecutionAllowed": false,
             "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2916,7 +2978,8 @@
             "telegramCommandExecutionAllowed": false,
             "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -2937,7 +3000,8 @@
             "telegramCommandExecutionAllowed": false,
             "externalMarketRealMoneyAllowed": false,
             "liveMutationAllowed": false
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -2950,7 +3014,8 @@
             "orderSendAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2963,7 +3028,8 @@
             "orderSendAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2976,7 +3042,8 @@
             "orderSendAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -2989,7 +3056,8 @@
             "orderSendAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "push-preview"
         },
         {
           "method": "GET",
@@ -3117,7 +3185,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -3141,7 +3210,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -3167,7 +3237,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -3191,7 +3262,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -3215,7 +3287,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -3239,7 +3312,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -3263,7 +3337,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -3287,7 +3362,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -3311,7 +3387,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -3335,7 +3412,8 @@
             "externalMarketOrderAllowed": false,
             "liveMutationAllowed": false,
             "autoApplyAllowed": "shadow_tester_only"
-          }
+          },
+          "mode": "push-preview"
         },
         {
           "method": "GET",
@@ -3360,7 +3438,8 @@
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
             "externalMarketRealMoneyAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -3385,7 +3464,8 @@
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
             "externalMarketRealMoneyAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -3410,7 +3490,8 @@
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
             "externalMarketRealMoneyAllowed": false
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -3435,7 +3516,8 @@
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
             "externalMarketRealMoneyAllowed": false
-          }
+          },
+          "mode": "push-preview"
         },
         {
           "method": "GET",
@@ -3460,7 +3542,8 @@
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
             "externalMarketRealMoneyAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -3485,7 +3568,8 @@
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
             "externalMarketRealMoneyAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -3510,7 +3594,8 @@
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
             "externalMarketRealMoneyAllowed": false
-          }
+          },
+          "mode": "research-only"
         },
         {
           "method": "GET",
@@ -3535,7 +3620,8 @@
             "writesMt5OrderRequest": false,
             "telegramCommandExecutionAllowed": false,
             "externalMarketRealMoneyAllowed": false
-          }
+          },
+          "mode": "push-preview"
         },
         {
           "method": "GET",
@@ -3559,7 +3645,8 @@
             "liveMutationAllowed": false,
             "completedByAgent": true,
             "autoAppliedByAgent": false
-          }
+          },
+          "mode": "push-preview"
         },
         {
           "method": "GET",
@@ -4035,7 +4122,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -4051,7 +4139,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "push-only"
         },
         {
           "method": "POST",
@@ -4067,7 +4156,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "push-only"
         },
         {
           "method": "GET",
@@ -4083,7 +4173,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -4099,7 +4190,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "GET",
@@ -4115,7 +4207,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "read-only"
         },
         {
           "method": "POST",
@@ -4131,7 +4224,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "review-only-build"
         },
         {
           "method": "GET",
@@ -4147,7 +4241,8 @@
             "cancelAllowed": false,
             "livePresetMutationAllowed": false,
             "telegramCommandExecutionAllowed": false
-          }
+          },
+          "mode": "push-preview"
         }
       ]
     },

@@ -57,6 +57,39 @@ class DocsContractTests(unittest.TestCase):
         )
         self.assertEqual(errors, [])
 
+    def test_endpoint_modes_are_required_and_limited(self) -> None:
+        valid = {
+            "endpointGroups": [
+                {
+                    "name": "core",
+                    "endpoints": [
+                        {"method": "GET", "path": "/api/latest", "mode": "read-only"},
+                        {"method": "POST", "path": "/api/run", "mode": "research-only"},
+                    ],
+                }
+            ]
+        }
+        self.assertEqual(api_check.check_endpoint_modes(valid), [])
+
+        missing = {
+            "endpointGroups": [
+                {"name": "core", "endpoints": [{"method": "GET", "path": "/api/latest"}]}
+            ]
+        }
+        self.assertTrue(any("mode is required" in error for error in api_check.check_endpoint_modes(missing)))
+
+        invalid = {
+            "endpointGroups": [
+                {
+                    "name": "core",
+                    "endpoints": [
+                        {"method": "GET", "path": "/api/latest", "mode": "maybe-live"}
+                    ],
+                }
+            ]
+        }
+        self.assertTrue(any("invalid endpoint mode" in error for error in api_check.check_endpoint_modes(invalid)))
+
     def test_contract_requires_hfm_summary_variant(self) -> None:
         errors = api_check.check_hfm_summary_contract(
             {
