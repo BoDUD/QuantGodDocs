@@ -37,3 +37,9 @@ Vue component 只调用 service function，不直接写 raw fetch。这样做可
 3. Docs 重新生成 `docs/backend/api-contract.md`。
 4. Frontend service wrapper 消费新 endpoint。
 5. Frontend CI 运行 contract guard。
+
+在本地四仓 workspace 中，Frontend 的 `npm run contract` 会自动读取相邻
+`../QuantGodDocs/docs/contracts/api-contract.json`。任何前端源码中静态引用到的
+`/api/*` 路径，如果没有被 Docs contract 的精确路径或 `:endpoint` / `:id`
+等 placeholder 覆盖，guard 必须失败。这样可以防止前端先接入未登记端点，导致
+API 合同和操作台显示继续漂移。
