@@ -5,27 +5,9 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import subprocess
 import sys
 from pathlib import Path
-
-PATH_RE = re.compile(r"/api/[A-Za-z0-9_./:-]+")
-
-PLACEHOLDER_PATHS = {
-    "/api/ai-analysis/history/:id",
-    "/api/ai-analysis-v2/history/:id",
-    "/api/vibe-coding/strategy/:id",
-    "/api/usdjpy-strategy-lab/ga/candidate/:seedId",
-    "/api/paramlab/auto-tester/:action",
-    "/api/mt5-platform/:endpoint",
-    "/api/mt5-trading/:endpoint",
-    "/api/mt5/order/:ticket",
-    "/api/mt5-readonly/:endpoint",
-    "/api/mt5-readonly-secondary/:endpoint",
-    "/api/mt5-symbol-registry/:endpoint",
-    "/api/mt5/:endpoint",
-}
 
 REQUIRED_SAFETY_FALSE_KEYS = [
     "orderSendAllowed",
@@ -62,27 +44,6 @@ ALLOWED_ENDPOINT_MODES = {
     "read-only-csv",
     "research-only",
     "review-only-build",
-}
-
-BACKEND_ROUTE_FILES = [
-    "Dashboard/phase1_api_routes.js",
-    "Dashboard/phase2_api_routes.js",
-    "Dashboard/phase3_api_routes.js",
-    "Dashboard/state_api_routes.js",
-    "Dashboard/dashboard_server.js",
-    "Dashboard/automation_chain_api_routes.js",
-    "Dashboard/usdjpy_strategy_lab_api_routes.js",
-    "Dashboard/case_memory_api_routes.js",
-    "Dashboard/strategy_ga_factory_api_routes.js",
-    "Dashboard/ga_factory_api_routes.js",
-    "Dashboard/telegram_gateway_ops_api_routes.js",
-    "Dashboard/hfm_crypto_cfd_api_routes.js",
-    "Dashboard/live_automation_readiness_api_routes.js",
-    "Dashboard/production_evidence_validation_api_routes.js",
-]
-
-ALIAS_PREFIX_COVERAGE = {
-    "/api/ga-factory/": "/api/ga-factory",
 }
 
 
@@ -208,56 +169,12 @@ def check_endpoint_modes(contract: dict) -> list[str]:
     return errors
 
 
-def normalize_backend_path(path: str) -> str:
-    clean = path.rstrip("/") or path
-
-    if clean.startswith("/api/ai-analysis/history/"):
-        return "/api/ai-analysis/history/:id"
-    if clean.startswith("/api/ai-analysis-v2/history/"):
-        return "/api/ai-analysis-v2/history/:id"
-    if clean.startswith("/api/vibe-coding/strategy/"):
-        return "/api/vibe-coding/strategy/:id"
-    if clean.startswith("/api/usdjpy-strategy-lab/ga/candidate/"):
-        return "/api/usdjpy-strategy-lab/ga/candidate/:seedId"
-    if clean.startswith("/api/paramlab/auto-tester/"):
-        return "/api/paramlab/auto-tester/:action"
-    if clean.startswith("/api/mt5-platform/"):
-        return "/api/mt5-platform/:endpoint"
-    if clean.startswith("/api/mt5-trading/"):
-        return "/api/mt5-trading/:endpoint"
-    if clean.startswith("/api/mt5/order/"):
-        return "/api/mt5/order/:ticket"
-    if clean.startswith("/api/mt5-readonly/"):
-        return "/api/mt5-readonly/:endpoint"
-    if clean.startswith("/api/mt5-readonly-secondary/"):
-        return "/api/mt5-readonly-secondary/:endpoint"
-    if clean.startswith("/api/mt5-symbol-registry/"):
-        return "/api/mt5-symbol-registry/:endpoint"
-    if clean.startswith("/api/mt5/"):
-        return "/api/mt5/:endpoint"
-
-    return clean
-
-
-def scan_backend_route_files(backend_root: Path) -> set[str]:
-    found: set[str] = set()
-    for rel in BACKEND_ROUTE_FILES:
-        path = backend_root / rel
-        if not path.exists():
-            continue
-        text = path.read_text(encoding="utf-8", errors="ignore")
-        for match in PATH_RE.finditer(text):
-            raw = match.group(0).rstrip("/") or match.group(0)
-            normalized = normalize_backend_path(raw)
-            found.add(raw)
-            found.add(normalized)
-    return found
-
-
-def backend_route_registry_paths(backend_root: Path) -> set[str] | None:
+def backend_route_registry(backend_root: Path) -> dict:
     registry_script = backend_root / "tools" / "api_route_registry.py"
     if not registry_script.exists():
-        return None
+        raise FileNotFoundError(
+            f"Backend API route registry is required for strict contract checks: {registry_script}"
+        )
 
     result = subprocess.run(
         [
@@ -280,40 +197,75 @@ def backend_route_registry_paths(backend_root: Path) -> set[str] | None:
         )
 
     payload = json.loads(result.stdout)
+    if payload.get("schema") != "quantgod.backend_api_route_registry.v1":
+        raise ValueError("Backend API route registry schema must be quantgod.backend_api_route_registry.v1")
     paths = payload.get("paths")
     if not isinstance(paths, list) or not all(isinstance(path, str) for path in paths):
         raise ValueError("Backend API route registry must expose a string list at `paths`")
-    return set(paths)
+    placeholder_paths = payload.get("placeholderPaths")
+    if not isinstance(placeholder_paths, list) or not all(
+        isinstance(path, str) for path in placeholder_paths
+    ):
+        raise ValueError("Backend API route registry must expose placeholderPaths")
+    alias_prefix_coverage = payload.get("aliasPrefixCoverage")
+    if not isinstance(alias_prefix_coverage, dict) or not all(
+        isinstance(prefix, str) and isinstance(base, str)
+        for prefix, base in alias_prefix_coverage.items()
+    ):
+        raise ValueError("Backend API route registry must expose aliasPrefixCoverage")
+    return payload
+
+
+def backend_route_registry_paths(backend_root: Path) -> set[str]:
+    return set(backend_route_registry(backend_root)["paths"])
 
 
 def backend_paths(backend_root: Path) -> set[str]:
-    registry_paths = backend_route_registry_paths(backend_root)
-    if registry_paths is not None:
-        return registry_paths
-    return scan_backend_route_files(backend_root)
+    return backend_route_registry_paths(backend_root)
 
 
-def path_is_covered_by_alias(path: str, actual: set[str]) -> bool:
-    for prefix, base in ALIAS_PREFIX_COVERAGE.items():
+def path_is_covered_by_alias(
+    path: str,
+    actual: set[str],
+    alias_prefix_coverage: dict[str, str],
+) -> bool:
+    for prefix, base in alias_prefix_coverage.items():
         if path.startswith(prefix) and base in actual:
             return True
     return False
 
 
+def placeholder_prefix(placeholder: str) -> str:
+    for token in (":endpoint", ":id", ":ticket", ":action", ":seedId"):
+        if token in placeholder:
+            return placeholder.split(token, 1)[0]
+    return ""
+
+
+def path_is_covered_by_placeholder(path: str, placeholders: set[str]) -> bool:
+    for placeholder in placeholders:
+        prefix = placeholder_prefix(placeholder)
+        if prefix and path.startswith(prefix):
+            return True
+    return False
+
+
+def path_is_documented(path: str, documented: set[str], placeholder_paths: set[str]) -> bool:
+    if path in documented:
+        return True
+    documented_placeholders = documented & placeholder_paths
+    return path_is_covered_by_placeholder(path, documented_placeholders)
+
+
 def compare_backend_routes(contract: dict, backend_root: Path, strict_extra: bool) -> list[str]:
     documented = contract_endpoints(contract)
-    actual = backend_paths(backend_root)
+    registry = backend_route_registry(backend_root)
+    actual = set(registry["paths"])
+    placeholder_paths = set(registry["placeholderPaths"])
+    alias_prefix_coverage = dict(registry["aliasPrefixCoverage"])
     errors: list[str] = []
 
-    # For the "missing from contract" check, skip backend paths whose normalized form
-    # is a known wildcard placeholder. Raw literal paths (e.g. /api/mt5-readonly/kline)
-    # are expected to be covered by wildcard placeholders (e.g. /api/mt5-readonly/:endpoint).
-    missing = sorted(
-        path for path in actual
-        if path not in documented
-        and path not in PLACEHOLDER_PATHS
-        and normalize_backend_path(path) not in PLACEHOLDER_PATHS
-    )
+    missing = sorted(path for path in actual if not path_is_documented(path, documented, placeholder_paths))
     if missing:
         errors.append(
             "backend route(s) missing from docs contract: " + ", ".join(missing[:50])
@@ -324,19 +276,14 @@ def compare_backend_routes(contract: dict, backend_root: Path, strict_extra: boo
         for path in sorted(documented):
             if path in actual:
                 continue
-            if path in PLACEHOLDER_PATHS:
+            if path in placeholder_paths:
                 continue
-            if path_is_covered_by_alias(path, actual):
+            if path_is_covered_by_alias(path, actual, alias_prefix_coverage):
                 continue
             # A literal contract path (e.g. /api/mt5-readonly/account) is covered
             # if the corresponding wildcard (e.g. /api/mt5-readonly/:endpoint) is in
             # the observed backend paths.
-            covered_by_wildcard = any(
-                wildcard in actual
-                for wildcard in PLACEHOLDER_PATHS
-                if path.startswith(wildcard.replace(":endpoint", "").replace(":id", "").replace(":ticket", "").replace(":action", ""))
-            )
-            if not covered_by_wildcard:
+            if not path_is_covered_by_placeholder(path, actual & placeholder_paths):
                 extra_contract_paths.append(path)
         if extra_contract_paths:
             errors.append(
@@ -390,7 +337,10 @@ def main(argv: list[str] | None = None) -> int:
     errors = validate_contract(contract, min_endpoints=args.min_endpoints)
 
     if args.backend:
-        errors.extend(compare_backend_routes(contract, Path(args.backend).resolve(), args.strict_extra))
+        try:
+            errors.extend(compare_backend_routes(contract, Path(args.backend).resolve(), args.strict_extra))
+        except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
+            errors.append(str(exc))
 
     if errors:
         print("QuantGod API contract check failed:")

@@ -171,7 +171,19 @@ class DocsContractTests(unittest.TestCase):
         self.assertIn("/api/production-evidence-validation/run", paths)
         self.assertIn("/api/production-evidence-validation/telegram-text", paths)
 
-    def test_backend_paths_prefers_backend_route_registry(self) -> None:
+    def test_backend_paths_requires_backend_route_registry(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            backend = Path(tmp)
+            (backend / "Dashboard").mkdir()
+            (backend / "Dashboard" / "dashboard_server.js").write_text(
+                "app.get('/api/from-fallback-scan', handler)",
+                encoding="utf-8",
+            )
+
+            with self.assertRaises(FileNotFoundError):
+                api_check.backend_paths(backend)
+
+    def test_backend_paths_uses_backend_route_registry_as_single_source(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             backend = Path(tmp)
             (backend / "tools").mkdir()
@@ -184,7 +196,12 @@ class DocsContractTests(unittest.TestCase):
                 "\n".join(
                     [
                         "import json",
-                        'print(json.dumps({"paths": ["/api/from-backend-registry"]}))',
+                        "print(json.dumps({",
+                        '  "schema": "quantgod.backend_api_route_registry.v1",',
+                        '  "paths": ["/api/from-backend-registry"],',
+                        '  "placeholderPaths": [],',
+                        '  "aliasPrefixCoverage": {}',
+                        "}))",
                     ]
                 ),
                 encoding="utf-8",
@@ -196,10 +213,48 @@ class DocsContractTests(unittest.TestCase):
 
     def test_ga_factory_alias_children_are_covered_by_base_route(self) -> None:
         actual = {"/api/ga-factory"}
+        alias_prefix_coverage = {"/api/ga-factory/": "/api/ga-factory"}
 
-        self.assertTrue(api_check.path_is_covered_by_alias("/api/ga-factory/status", actual))
-        self.assertTrue(api_check.path_is_covered_by_alias("/api/ga-factory/build", actual))
-        self.assertFalse(api_check.path_is_covered_by_alias("/api/strategy-ga-factory/status", actual))
+        self.assertTrue(
+            api_check.path_is_covered_by_alias(
+                "/api/ga-factory/status",
+                actual,
+                alias_prefix_coverage,
+            )
+        )
+        self.assertTrue(
+            api_check.path_is_covered_by_alias(
+                "/api/ga-factory/build",
+                actual,
+                alias_prefix_coverage,
+            )
+        )
+        self.assertFalse(
+            api_check.path_is_covered_by_alias(
+                "/api/strategy-ga-factory/status",
+                actual,
+                alias_prefix_coverage,
+            )
+        )
+
+    def test_dynamic_backend_routes_require_documented_placeholder(self) -> None:
+        documented = {"/api/mt5-readonly/:endpoint"}
+        placeholder_paths = {"/api/mt5-readonly/:endpoint"}
+
+        self.assertTrue(
+            api_check.path_is_documented(
+                "/api/mt5-readonly/account",
+                documented,
+                placeholder_paths,
+            )
+        )
+        self.assertFalse(
+            api_check.path_is_documented(
+                "/api/mt5-readonly/account",
+                set(),
+                placeholder_paths,
+            )
+        )
 
 
 if __name__ == "__main__":
