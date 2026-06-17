@@ -99,9 +99,9 @@ NEWS_DAMAGE
 GA_OVERFIT
 ```
 
-`missingRows` is the audit table used by the frontend. It includes the required sample target, remaining count, priority, source artifacts, collection endpoint, next action, and acceptance criteria for each missing category.
+`missingRows` is the audit table used by the frontend. It includes the required sample target, remaining count, priority, source artifacts, collection endpoint, safe evidence collection command, Case Memory rebuild command, verify command, next action, and acceptance criteria for each missing category.
 
-`nextCollectionQueue` is the actionable queue for evidence collection. It may point to execution-feedback, GA blocker, or bar-replay endpoints, but those endpoints remain read-only, shadow, tester, or replay-only. They must not place orders, close positions, cancel orders, mutate live presets, write MT5 request or receipt files, authorize wallets, or bypass `orderSendAllowed=false`.
+`nextCollectionQueue` is the actionable queue for evidence collection. It may point to execution-feedback, GA blocker, or bar-replay endpoints and commands such as `run_usdjpy_bar_replay.py`, `run_live_execution_feedback.py`, `run_case_memory.py`, and `run_runtime_evidence_integrity.py`; those paths remain read-only, shadow, tester, or replay-only. They must not place orders, close positions, cancel orders, mutate live presets, write MT5 request or receipt files, authorize wallets, or bypass `orderSendAllowed=false`.
 
 When both history freshness and Case Memory coverage are blocked, fix them independently:
 

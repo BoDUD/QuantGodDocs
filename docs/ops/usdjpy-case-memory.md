@@ -97,9 +97,14 @@ remainingCount
 priority
 sourceArtifacts
 collectionEndpoint
+collectionCommand
+caseMemoryBuildCommand
+verifyCommand
 nextActionZh
 acceptanceZh
 ```
+
+`collectionCommand` refreshes the upstream read-only/shadow/tester evidence for that category. `caseMemoryBuildCommand` rebuilds the Case Memory candidate report from those artifacts. `verifyCommand` reruns the core runtime evidence integrity gate. These commands may write local evidence reports, but they are not trading instructions.
 
 `nextCollectionQueue` is the operator work queue sorted by priority and remaining evidence. It should be read as an evidence collection plan, not as a trading instruction. Current high-priority examples are:
 
