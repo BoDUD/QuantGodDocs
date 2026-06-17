@@ -5,7 +5,7 @@
 
 ## Contract 摘要
 
-- Endpoint 总数：`380`。
+- Endpoint 总数：`383`。
 - Backend API base：`http://127.0.0.1:8080/api`。
 - Backend `/api/*` route surface 以 `QuantGodBackend/tools/api_route_registry.py` 输出为准。
 - 任何新增、删除或重命名 `/api/*` route，都必须同步更新 JSON contract、本文档和 Frontend service wrapper。
@@ -99,6 +99,17 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | POST | `/api/hfm-crypto/mt5-post-upgrade-verify/build` | `read-only` | Build the post-upgrade verifier and, when specs are present, refresh local contract-spec review artifacts without mutating MT5 or sending orders. |
 | POST | `/api/hfm-crypto/post-upgrade-controller/build` | `read-only` | Run the HFM post-upgrade controller; it may write local review artifacts but never copies into MT5, compiles an EA, changes presets, or sends orders. |
 | POST | `/api/hfm-crypto/filled-input-validator/build` | `read-only` | Build the HFM review-input validator artifact from manual filled specs/profile or already passing auto review artifacts; it writes review evidence only and cannot create order requests. |
+
+### profit-target-tracker
+
+- Phase / Domain：`backend-core`。
+- Endpoint 数量：`3`。
+
+| Method | Path | Mode | Notes |
+|---|---|---|---|
+| GET | `/api/profit-target` | `local-advisory-control` | Profit target tracker status alias; may refresh local runtime evidence but cannot place, close, cancel, or modify orders. |
+| GET | `/api/profit-target/status` | `local-advisory-control` | Refresh and read the combined forex/HFM crypto profit-target tracker for review; it writes local evidence only and preserves all execution safety flags. |
+| POST | `/api/profit-target/build` | `local-advisory-control` | Build the local profit-target tracker report for review; no MT5 order files, broker calls, wallet authorization, or live preset changes are allowed. |
 
 ### live-automation-readiness
 

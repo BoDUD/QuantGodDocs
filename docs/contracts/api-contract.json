@@ -354,6 +354,30 @@
       ]
     },
     {
+      "name": "profit-target-tracker",
+      "phase": "backend-core",
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/profit-target",
+          "mode": "local-advisory-control",
+          "description": "Profit target tracker status alias; may refresh local runtime evidence but cannot place, close, cancel, or modify orders."
+        },
+        {
+          "method": "GET",
+          "path": "/api/profit-target/status",
+          "mode": "local-advisory-control",
+          "description": "Refresh and read the combined forex/HFM crypto profit-target tracker for review; it writes local evidence only and preserves all execution safety flags."
+        },
+        {
+          "method": "POST",
+          "path": "/api/profit-target/build",
+          "mode": "local-advisory-control",
+          "description": "Build the local profit-target tracker report for review; no MT5 order files, broker calls, wallet authorization, or live preset changes are allowed."
+        }
+      ]
+    },
+    {
       "name": "live-automation-readiness",
       "phase": "backend-core",
       "endpoints": [
