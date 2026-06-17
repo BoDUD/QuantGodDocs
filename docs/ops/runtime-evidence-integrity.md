@@ -10,10 +10,13 @@ Run from `QuantGodBackend`:
 
 ```bash
 python3 tools/run_runtime_evidence_integrity.py --runtime-dir ./runtime verify
+python3 tools/run_runtime_evidence_integrity.py --runtime-dir ./runtime summary
 python3 tools/run_runtime_evidence_integrity.py --runtime-dir ./runtime build
 ```
 
 `verify` prints the manifest and exits non-zero when a required artifact is missing, a JSON/JSONL schema drifts, a CSV header is absent, an artifact manifest lacks per-file hashes, or a core artifact contains an old `/Quard/QuantGod/` legacy absolute path.
+
+`summary` prints a compact, frontend-friendly envelope with `status`, `promotionGateStatus`, bounded `promotionBlockers`, bounded `promotionRecoveryQueue`, overflow counts, `nextActionZh`, and the immutable safety block. It is read-only and does not write runtime files.
 
 `build` writes:
 
@@ -52,7 +55,9 @@ promotionRecoveryQueue
 ```
 
 `promotionRecoveryQueue` is the operator-facing repair plan consumed by the
-dashboard. It merges:
+dashboard. The same rows are also exposed in compact form through
+`coreRuntimeEvidenceSummary` on `/api/production-evidence-validation/status`.
+It merges:
 
 - history freshness rows for `M1`, `M5`, `M15`, and `H1`, including the
   `sync-klines` refresh command, `production-status` verify command, lag, and

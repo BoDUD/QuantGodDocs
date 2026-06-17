@@ -123,6 +123,13 @@ POST /api/production-evidence-validation/run
 GET  /api/production-evidence-validation/telegram-text?refresh=1
 ```
 
+The status response includes both `coreRuntimeEvidenceIntegrity` and
+`coreRuntimeEvidenceSummary`. The integrity object is the full manifest for
+audit and hash review. The summary object is the compact UI contract for
+showing `promotionGateStatus`, blocker counts, recovery queue rows, source-gap
+status, and the next safe evidence-only action without requiring the frontend
+to parse the full artifact list.
+
 ## Outputs
 
 ```text
