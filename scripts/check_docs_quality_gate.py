@@ -298,6 +298,31 @@ def check_phase_docs(root: Path, errors: list[str]) -> None:
             fail(errors, f"{rel} should describe safety boundaries")
 
 
+def check_live_lane_doctrine(root: Path, errors: list[str]) -> None:
+    safety_path = root / "docs/backend/safety-boundaries.md"
+    if not safety_path.exists():
+        return
+    text = read_text(safety_path)
+    required_terms = [
+        "USDJPYc / RSI_Reversal / LONG",
+        "MA_Cross",
+        "USDJPY_NIGHT_REVERSION_SAFE",
+        "SHADOW",
+        "TESTER_ONLY",
+        "PAPER_LIVE_SIM",
+        "topLiveEligiblePolicy",
+        "order-send",
+        "live-preset-mutation",
+    ]
+    for term in required_terms:
+        if term not in text:
+            fail(errors, f"docs/backend/safety-boundaries.md must preserve live lane doctrine term: {term}")
+    if "非 RSI" not in text and "non-RSI" not in text:
+        fail(errors, "docs/backend/safety-boundaries.md must state non-RSI routes remain non-live")
+    if "单独执行 lane RFC" not in text and "separate execution lane RFC" not in text:
+        fail(errors, "docs/backend/safety-boundaries.md must require a separate execution lane RFC for non-RSI/HFM live execution")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Check QuantGodDocs readability and completion")
     parser.add_argument("--root", default=".", help="QuantGodDocs root")
@@ -312,6 +337,7 @@ def main() -> int:
     check_api_contract(root, errors)
     check_api_contract_markdown_sync(root, errors)
     check_phase_docs(root, errors)
+    check_live_lane_doctrine(root, errors)
 
     if errors:
         print("QuantGodDocs quality gate failed:", file=sys.stderr)

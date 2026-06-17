@@ -122,6 +122,42 @@ class DocsQualityGateTests(unittest.TestCase):
             module.check_api_contract(root, errors)
             self.assertTrue(any("endpoint mode missing" in error for error in errors))
 
+    def test_live_lane_doctrine_accepts_current_freeze(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            safety = root / "docs/backend/safety-boundaries.md"
+            safety.parent.mkdir(parents=True)
+            safety.write_text(
+                "\n".join(
+                    [
+                        "# Backend 安全边界",
+                        "当前唯一 live lane 是 USDJPYc / RSI_Reversal / LONG。",
+                        "MA_Cross 与 USDJPY_NIGHT_REVERSION_SAFE 等非 RSI 路线只能保留在 SHADOW、TESTER_ONLY、PAPER_LIVE_SIM。",
+                        "它们不能抢 topLiveEligiblePolicy。",
+                        "未来必须单独执行 lane RFC，且 order-send 与 live-preset-mutation 继续为 false。",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            errors = []
+            module.check_live_lane_doctrine(root, errors)
+            self.assertEqual(errors, [])
+
+    def test_live_lane_doctrine_rejects_soft_non_rsi_boundary(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            safety = root / "docs/backend/safety-boundaries.md"
+            safety.parent.mkdir(parents=True)
+            safety.write_text(
+                "# Backend 安全边界\n新增策略经过治理后可进入实盘。\n",
+                encoding="utf-8",
+            )
+            errors = []
+            module.check_live_lane_doctrine(root, errors)
+            self.assertTrue(any("live lane doctrine" in error for error in errors))
+
     def test_api_contract_markdown_sync_accepts_rendered_markdown(self):
         module = load_module()
         with tempfile.TemporaryDirectory() as tmp:

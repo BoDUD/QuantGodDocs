@@ -22,7 +22,9 @@
 
 新增三条路线只写 shadow candidate ledger，不调用下单、平仓、撤单、改单，也不修改 live preset。
 
-现有 RSI live 路线保持恢复状态；新增策略进入实盘前必须经过回测、ParamLab、治理复核、版本门禁和人工确认。
+现有 RSI live 路线保持恢复状态；新增策略和 `MA_Cross` 等非 RSI 路线在当前 doctrine 下只能进入 shadow / tester / paper-live-sim 研究 lane，不能抢占 live eligibility，也不能通过 Dashboard、GA 或 Telegram 文案直接升级为实盘。
+
+如果未来要让非 RSI 路线真实执行，必须另开单独执行 lane RFC，并先完成 API contract、runtime preflight、request/receipt contract、EA request reader、broker send wrapper、rollback 和 operator approval 的独立评审。
 
 ## 运行数据
 
@@ -38,4 +40,4 @@ Backend 会通过 `/api/usdjpy-strategy-lab/*` 展示策略目录、候选信号
 
 ## 今日判断
 
-这一步不是恢复更多实盘策略，而是让 USDJPY 策略池先开始大规模模拟采样。等样本量、胜率、Profit Factor、MFE/MAE 和阻断原因稳定后，再决定哪条策略进入人工试点复核。
+这一步不是恢复更多实盘策略，而是让 USDJPY 策略池先开始大规模模拟采样。等样本量、胜率、Profit Factor、MFE/MAE 和阻断原因稳定后，也只能决定哪条策略进入人工研究复核；真实执行仍需要未来单独 lane RFC。
