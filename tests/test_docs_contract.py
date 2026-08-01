@@ -24,6 +24,17 @@ class DocsContractTests(unittest.TestCase):
             text = (root / rel).read_text(encoding="utf-8")
             self.assertGreater(len(text.splitlines()), 10, rel)
 
+    def test_docs_ci_resolves_matching_backend_pr_branch_before_strict_contract_check(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        workflow = (root / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+
+        self.assertIn("DOCS_HEAD_REF: ${{ github.head_ref }}", workflow)
+        self.assertIn("git ls-remote --exit-code --heads", workflow)
+        self.assertIn('"refs/heads/$DOCS_HEAD_REF"', workflow)
+        self.assertIn("explicitly falling back to Backend main", workflow)
+        self.assertIn("ref: ${{ steps.backend-ref.outputs.ref }}", workflow)
+        self.assertIn("--strict-extra", workflow)
+
     def test_contract_endpoint_counter(self) -> None:
         contract = {
             "endpointGroups": [

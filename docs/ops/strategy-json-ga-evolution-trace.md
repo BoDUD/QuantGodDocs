@@ -22,7 +22,7 @@ Daily Autopilot research tasks
 It must not affect:
 
 ```text
-USDJPY Live Lane execution
+broker execution lane creation (`executionLaneExists=false`)
 MT5 OrderSend / CTrade
 close / cancel / order modification
 live preset mutation
@@ -166,7 +166,7 @@ sample-count penalty
 trade-frequency penalty
 ```
 
-Candidates with insufficient evidence remain `NEEDS_MORE_DATA` or `SHADOW`; they are not promoted to live.
+Candidates with insufficient evidence remain `NEEDS_MORE_DATA` or `SHADOW`; candidates with sufficient evidence also remain Shadow / tester because the product has no execution lane.
 
 Fitness also consumes execution feedback and Case Memory penalties. Excessive
 rejects, slippage, latency, accepted-without-fill drift, policy mismatch, or

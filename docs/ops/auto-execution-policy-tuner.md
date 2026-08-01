@@ -1,13 +1,13 @@
-# P3-11 自动执行策略调参器
+# P3-11 Shadow Advisory 调参器（兼容旧 AutoExecution 文件名）
 
 ## 目标
 
-P3-11 用来解决两个运营问题：
+P3-11 用来解决两个研究问题：
 
-1. 入场过严，导致 EA 长时间不入场、错失机会。
-2. 出场太早，导致本来能继续盈利的单子被过早保护或抛出。
+1. Shadow 信号过严，导致候选长期不足、无法评估错失机会。
+2. 模拟出场太早，导致回放无法验证更长持有窗口。
 
-这一步不会直接下单，也不会修改 MT5 preset。它只生成 EA 可读取的策略政策文件：
+这一步不会下单，也不会修改 MT5 preset。它只生成 Shadow / dry-run 可读取的策略政策文件；文件名中的 `AutoExecution` 是历史兼容命名：
 
 ```text
 runtime/adaptive/QuantGod_AutoExecutionPolicy.json
@@ -24,10 +24,10 @@ runtime/adaptive/QuantGod_AutoExecutionPolicyLedger.csv
 
 这会非常安全，但也会错过很多机会。P3-11 改成三档：
 
-| 状态 | 含义 | 仓位 |
+| 状态 | 含义 | 研究 lot 字段 |
 |---|---|---|
-| 标准入场 | 核心安全和入场确认都通过 | 按风险预算，最大不超过 2 |
-| 机会入场 | 核心安全通过，但战术确认缺一项 | 小仓试探 |
+| 标准建议 | 核心安全和入场确认都通过 | 仅作回放与展示估计 |
+| 机会建议 | 核心安全通过，但战术确认缺一项 | 仅作较低权重模拟 |
 | 阻断 | 核心安全缺失或历史方向为负 | 0 |
 
 ## 不能放宽的核心安全
@@ -43,15 +43,9 @@ runtime/adaptive/QuantGod_AutoExecutionPolicyLedger.csv
 
 也就是说，P3-11 不是“乱放宽”，而是允许在核心安全通过时，把 M1/M5 二次确认、bar close、回踩确认这类战术项降一级处理。
 
-## 仓位为什么不能固定 2
+## lot 字段的当前解释
 
-系统支持最大仓位设为 2：
-
-```text
-QG_AUTO_MAX_LOT=2.0
-```
-
-但不会无条件每次 2 手。实际建议仓位由这些参数共同决定：
+兼容 artifact 可能包含 `maxLot`、`recommendedLot` 和风险预算字段。它们只用于研究排序、回放和 UI 展示，不能成为 MT5 order 参数。研究建议由这些因素共同决定：
 
 - 最大仓位
 - 单笔风险百分比
@@ -59,13 +53,7 @@ QG_AUTO_MAX_LOT=2.0
 - 综合评分
 - 机会入场折扣
 
-机会入场默认只使用小仓：
-
-```text
-QG_AUTO_OPPORTUNITY_LOT_MULTIPLIER=0.35
-```
-
-这样可以减少“错失机会”，但不会把弱确认机会直接变成满仓。
+机会建议使用较低研究权重，以便比较错失机会，同时保持 `executionLaneExists=false`。
 
 ## 出场调参
 
@@ -109,7 +97,7 @@ python tools\run_auto_execution_policy.py --runtime-dir .\runtime telegram-text 
   --send
 ```
 
-## 本地配置
+## 本地配置边界
 
 复制：
 
@@ -117,17 +105,7 @@ python tools\run_auto_execution_policy.py --runtime-dir .\runtime telegram-text 
 Copy-Item .env.auto.local.example .env.auto.local
 ```
 
-常用参数：
-
-```text
-QG_AUTO_MAX_LOT=2.0
-QG_AUTO_RISK_PER_TRADE_PCT=0.5
-QG_AUTO_OPPORTUNITY_LOT_MULTIPLIER=0.35
-QG_AUTO_STANDARD_LOT_MULTIPLIER=1.0
-QG_AUTO_MIN_LOT=0.01
-QG_AUTO_LOT_STEP=0.01
-QG_AUTO_ACCOUNT_EQUITY=1000.0
-```
+旧 `.env.auto.local` 键只允许影响 Shadow 建议计算。它们不能启用 AutoTrading、创建 execution lane、修改 preset 或恢复 broker mutation 原语。活动运维文档不再提供可被误当成实盘仓位配置的数值示例。
 
 ## 安全边界
 
@@ -143,4 +121,4 @@ P3-11 不做：
 - 开放 webhook 执行入口
 - 存储密码、token、private key
 
-EA 后续如果读取 `QuantGod_AutoExecutionPolicy.json`，也必须再次做 MT5 侧保证金、最小手数、最大手数、手数步进和止损距离校验。
+EA 读取 `QuantGod_AutoExecutionPolicy.json` 时只能生成 Shadow / dry-run 证据。生产 EA 不得包含保证金下单流程、order request 或 broker send 逻辑。

@@ -2,14 +2,14 @@
 
 本阶段把 QuantGod 自动化主线收窄为 **只研究 USDJPYc**。
 
-不再让 EURUSD、XAUUSD 或其他品种参与模拟盘、实盘策略评分、自动执行政策或 Telegram 主报告。它们可以存在于 runtime 目录里，但会被标记为非研究品种并忽略。
+不再让 EURUSD、XAUUSD 或其他品种参与当前 USDJPY 研究评分或 Telegram 主报告。它们可以存在于 runtime 目录里，但会被标记为非研究品种并忽略。
 
 ## 目标
 
 ```text
 USDJPYc 运行快照
 → USDJPY 多策略评分
-→ USDJPY 专用自动执行政策
+→ USDJPY 专用 Shadow Advisory 政策（兼容 AutoExecution 文件名）
 → EA 干跑决策
 → 中文 Telegram / 前端策略矩阵
 ```
@@ -34,13 +34,13 @@ runtime/adaptive/QuantGod_USDJPYEADryRunDecisionLedger.csv
 
 | 状态 | 含义 |
 |---|---|
-| `STANDARD_ENTRY` | 标准入场候选，核心证据和战术确认都通过 |
-| `OPPORTUNITY_ENTRY` | 机会入场候选，核心证据通过，战术确认最多缺一项，只适合小仓试探 |
+| `STANDARD_ENTRY` | 标准 Shadow 候选，核心证据和战术确认都通过 |
+| `OPPORTUNITY_ENTRY` | 机会 Shadow 候选，核心证据通过、战术确认最多缺一项，仅用于较低权重模拟 |
 | `BLOCKED` | 阻断，缺核心证据、方向负期望、快通道降级、运行快照陈旧等 |
 
-## 仓位逻辑
+## lot 字段的当前解释
 
-`QG_AUTO_MAX_LOT=2.0` 表示 USDJPY 的仓位上限，不是每次固定 2 手。
+兼容 artifact 中的 `maxLot` 和 `recommendedLot` 只是研究、回放与 UI 展示值，不是可执行仓位。
 
 实际建议仓位会根据：
 
@@ -52,14 +52,13 @@ runtime/adaptive/QuantGod_USDJPYEADryRunDecisionLedger.csv
 最小手数 / 手数步进
 ```
 
-计算。阻断时建议仓位永远是 `0`。
+计算。阻断时研究建议值永远是 `0`，其余值也不能进入 broker order。
 
 机会入场现在额外经过 `centSamplingGate`：
 
-- `OPPORTUNITY_ENTRY` 只允许美分账户小仓采样；
+- `OPPORTUNITY_ENTRY` 只允许美分口径的模拟采样；
 - USD 账户对机会入场只做 `PAPER_MIRROR_ONLY`；
-- 默认机会入场上限来自 `QG_CENT_OPPORTUNITY_LOT`，默认 `0.10` lot；
-- 点差轻微偏宽时继续降为美分账户小仓，不让 USD 实盘接探索单；
+- 点差轻微偏宽时继续降低研究权重；
 - `centSamplingGate.recommendedLotBeforeCap` 和 `recommendedLotAfterCap` 会记录限仓前后差异。
 
 ## CLI
@@ -89,7 +88,7 @@ GET  /api/usdjpy-strategy-lab/telegram-text?refresh=1
 POST /api/usdjpy-strategy-lab/run
 ```
 
-这些 API 都只运行本地证据链和政策生成，不下单。
+这些 API 都只运行本地证据链和政策生成，不下单；`executionLaneExists=false`。
 
 ## 前端
 

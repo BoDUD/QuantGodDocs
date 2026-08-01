@@ -44,16 +44,18 @@ python tools/run_usdjpy_strategy_lab.py --runtime-dir ./runtime candidate-policy
 - 已导入回测应显示 PF、胜率和交易数
 - 风险检查应显示 runtime、快通道、新闻和 shadow 隔离状态
 
-## 5. 实盘状态
+## 5. 当前执行边界
 
-现有 RSI live 策略保持恢复状态。三条新增策略只做模拟采样，不会进入实盘自动下单。
+当前没有 execution lane。RSI 与三条新增策略都只做 Shadow / tester / replay 采样；旧 live 字段只作为历史兼容证据读取。生产 EA 不包含 broker mutation 原语，preset 也不能恢复自动下单。
 
 ## 6. 升级条件
 
-新增策略进入下一阶段前至少需要：
+新增策略进入下一研究阶段前至少需要：
 
 - 样本量足够
 - 胜率和 Profit Factor 达标
 - MFE/MAE 支持合理止盈止损
 - 高影响 USD/JPY 新闻过滤有效
-- 通过 ParamLab、治理复核和版本门禁
+- 通过 ParamLab、只读治理复核和版本门禁
+
+满足这些条件只能晋级为更高质量的 Shadow / tester 候选，不能创建 execution lane。

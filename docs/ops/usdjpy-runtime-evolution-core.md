@@ -96,7 +96,7 @@ agentMayMutateLivePreset=false
 orderSendAllowed=false
 ```
 
-参数候选只能通过 autonomous promotion gate 进入 `SHADOW_ONLY`、`TESTER_ONLY`、`PAPER_LIVE_SIM`、`MICRO_LIVE` 或 `LIVE_LIMITED`。即使进入 `MICRO_LIVE`，也只允许极小仓阶段，且仍受连续亏损、日亏损、快通道、runtime、点差和高冲击新闻硬门禁约束。
+参数候选只能通过 autonomous research gate 进入 `SHADOW_ONLY`、`TESTER_ONLY` 或 `PAPER_LIVE_SIM`。旧 artifact 中的 `MICRO_LIVE` / `LIVE_LIMITED` 是已退役阶段，必须降级解释为 Shadow / ReadOnly；`executionLaneExists=false`。
 
 ## P3-20 自主治理门
 
@@ -112,7 +112,7 @@ replay → 参数候选 → live config proposal → legacy review queue
 replay → walk-forward → autonomous promotion gate → controlled config patch → auto rollback
 ```
 
-Agent 可以自动写入 `QuantGod_AutonomousConfigPatch.json`，但不能改 `.mq5`、不能改 live preset、不能写 MT5 OrderRequest、不能让 DeepSeek 直接批准 live，也不能解除 high-impact news / spread / runtime / fastlane 硬阻断。
+Agent 可以自动写入 `QuantGod_AutonomousConfigPatch.json`，但不能改 `.mq5`、不能改 preset、不能写 MT5 OrderRequest、不能让 DeepSeek 产生执行授权，也不能解除 high-impact news / spread / runtime / fastlane 的 fail-closed 证据阻断。
 
 ## 前端位置
 

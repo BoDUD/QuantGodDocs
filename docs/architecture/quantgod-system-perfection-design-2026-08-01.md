@@ -1,9 +1,9 @@
 # QuantGod 全系统完善设计书
 
-版本：1.5
+版本：1.6
 日期：2026-08-01
 适用目录：`QuantGodBackend`、`QuantGodFrontend`、`QuantGodInfra`、`QuantGodDocs`，以及只读兼容目录 `QuantGod`
-当前决策：纯本地、纯外汇、研究与证据优先、Shadow/Paper 优先；本设计不授权真实下单、平仓、撤单、实盘参数修改或 Kill Switch 绕过。HFM 仅作为外汇 broker 保留。所有数字资产、预测市场、远端同步和公网展示路线均已退役，不再属于 active architecture 或 roadmap。
+当前决策：纯本地、纯外汇、研究与证据优先、永久 Shadow/ReadOnly；当前产品没有 broker execution lane。本设计不授权真实下单、平仓、撤单、实盘参数修改或 Kill Switch 绕过。HFM 仅作为外汇 broker 和只读证据源保留。所有数字资产、预测市场、远端同步和公网展示路线均已退役，不再属于 active architecture 或 roadmap。
 
 ## 1. 执行摘要
 
@@ -16,7 +16,7 @@ QuantGod 已经具备一个外汇量化研究与交易治理系统的主要工�
 3. 策略是否有足够样本证明正期望。
 4. 某个动作是否被安全策略明确允许。
 
-最新本地审计事实为：HFM 主账号已经由 MT5 终端授权，USDJPY EA dashboard writer 正常刷新，Backend 只读桥同时确认终端进程、EA 内嵌时间和 timer heartbeat；`/api/mt5-readonly/snapshot` 为新鲜状态，当前 0 持仓、0 挂单。运行时硬边界为 `tradeStatus=SHADOW`、`shadowMode=true`、`readOnlyMode=true`、`executionEnabled=false`、`tradeAllowed=false`、DLL 禁用。本状态表示“账号已连接且可只读复核”，不表示允许真实执行。
+最新本地审计事实为：HFM 主账号已经由 MT5 终端授权，USDJPY EA dashboard writer 正常刷新，Backend 只读桥同时确认终端进程、EA 内嵌时间和 timer heartbeat；`/api/mt5-readonly/snapshot` 为新鲜状态，当前 0 持仓、0 挂单。运行时硬边界为 `tradeStatus=SHADOW`、`shadowMode=true`、`readOnlyMode=true`、`executionEnabled=false`、`tradeAllowed=false`、DLL 禁用。本状态表示“账号已连接且可只读复核”，不表示允许真实执行。活动 EA 源码进一步物理移除了 broker mutation 原语；即使旧环境字段被误改，也不存在 `Buy/Sell`、`PositionClose`、`OrderSend` 或 `TRADE_ACTION_*` 可调用路径。
 
 第二账号是可选扩展车道。其已有本地凭据在安全只读启动验证中被 broker 判定为无效，因此已停止对应终端并设为默认禁用；前端和 Backend 都不再把一个未启用的可选账号汇总成主账号“不可用”。此前发现的历史数据断档已在本轮通过 MQL5 CopyRates CSV 增量入库恢复到 2026-07-31 收盘，SQLite 已启用 WAL 且 `quick_check=ok`。但历史新闻仍缺失、GA 无 elite、主策略为负期望、生产证据仍为 `FAIL`，因此研究与晋级状态继续保持 `BLOCKED`，不会因 MT5 登录或行情恢复而自动变绿。
 
@@ -34,6 +34,11 @@ QuantGod 已经具备一个外汇量化研究与交易治理系统的主要工�
 - 活动历史库从 2026-06-05 恢复到 2026-07-31 收盘；M1/M5/M15/H1/H4 均通过增量导入，研究质量仍因历史新闻缺失保持 `BLOCKED`。
 - GA 在历史数据不就绪，或达到无 elite 代数上限时停止继续增加代数，要求新数据或新策略假设后才能恢复。
 - 所有活动安全合同统一为 `SHADOW_READONLY`、`executionLaneExists=false`、`liveExpansionAllowed=false`、`unattendedLiveExpansionAllowed=false`、`operatorApprovalRequired=true`。
+- 活动 EA 物理移除 `Trade.mqh`、`CTrade`、开平仓、改单与 raw trade action 原语；Python bridge 也只保留永久 fail-closed shim。
+- 真实终端同步改为 preset allowlist，只复制 `QuantGod_MT5_HFM_Shadow.set`；兼容 LivePilot 命名文件本身也锁定 Shadow/ReadOnly，不能恢复执行。
+- Mac 启动器在每次启动前扫描 EA 源码并强制 fresh compile；旧 EX5 先隔离，只有编译退出 0、产物非空且晚于 compile marker 才原子安装，否则拒绝启动 MT5。三个 Windows MT5 启动器已退役并以非零退出，不复制文件、不启动终端。
+- USDJPY 闭环的成功状态改为 `SHADOW_ADVISORY_READY`；旧 `READY_FOR_EXISTING_EA` 只作为兼容 artifact 降级显示，不能成为交易 ready。
+- launchd automation validator 同时兼容 Backend 当前 `name` 和旧 `id` 步骤身份，并拒绝缺失、冲突、重复、未知或不完整 required-step 集合。
 - 建立本地原子备份与校验工具；首次活动备份已通过 SQLite `quick_check` 和 SHA-256 校验。该备份仍位于同一物理磁盘，不能替代第二故障域。
 
 本批次没有创建真实执行 lane，没有下单、平仓、撤单、改仓或放宽 Kill Switch。
@@ -78,7 +83,7 @@ QuantGod 已经具备一个外汇量化研究与交易治理系统的主要工�
 |---|---|---|
 | Backend | Node API 在 `127.0.0.1:8080` 运行；核心 profile 已由 launchd 管理 | 服务在线，MT5 只读端点已独立验证 freshness |
 | Frontend | Vite 在 `127.0.0.1:5173` 运行；生产 `dist` 已原子同步到 Backend | 5173 与 8080 使用同代源码产物 |
-| MT5/EA | HFM 主账号已连接；0 持仓、0 挂单；EA 为 Shadow + ReadOnly | 当前只读状态可信；真实执行明确关闭 |
+| MT5/EA | HFM 主账号已连接；0 持仓、0 挂单；EA 为 Shadow + ReadOnly；活动源码无 broker mutation 原语 | 当前只读状态可信；下一次启动必须通过 fresh compile provenance gate，真实执行物理不可达 |
 | 第二账号 | 可选车道默认禁用；旧登录验证为无效账号且终端已停止 | 不参与主账号健康汇总，不产生假阻断 |
 | Agent | 可选 agent profile 未加载 | 核心本地运行不依赖可选 agent |
 | MT5 核心快照 | 文件时间、EA 内嵌时间与 heartbeat 三项共同校验，TTL 180 秒 | `FRESH`；复制或 touch 旧 JSON 不能伪造新鲜状态 |
@@ -131,7 +136,7 @@ QuantGod 已经具备一个外汇量化研究与交易治理系统的主要工�
 - 第二账号改为显式 optional/default-disabled；其端点返回中性 `DISABLED` 合同，前端从阻断、指标、持仓、恢复矩阵和 endpoint health 中排除。
 - 启动前从已登录 portable terminal 的 `common.ini`（或成对提供的本机私有变量）原子 hydration 私有 Shadow config；仓库模板继续保持 synthetic，不保存 Password，私有配置权限为 `0600`。
 - launchd 在启动 Wine 前严格验证 HFM server，并把 runtime Login 与独立 LoginOnly 私有参考做常量时间比较；任何缺失、重复、大小写漂移或 synthetic 身份都 fail closed，状态和日志不泄露账号。
-- 前端明确区分“主账号已连接（Shadow / ReadOnly）”与“EA 可真实执行”，不再把刻意关闭执行显示为“等待 EA 权限”。
+- 前端明确区分“主账号已连接（Shadow / ReadOnly）”与“影子建议已就绪”，不再显示“等待 EA 权限/等待 EA 自身信号”。`SHADOW_ADVISORY_READY` 只表示观察与复核 ready；旧 `READY_FOR_EXISTING_EA` 显示为“影子建议已就绪（旧契约）”。
 - 增加旧 JSON 被 touch、旧 heartbeat、macOS Wine 路径、可选账号禁用和前端只读文案的自动化回归。
 
 ## 4. 已有优势
@@ -139,7 +144,7 @@ QuantGod 已经具备一个外汇量化研究与交易治理系统的主要工�
 需要保留并加强的能力包括：
 
 - 本地端口默认绑定 loopback。
-- 当前环境变量将 order send、close、cancel、live preset mutation、Telegram command、Webhook 和 Kill Switch override 设为关闭。
+- EA broker mutation 原语已经物理移除；环境变量关闭只作为第二层防御，不再承担阻止开仓、平仓或改单的唯一责任。
 - MT5 控制状态能报告 dry-run、Kill Switch 和 owner mode。
 - Strategy JSON、GA、Walk-Forward、Parity、Case Memory 和 Evidence OS 已形成较完整研究链。
 - 系统已收敛到外汇路线；不再维护钱包、交易所、预测市场、跟单或数字资产 CFD 能力。
@@ -162,8 +167,8 @@ QuantGod 已经具备一个外汇量化研究与交易治理系统的主要工�
 
 | ID | 缺陷 | 证据 | 影响 | 必须达到的结果 |
 |---|---|---|---|---|
-| QG-P0-01 | macOS 启动脚本曾存在 live 默认值 | 已改为 `MT5_START_MODE=shadow`、`MT5_LIVE_LAUNCH_ALLOWED=0`，并有负向回归 | 新环境或变量缺失时可能越过“默认关闭”原则 | **已修复并守护**；live 只能由未来独立、双重授权的执行系统开启 |
-| QG-P0-02 | Python MT5 bridge 具备替代执行通道且约束不完整 | 当前环境所有 send/close/cancel/preset mutation 均关闭，页面只调用 readonly bridge | 一旦未来错误解除环境锁，仍可能形成旁路 | **当前隔离，架构整改未结束**；未来执行必须单独 RFC、进程身份和端到端负向测试 |
+| QG-P0-01 | 启动器曾可选择 live 或复用来源不明的 EX5 | Mac live 分支与 live override 已删除；Windows MT5 启动器退役；真实终端只同步 Shadow preset，并要求 fresh compile | 配置漂移、陈旧二进制或未审查入口可能恢复执行面 | **已修复并守护**；编译失败、产物不新鲜、compiler 缺失或非 `shadow/off` 模式均 fail closed，不启动 MT5 |
+| QG-P0-02 | MQL5 EA 与 Python bridge 曾具备 broker mutation 旁路 | EA 已移除交易库、`CTrade`、开平仓/改单/`OrderSend`/`TRADE_ACTION_*`；Python bridge 为永久 fail-closed shim | 只靠环境锁时，误解锁仍可能形成真实订单或手工仓 mutation | **当前架构已物理闭合**；未来执行必须新建独立 EA/lane RFC，不得在现有 Shadow EA 中重新打开开关 |
 | QG-P0-03 | 系统曾存在“假绿/假红” | MT5 进程误判、只看 mtime、可选账号连带阻断已修复；历史/GA/晋级仍分线显示 | 操作者可能把“进程活着”误解为“策略可运行/可晋级”，或把可选车道误解为主账号失败 | **MT5 当前状态线已修复**；其余汇总继续采用最坏项，`UNKNOWN/STALE/BLOCKED` 不得产生业务绿色 |
 | QG-P0-04 | 前端命令失败仍可显示成功 | API client 把失败包装为普通对象，多处组件在 `await` 后无条件成功 | 用户误以为构建、GA、自动化已完成，实际可能失败或仍在后台写入 | 命令必须严格检查 transport/domain/schema；失败不可进入成功路径 |
 
@@ -603,7 +608,7 @@ CI 按 release lock checkout 四仓精确 SHA，然后执行：
 | 数据新鲜度 | 按 timeframe 定义 TTL，超时 1 个周期内告警并阻断晋级 |
 | 恢复目标 | RPO ≤ 5 分钟，RTO ≤ 1 小时，月度恢复演练通过 |
 | 策略晋级 | 100% 绑定 dataset、walk-forward、parity、sample 和 blocker 证据 |
-| 执行安全 | 当前版本 order send/close/cancel/live mutation 始终为 false |
+| 执行安全 | 当前版本 broker mutation 原语物理不存在；所有 safety 字段固定 false，`executionLaneExists=false` |
 
 系统达到“完善版”的定义是：状态可信、失败可见、结果可复现、操作可审计、数据可恢复、安全默认不可绕过。它不等于保证盈利，也不等于自动开放实盘。
 
@@ -624,25 +629,29 @@ CI 按 release lock checkout 四仓精确 SHA，然后执行：
 - 产品范围收敛为本地外汇系统；退役业务的源码、页面、API、配置、测试器输入、运行证据和旧日志已移出 active tree。旧 URL 只保留单向迁移 alias，不能恢复退役 workspace。
 - 公网展示、远端同步和边缘代理从 active Infra、launchd、环境变量和运行进程中移除；8080/5173 仅监听 `127.0.0.1`。
 - 日常 `local-shadow` profile 只加载 Backend、MT5 Shadow supervisor、历史同步、advisory automation、健康、日志与本地备份；Vite、legacy daily、AI 和 Telegram 均保持未加载。
-- HFM 主账号已经重新加载外汇-only EA；EA 源码与 EX5 已同步到 Backend、legacy、主/副终端和隔离 tester。MetaEditor 编译结果为 0 errors、0 warnings。
+- HFM 主账号继续作为本地只读证据源；本轮没有热替换或重启已登录终端。活动 EA 源码已移除 broker mutation 原语；下一次启动必须重新编译并通过 fresh-output gate，旧 EX5 会先被隔离，失败时终端不会启动。
 - 仓库 synthetic preset 不再覆盖本地账号：启动脚本从已登录 portable terminal hydration 私有 Shadow config，LoginOnly 身份、精确 HFM server、`0600` 权限与无 Password 落盘均由启动前门禁验证。
 - Backend 已移除 `/api/mt5-trading*`、兼容 `/api/mt5*` 与撤单别名，Python compatibility shim 不再包含 broker login/order-send 调用；本地委托链只保留 `DRY_RUN_ACCEPTED` 的 Shadow 模拟与审计，任何 live 请求永久 fail closed。
+- Mac 启动路径只接受 `shadow/off`，并只向真实终端复制 `QuantGod_MT5_HFM_Shadow.set`；不再全量同步可能被 GUI 误加载的 tester/live presets。Windows 的通用、Shadow 和 LivePilot 三个 tracked launcher 均已退役，直接以非零退出且无副作用。
+- USDJPY Live Loop 保留兼容文件名，但状态契约改为 `SHADOW_ADVISORY_READY`、`topAdvisoryPolicy/topShadowPolicy` 和 `advisoryRouteZh`；`executionLaneExists=false`、`existingEaOwnsExecution=false`。前端与 Telegram 只显示影子观察/建议。
+- launchd automation required-step 校验已修复 Backend `name` 与旧 `id` 的身份字段不一致；缺失、冲突、重复、未知和集合不完整继续 fail closed。
 - MT5 进程归属、dashboard writer freshness、可选第二账号、只读前端文案和生产 artifact 漂移已经修复；supervisor 持有并等待精确 Wine child，退出后原子写回 `STOPPED/FAILED`，singleton 初始化与回收均 fail closed。
 - MT5 platform store 已改为只接受、保存和返回外汇品种；入库时会根据 broker symbol 重新归类，调用方不能通过伪报 Forex 绕过。旧 SQLite 已完整备份，活动数据库重建后包含 44 个外汇品种、0 个非外汇品种、0 个待处理订单和 0 个平台持仓。
 - 历史退役证据采用可恢复归档，不做不可逆删除；活动秘密、日志和归档权限收紧为文件 `0600`、目录 `0700`。
+- 本地日志维护覆盖 Backend runtime、真实 MT5 evidence 与 launchd 三个受限根目录；备份任务在新快照逐文件验证后保留最近 3 份已验证快照，未验证目录永不参与 retention 清理。
 - Backend 与 legacy 的 Dashboard、readonly bridge、Phase 2 freshness、tester gate 和 USDJPY data loader 已恢复兼容一致。
 
 自动化验收结果：
 
 | 范围 | 结果 |
 |---|---|
-| Backend Python | 668 passed，1 skipped，另含 89 个 subtests |
+| Backend Python | 672 passed，1 skipped，另含 105 个 subtests |
 | Backend Node | 162/162 passed |
 | Frontend Node guards | 155/155 passed |
-| Frontend unit | 67/67 passed；contract/API/lint/format/style/unit toolchain 全通过 |
+| Frontend unit | 70/70 passed；contract/API/lint/format/style/unit toolchain 全通过 |
 | Frontend production build | Vite build 与 smoke guard 通过；原子同步 manifest 校验通过 |
-| Infra | 72/72 passed，另含 12 个 subtests；fake-Wine 生命周期、信号转发、singleton 竞态与真实进程识别回归通过 |
-| Docs | 29/29 passed；质量门与 351 个 Backend API 契约严格比对通过 |
+| Infra | 77/77 passed；fake-Wine 生命周期、信号转发、singleton 竞态、advisory step 契约、无执行通道静态门禁与真实进程识别回归通过 |
+| Docs | 33/33 passed；质量门与 351 个 Backend API 契约严格比对通过 |
 | Legacy Python | 602 passed，1 skipped，另含 64 个 subtests |
 | Legacy Node | 154/154 passed |
 | EA compile | 0 errors，0 warnings；源码与 EX5 部署 hash 全目标一致 |

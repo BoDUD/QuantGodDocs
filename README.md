@@ -6,20 +6,20 @@ This repository is the source of truth for architecture, API contracts, runbooks
 
 ## System Summary
 
-QuantGod is a local-first foreign-exchange research and execution-governance system. USDJPY is the current primary pair, while the architecture may admit other FX pairs after the same data, research and safety gates pass:
+QuantGod is a local-first foreign-exchange research, Shadow Advisory, and operations-observability system. USDJPY is the current primary pair, while other FX pairs may enter the same read-only research process after their data and safety evidence passes:
 
 ```text
-Live Lane: USDJPYc / RSI_Reversal / LONG / cent account
-MT5 Shadow Lane: USDJPY multi-strategy simulation and tester research; other FX pairs require separate validation
-Agent: autonomous daily todo, daily review, promotion, demotion, rollback
+Execution lane: none; executionLaneExists=false; existingEaOwnsExecution=false
+MT5 Shadow Lane: USDJPY multi-strategy simulation, tester research, and advisory ranking; other FX pairs require separate validation
+Agent: autonomous daily todo, daily review, evidence promotion/demotion, and research rollback
 GA Trace: Strategy JSON seeds, generations, fitness, blockers, elites, mutation, and crossover
-Hard guards: runtime freshness, fastlane quality, spread, high-impact news, loss, and rollback
+Hard guards: runtime freshness, fastlane quality, spread, and evidence integrity; failures remain fail-closed
 ```
 
 Core principle:
 
 ```text
-Live narrow. Simulation broad. Promotion fast. Rollback hard.
+Observe broadly. Advise narrowly. Execute nowhere. Fail closed.
 ```
 
 ## Repository Map
@@ -62,7 +62,7 @@ Live narrow. Simulation broad. Promotion fast. Rollback hard.
 | Execution feedback producer | [Execution Feedback Producer](docs/ops/execution-feedback-producer.md) |
 | News gate simplification | [News gate simplification](docs/ops/news-gate-simplification.md) |
 | USDJPY autonomous governance | [USDJPY autonomous Agent](docs/ops/usdjpy-autonomous-agent.md) |
-| USDJPY live loop and daily autopilot | [USDJPY live loop daily autopilot](docs/ops/usdjpy-live-loop-daily-autopilot.md) |
+| USDJPY Shadow Advisory and daily autopilot | [USDJPY Shadow Advisory daily autopilot](docs/ops/usdjpy-live-loop-daily-autopilot.md) |
 | USDJPY strategy policy lab | [USDJPY strategy policy lab](docs/ops/usdjpy-strategy-policy-lab.md) |
 | USDJPY runtime evolution core | [USDJPY runtime evolution core](docs/ops/usdjpy-runtime-evolution-core.md) |
 | Causal replay simulator | [USDJPY bar replay simulator](docs/ops/usdjpy-bar-replay-simulator.md) |
@@ -118,16 +118,16 @@ When a backend `/api/*` endpoint changes, update:
 
 Documentation should consistently reflect these constraints:
 
-- Live Lane is limited to `USDJPYc / RSI_Reversal / LONG`.
-- MT5 Shadow Lane may simulate and rank multiple USDJPY strategies, but cannot seize the live route. Other FX pairs remain research-only until separately validated.
+- The current product has no Live Lane. `USDJPYc / RSI_Reversal / LONG` is not an exception; every strategy remains Shadow / ReadOnly and `executionLaneExists=false`.
+- MT5 Shadow Lane may simulate and rank multiple FX strategies, but no result can create an execution route. Other FX pairs remain research-only until separately validated.
 - Crypto-only lanes, including Bitcoin, HFM Crypto CFD, Moss and Hyperliquid, are outside the product scope and must not appear in active routes, workspaces or runbooks. HFM remains supported as an FX broker.
 - Telegram is push-only; Telegram command execution is out of scope.
-- DeepSeek explains, summarizes, and reviews; it does not approve live execution or override rollback.
-- `QG_AUTO_MAX_LOT=2.0` is an upper bound, not a fixed lot size.
-- Runtime stale, fastlane degraded, high-impact news, abnormal spread, daily loss, and loss streak gates remain hard stops.
-- Ordinary news is a soft risk adjustment by default: it can downgrade stage or reduce lot, but should not by itself block USDJPY RSI LONG.
-- Agent may write controlled patch evidence through staged governance; it must not mutate source code or live preset directly.
-- GA may generate and score Strategy JSON candidates for shadow/tester/paper research, but it must not directly enter live execution or mutate live preset.
+- DeepSeek explains, summarizes, and reviews; it cannot create execution authority or override fail-closed evidence gates.
+- Lot and stage fields in compatibility artifacts are research estimates only; they cannot become broker order parameters.
+- Runtime stale, fastlane degraded, high-impact news, abnormal spread, and evidence-integrity failures remain Shadow Advisory blockers.
+- Ordinary news may adjust a hypothetical research score or recommendation, but it never causes an order because no execution lane exists.
+- Agent may write controlled research-patch evidence through staged governance; it must not mutate source code, preset, or broker state.
+- GA may generate and score Strategy JSON candidates for shadow/tester/paper research, but it can never enter execution or mutate a preset.
 
 ## Local Checks
 

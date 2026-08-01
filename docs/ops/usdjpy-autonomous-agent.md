@@ -1,6 +1,6 @@
 # USDJPY 自主治理 Agent
 
-P3-20 把 USDJPY 参数提案从“等待人工复核”升级为“自主治理门”。取消人工审批不等于取消风控：Agent 只能在 walk-forward、tester/shadow 和硬风控通过后写入受控配置 patch。
+P3-20 把 USDJPY 参数提案从“等待人工复核”升级为自主研究治理门。Agent 只能在 walk-forward、tester/shadow 和证据门禁通过后写入受控研究 patch；当前没有 execution lane。
 
 ## 输出文件
 
@@ -11,19 +11,17 @@ runtime/agent/QuantGod_AutonomousConfigPatch.json
 runtime/agent/QuantGod_AutonomousRollbackLedger.csv
 ```
 
-## 阶段
+## 当前阶段契约
 
 ```text
 REJECTED
 SHADOW_ONLY
 TESTER_ONLY
 PAPER_LIVE_SIM
-MICRO_LIVE
-LIVE_LIMITED
 ROLLBACK_PAUSED
 ```
 
-`MICRO_LIVE` 只允许极小仓试点，`LIVE_LIMITED` 仍受最大仓位 2.0、日亏损、连续亏损、点差、新闻和快通道质量限制。
+旧 artifact 中的 `MICRO_LIVE` 与 `LIVE_LIMITED` 是已退役历史阶段，只能降级映射到 Shadow / ReadOnly 证据，不能恢复 broker execution。所有当前输出必须保持 `executionLaneExists=false`、`existingEaOwnsExecution=false`。
 
 ## 命令
 
@@ -62,4 +60,4 @@ QuantGod_AutonomousConfigPatch.json
 
 ## DeepSeek 角色
 
-DeepSeek 可以解释晋级、回滚和参数变化；不能批准 live、取消回滚、提高 `maxLot`、覆盖 replay / walk-forward 评分，或放宽新闻、点差、runtime、快通道硬门禁。
+DeepSeek 可以解释研究晋级、回滚和参数变化；不能产生执行授权、取消回滚、把 lot 建议变成订单参数、覆盖 replay / walk-forward 评分，或放宽新闻、点差、runtime、快通道证据门禁。

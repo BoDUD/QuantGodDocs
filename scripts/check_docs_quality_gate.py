@@ -95,6 +95,53 @@ CRYPTO_ONLY_ENDPOINT_MARKERS = (
     "moss",
 )
 
+ACTIVE_SHADOW_DOCTRINE_DOCS = [
+    "README.md",
+    "docs/backend/usdjpy-strategy-lab-api.md",
+    "docs/ops/auto-execution-policy-tuner.md",
+    "docs/ops/ga-multi-generation-stability.md",
+    "docs/ops/news-gate-simplification.md",
+    "docs/ops/production-evidence-validation.md",
+    "docs/ops/strategy-json-ga-evolution-trace.md",
+    "docs/ops/usdjpy-autonomous-agent.md",
+    "docs/ops/usdjpy-cent-autonomous-multilane-agent.md",
+    "docs/ops/usdjpy-ea-lab-runbook.md",
+    "docs/ops/usdjpy-evidence-os.md",
+    "docs/ops/usdjpy-ga-factory.md",
+    "docs/ops/usdjpy-runtime-evolution-core.md",
+    "docs/ops/usdjpy-strategy-policy-lab.md",
+]
+
+ACTIVE_SHADOW_BOUNDARY_MARKERS = (
+    "executionLaneExists=false",
+    "没有 execution lane",
+    "no execution lane",
+    "no such lane exists",
+    "不能创建 execution lane",
+    "不能直接或间接创建实盘执行能力",
+    "生产 EA 不再生成 order-send",
+)
+
+RETIRED_LIVE_RUNBOOKS = [
+    "docs/ops/mt5-hfm-live-pilot.md",
+]
+
+FORBIDDEN_ACTIVE_EXECUTION_PATTERNS = [
+    re.compile(r"(?m)^Live Lane:\s*USDJPY"),
+    re.compile(r"(?m)^#{2,3}\s+Live Lane\s*$"),
+    re.compile(r"Live Lane\s*=\s*USDJPY", re.I),
+    re.compile(r"Live Lane (?:is|remains) limited", re.I),
+    re.compile(r"实盘车道只允许"),
+    re.compile(r"现有 RSI live 策略保持恢复状态", re.I),
+    re.compile(r"新增策略想进入实盘"),
+    re.compile(r"(?m)^\s*QG_AUTO_MAX_LOT\s*="),
+    re.compile(r"topLiveEligiblePolicy"),
+    re.compile(r"`MICRO_LIVE`\s*只允许"),
+    re.compile(r"参数候选只能通过 autonomous promotion gate[^\n]*MICRO_LIVE"),
+    re.compile(r"进入 `MICRO_LIVE` 或 `LIVE_LIMITED`"),
+    re.compile(r"Live pilot preset (?:uses|使用)", re.I),
+]
+
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
@@ -302,23 +349,49 @@ def check_live_lane_doctrine(root: Path, errors: list[str]) -> None:
         return
     text = read_text(safety_path)
     required_terms = [
+        "当前没有 live lane",
+        "executionLaneExists=false",
         "USDJPYc / RSI_Reversal / LONG",
         "MA_Cross",
         "USDJPY_NIGHT_REVERSION_SAFE",
         "SHADOW",
         "TESTER_ONLY",
         "PAPER_LIVE_SIM",
-        "topLiveEligiblePolicy",
+        "topAdvisoryPolicy",
+        "broker mutation",
         "order-send",
         "live-preset-mutation",
     ]
     for term in required_terms:
         if term not in text:
-            fail(errors, f"docs/backend/safety-boundaries.md must preserve live lane doctrine term: {term}")
-    if "非 RSI" not in text and "non-RSI" not in text:
-        fail(errors, "docs/backend/safety-boundaries.md must state non-RSI routes remain non-live")
+            fail(errors, f"docs/backend/safety-boundaries.md must preserve Shadow-only doctrine term: {term}")
+    if "不例外" not in text:
+        fail(errors, "docs/backend/safety-boundaries.md must state RSI is not an execution exception")
     if "单独执行 lane RFC" not in text and "separate execution lane RFC" not in text:
-        fail(errors, "docs/backend/safety-boundaries.md must require a separate execution lane RFC for non-RSI live execution")
+        fail(errors, "docs/backend/safety-boundaries.md must require a separate execution lane RFC for any future execution")
+    if "当前唯一允许保留为 live" in text or "topLiveEligiblePolicy" in text:
+        fail(errors, "docs/backend/safety-boundaries.md must not preserve the retired live-route doctrine")
+
+
+def check_active_shadow_doctrine(root: Path, errors: list[str]) -> None:
+    for rel in ACTIVE_SHADOW_DOCTRINE_DOCS:
+        path = root / rel
+        if not path.exists():
+            continue
+        text = read_text(path)
+        if not any(marker in text for marker in ACTIVE_SHADOW_BOUNDARY_MARKERS):
+            fail(errors, f"{rel} must state the permanent Shadow/ReadOnly no-execution boundary")
+        for pattern in FORBIDDEN_ACTIVE_EXECUTION_PATTERNS:
+            if pattern.search(text):
+                fail(errors, f"{rel} contains retired active-execution doctrine: {pattern.pattern}")
+
+    for rel in RETIRED_LIVE_RUNBOOKS:
+        path = root / rel
+        if not path.exists():
+            continue
+        heading = "\n".join(read_text(path).splitlines()[:8])
+        if "Historical / Retired" not in heading or "已退役" not in heading:
+            fail(errors, f"{rel} must be explicitly marked Historical / Retired and 已退役 near the top")
 
 
 def main() -> int:
@@ -336,6 +409,7 @@ def main() -> int:
     check_api_contract_markdown_sync(root, errors)
     check_phase_docs(root, errors)
     check_live_lane_doctrine(root, errors)
+    check_active_shadow_doctrine(root, errors)
 
     if errors:
         print("QuantGodDocs quality gate failed:", file=sys.stderr)
