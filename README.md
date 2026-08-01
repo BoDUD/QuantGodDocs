@@ -6,36 +6,36 @@ This repository is the source of truth for architecture, API contracts, runbooks
 
 ## System Summary
 
-QuantGod v2.6 is a local-first USDJPY autonomous research and execution-governance system with an auditable Strategy JSON GA evolution trace:
+QuantGod is a local-first foreign-exchange research, Shadow Advisory, and operations-observability system. USDJPY is the current primary pair, while other FX pairs may enter the same read-only research process after their data and safety evidence passes:
 
 ```text
-Live Lane: USDJPYc / RSI_Reversal / LONG / cent account
-MT5 Shadow Lane: USDJPY multi-strategy simulation and tester research
-HFM Crypto CFD Shadow Lane: local HFM symbol evidence, Moss backtest profile mapping, and shadow-only research
-Agent: autonomous daily todo, daily review, promotion, demotion, rollback
+Execution lane: none; executionLaneExists=false; existingEaOwnsExecution=false
+MT5 Shadow Lane: USDJPY multi-strategy simulation, tester research, and advisory ranking; other FX pairs require separate validation
+Agent: autonomous daily todo, daily review, evidence promotion/demotion, and research rollback
 GA Trace: Strategy JSON seeds, generations, fitness, blockers, elites, mutation, and crossover
-Hard guards: runtime freshness, fastlane quality, spread, high-impact news, loss, and rollback
+Hard guards: runtime freshness, fastlane quality, spread, and evidence integrity; failures remain fail-closed
 ```
 
 Core principle:
 
 ```text
-Live narrow. Simulation broad. Promotion fast. Rollback hard.
+Observe broadly. Advise narrowly. Execute nowhere. Fail closed.
 ```
 
 ## Repository Map
 
 | Repository | Responsibility | Must not contain |
 |---|---|---|
-| `QuantGodBackend` | MT5 assets, local API, Agent tools, USDJPY replay/walk-forward/lifecycle, Telegram push | Vue source, Cloudflare source, long-form docs hub |
+| `QuantGodBackend` | MT5 assets, local API, Agent tools, USDJPY replay/walk-forward/lifecycle, Telegram push | Vue source, infrastructure source, long-form docs hub |
 | `QuantGodFrontend` | Vue operator workbench and `/api/*` client modules | MT5 source, Python tools, direct runtime file reads |
-| `QuantGodInfra` | Workspace automation, launchd, Docker local, dist sync, optional Cloudflare/Cloud Sync | Trading logic, live preset policy, product docs hub |
+| `QuantGodInfra` | Local workspace automation, launchd, Docker local, dist sync | Trading logic, live preset policy, product docs hub |
 | `QuantGodDocs` | Architecture, API contracts, runbooks, safety, maintenance records | Runtime output, credentials, execution code |
 
 ## Start Reading
 
 | Topic | Document |
 |---|---|
+| 2026 全系统完善设计书 | [QuantGod 全系统完善设计书](docs/architecture/quantgod-system-perfection-design-2026-08-01.md) |
 | Four-repo architecture | [Repo split architecture](docs/architecture/repo-split.md) |
 | Module boundaries | [Module boundaries](docs/architecture/module-boundaries.md) |
 | Repo linkage contract | [Linkage contract](docs/architecture/linkage-contract.md) |
@@ -49,10 +49,9 @@ Live narrow. Simulation broad. Promotion fast. Rollback hard.
 
 | Area | Document |
 |---|---|
-| Autonomous multi-lane Agent | [QuantGod v2.5 three-lane Agent](docs/ops/usdjpy-cent-autonomous-multilane-agent.md) |
+| Autonomous FX Agent | [USDJPY cent-account Agent](docs/ops/usdjpy-cent-autonomous-multilane-agent.md) |
 | Strategy JSON GA trace | [Strategy JSON GA evolution trace](docs/ops/strategy-json-ga-evolution-trace.md) |
 | Strategy GA Factory | [Strategy GA Factory](docs/ops/strategy-ga-factory.md) |
-| Trading Agent article gap audit | [Trading Agent Article Gap Audit](docs/ops/trading-agent-article-gap-audit.md) |
 | USDJPY GA Factory | [USDJPY GA Factory](docs/ops/usdjpy-ga-factory.md) |
 | Telegram Gateway observability | [Telegram Gateway observability](docs/ops/telegram-gateway-observability.md) |
 | Strategy JSON USDJPY backtest | [Strategy JSON USDJPY backtest](docs/ops/strategy-json-usdjpy-backtest.md) |
@@ -63,7 +62,7 @@ Live narrow. Simulation broad. Promotion fast. Rollback hard.
 | Execution feedback producer | [Execution Feedback Producer](docs/ops/execution-feedback-producer.md) |
 | News gate simplification | [News gate simplification](docs/ops/news-gate-simplification.md) |
 | USDJPY autonomous governance | [USDJPY autonomous Agent](docs/ops/usdjpy-autonomous-agent.md) |
-| USDJPY live loop and daily autopilot | [USDJPY live loop daily autopilot](docs/ops/usdjpy-live-loop-daily-autopilot.md) |
+| USDJPY Shadow Advisory and daily autopilot | [USDJPY Shadow Advisory daily autopilot](docs/ops/usdjpy-live-loop-daily-autopilot.md) |
 | USDJPY strategy policy lab | [USDJPY strategy policy lab](docs/ops/usdjpy-strategy-policy-lab.md) |
 | USDJPY runtime evolution core | [USDJPY runtime evolution core](docs/ops/usdjpy-runtime-evolution-core.md) |
 | Causal replay simulator | [USDJPY bar replay simulator](docs/ops/usdjpy-bar-replay-simulator.md) |
@@ -87,7 +86,7 @@ Recent maintenance records:
 - [P3-18 replay fidelity hardening](docs/maintenance/p3-18-replay-fidelity-hardening.md)
 - [P3-19 bar replay simulator](docs/maintenance/p3-19-usdjpy-bar-replay-simulator.md)
 - [P3-20 autonomous walk-forward promotion gate](docs/maintenance/p3-20-autonomous-walk-forward-promotion-gate.md)
-- [P3-21 three-lane autonomous lifecycle](docs/maintenance/p3-21-usdjpy-cent-autonomous-multilane-agent.md)
+- [P3-21 USDJPY autonomous lifecycle](docs/maintenance/p3-21-usdjpy-cent-autonomous-multilane-agent.md)
 - [v2.5.1 news gate simplification](docs/maintenance/v2-5-1-news-gate.md)
 - [v2.6 Strategy JSON GA trace](docs/maintenance/v2-6-strategy-json-ga-trace.md)
 - [v2.6.1 Strategy JSON USDJPY backtest](docs/maintenance/v2-6-1-strategy-json-usdjpy-backtest.md)
@@ -119,16 +118,16 @@ When a backend `/api/*` endpoint changes, update:
 
 Documentation should consistently reflect these constraints:
 
-- Live Lane is limited to `USDJPYc / RSI_Reversal / LONG`.
-- MT5 Shadow Lane may simulate and rank multiple USDJPY strategies, but cannot seize the live route.
-- HFM Crypto CFD is shadow-only; no broker order send, close, cancel, live preset mutation, wallet signing, or credential custody.
+- The current product has no Live Lane. `USDJPYc / RSI_Reversal / LONG` is not an exception; every strategy remains Shadow / ReadOnly and `executionLaneExists=false`.
+- MT5 Shadow Lane may simulate and rank multiple FX strategies, but no result can create an execution route. Other FX pairs remain research-only until separately validated.
+- Crypto-only lanes, including Bitcoin, HFM Crypto CFD, Moss and Hyperliquid, are outside the product scope and must not appear in active routes, workspaces or runbooks. HFM remains supported as an FX broker.
 - Telegram is push-only; Telegram command execution is out of scope.
-- DeepSeek explains, summarizes, and reviews; it does not approve live execution or override rollback.
-- `QG_AUTO_MAX_LOT=2.0` is an upper bound, not a fixed lot size.
-- Runtime stale, fastlane degraded, high-impact news, abnormal spread, daily loss, and loss streak gates remain hard stops.
-- Ordinary news is a soft risk adjustment by default: it can downgrade stage or reduce lot, but should not by itself block USDJPY RSI LONG.
-- Agent may write controlled patch evidence through staged governance; it must not mutate source code or live preset directly.
-- GA may generate and score Strategy JSON candidates for shadow/tester/paper research, but it must not directly enter live execution or mutate live preset.
+- DeepSeek explains, summarizes, and reviews; it cannot create execution authority or override fail-closed evidence gates.
+- Lot and stage fields in compatibility artifacts are research estimates only; they cannot become broker order parameters.
+- Runtime stale, fastlane degraded, high-impact news, abnormal spread, and evidence-integrity failures remain Shadow Advisory blockers.
+- Ordinary news may adjust a hypothetical research score or recommendation, but it never causes an order because no execution lane exists.
+- Agent may write controlled research-patch evidence through staged governance; it must not mutate source code, preset, or broker state.
+- GA may generate and score Strategy JSON candidates for shadow/tester/paper research, but it can never enter execution or mutate a preset.
 
 ## Local Checks
 

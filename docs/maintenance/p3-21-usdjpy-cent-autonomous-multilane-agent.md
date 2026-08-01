@@ -1,11 +1,10 @@
-# P3-21 维护记录：USDJPY 美分账户三车道自主 Agent
+# P3-21 维护记录：USDJPY 美分账户自主 Agent
 
-P3-21 将 QuantGod 从单一 USDJPY 自主治理门扩展为三车道自主生命周期。v2.5 在此基础上补齐 Agent 今日待办、Agent 每日复盘、下一阶段任务、字段语义硬化和美分账户快速晋级门。
+P3-21 为 USDJPY 自主治理补齐 Agent 今日待办、Agent 每日复盘、下一阶段任务、字段语义硬化和美分账户快速晋级门。2026-08-01 产品范围收敛为 forex-only；本记录同步只保留外汇主线。
 
 ```text
 Live Lane              USDJPYc / RSI_Reversal / LONG / cent account
 MT5 Shadow Lane        USDJPY 多策略模拟、回放、tester 和 ranking
-HFM Crypto CFD Shadow Lane 品种证据扫描、Moss 回测 profile 映射和 shadow-only 研究
 ```
 
 ## 本阶段新增
@@ -22,7 +21,6 @@ tools/run_daily_autopilot_v2.py
 GET  /api/usdjpy-strategy-lab/autonomous-agent/lifecycle
 GET  /api/usdjpy-strategy-lab/autonomous-agent/lanes
 GET  /api/usdjpy-strategy-lab/autonomous-agent/mt5-shadow
-GET  /api/usdjpy-strategy-lab/autonomous-agent/hfm-crypto-shadow
 GET  /api/usdjpy-strategy-lab/autonomous-agent/ea-repro
 GET  /api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2
 GET  /api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2/status
@@ -60,7 +58,7 @@ autoAppliedByAgent=true/false
 
 - Live Lane 只允许 USDJPYc / RSI_Reversal / LONG；
 - MT5 Shadow Lane 可以多策略模拟，但不能直接进真钱实盘；
-- HFM Crypto CFD 永远不连接钱包、不保存 broker 凭证、不下单；
+- 非外汇品种不在系统范围内；HFM 仅保留外汇 broker 角色；
 - 最大 2.0 是上限，不是固定仓位；
 - Agent 不修改 `.mq5` 源码；
 - Agent 不写 MT5 OrderRequest；

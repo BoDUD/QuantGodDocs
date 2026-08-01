@@ -31,10 +31,36 @@ jobs:
       - name: Validate API contract standalone
         run: python scripts/check_api_contract_matches_backend.py --contract docs/contracts/api-contract.json --min-endpoints 100
 
+      - name: Resolve Backend ref for cross-repo contract drift check
+        id: backend-ref
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          DOCS_HEAD_REF: ${{ github.head_ref }}
+        run: |
+          backend_ref=main
+          backend_ref_source="Backend main (push/default)"
+
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            if [ -n "$DOCS_HEAD_REF" ] && git ls-remote --exit-code --heads \
+              https://github.com/BoDUD/QuantGodBackend.git \
+              "refs/heads/$DOCS_HEAD_REF" >/dev/null 2>&1; then
+              backend_ref="$DOCS_HEAD_REF"
+              backend_ref_source="matching Backend PR branch"
+            else
+              echo "::warning::No matching BoDUD/QuantGodBackend branch for Docs head '$DOCS_HEAD_REF'; explicitly falling back to Backend main. Strict contract comparison remains enabled."
+              backend_ref_source="Backend main (explicit PR fallback)"
+            fi
+          fi
+
+          echo "ref=$backend_ref" >> "$GITHUB_OUTPUT"
+          echo "source=$backend_ref_source" >> "$GITHUB_OUTPUT"
+          echo "Backend contract ref: $backend_ref ($backend_ref_source)"
+
       - name: Checkout Backend for cross-repo contract drift check
         uses: actions/checkout@v4
         with:
           repository: BoDUD/QuantGodBackend
+          ref: ${{ steps.backend-ref.outputs.ref }}
           path: backend-checkout
 
       - name: Validate API contract against Backend routes
@@ -51,7 +77,6 @@ jobs:
           test ! -d Dashboard
           test ! -d tools/ai_analysis
           test ! -d frontend
-          test ! -d cloudflare
 
       - name: Secret hygiene
         run: |

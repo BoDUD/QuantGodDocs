@@ -87,6 +87,61 @@ SECRET_PATTERNS = [
     re.compile(r"TELEGRAM_BOT_TOKEN\s*=\s*['\"][^'\"]+['\"]", re.I),
 ]
 
+CRYPTO_ONLY_ENDPOINT_MARKERS = (
+    "crypto",
+    "hyperliquid",
+    "bitcoin",
+    "/btc",
+    "moss",
+)
+
+ACTIVE_SHADOW_DOCTRINE_DOCS = [
+    "README.md",
+    "docs/backend/usdjpy-strategy-lab-api.md",
+    "docs/ops/auto-execution-policy-tuner.md",
+    "docs/ops/ga-multi-generation-stability.md",
+    "docs/ops/news-gate-simplification.md",
+    "docs/ops/production-evidence-validation.md",
+    "docs/ops/strategy-json-ga-evolution-trace.md",
+    "docs/ops/usdjpy-autonomous-agent.md",
+    "docs/ops/usdjpy-cent-autonomous-multilane-agent.md",
+    "docs/ops/usdjpy-ea-lab-runbook.md",
+    "docs/ops/usdjpy-evidence-os.md",
+    "docs/ops/usdjpy-ga-factory.md",
+    "docs/ops/usdjpy-runtime-evolution-core.md",
+    "docs/ops/usdjpy-strategy-policy-lab.md",
+]
+
+ACTIVE_SHADOW_BOUNDARY_MARKERS = (
+    "executionLaneExists=false",
+    "没有 execution lane",
+    "no execution lane",
+    "no such lane exists",
+    "不能创建 execution lane",
+    "不能直接或间接创建实盘执行能力",
+    "生产 EA 不再生成 order-send",
+)
+
+RETIRED_LIVE_RUNBOOKS = [
+    "docs/ops/mt5-hfm-live-pilot.md",
+]
+
+FORBIDDEN_ACTIVE_EXECUTION_PATTERNS = [
+    re.compile(r"(?m)^Live Lane:\s*USDJPY"),
+    re.compile(r"(?m)^#{2,3}\s+Live Lane\s*$"),
+    re.compile(r"Live Lane\s*=\s*USDJPY", re.I),
+    re.compile(r"Live Lane (?:is|remains) limited", re.I),
+    re.compile(r"实盘车道只允许"),
+    re.compile(r"现有 RSI live 策略保持恢复状态", re.I),
+    re.compile(r"新增策略想进入实盘"),
+    re.compile(r"(?m)^\s*QG_AUTO_MAX_LOT\s*="),
+    re.compile(r"topLiveEligiblePolicy"),
+    re.compile(r"`MICRO_LIVE`\s*只允许"),
+    re.compile(r"参数候选只能通过 autonomous promotion gate[^\n]*MICRO_LIVE"),
+    re.compile(r"进入 `MICRO_LIVE` 或 `LIVE_LIMITED`"),
+    re.compile(r"Live pilot preset (?:uses|使用)", re.I),
+]
+
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
@@ -185,9 +240,13 @@ def check_api_contract(root: Path, errors: list[str]) -> None:
     endpoints = collect_endpoints(contract)
     if len(endpoints) < 100:
         fail(errors, f"api contract endpoint count too low: {len(endpoints)} < 100")
-    invalid = [endpoint for endpoint in endpoints if not endpoint.startswith("/api/")]
+    invalid = [
+        endpoint
+        for endpoint in endpoints
+        if not endpoint.startswith("/api/") and endpoint not in {"/healthz", "/readyz"}
+    ]
     if invalid:
-        fail(errors, f"api contract contains non-/api endpoint(s): {invalid[:5]}")
+        fail(errors, f"api contract contains unsupported endpoint(s): {invalid[:5]}")
     missing_modes: list[str] = []
     invalid_modes: list[str] = []
     for group in contract.get("endpointGroups", []):
@@ -207,38 +266,24 @@ def check_api_contract(root: Path, errors: list[str]) -> None:
         fail(errors, f"api contract endpoint mode missing: {missing_modes[:8]}")
     if invalid_modes:
         fail(errors, f"api contract endpoint mode invalid: {invalid_modes[:8]}")
-    hfm_status = None
-    for group in contract.get("endpointGroups", []):
-        if not isinstance(group, dict):
-            continue
-        for endpoint in group.get("endpoints", []):
-            if isinstance(endpoint, dict) and endpoint.get("path") == "/api/hfm-crypto/status":
-                hfm_status = endpoint
-                break
-        if hfm_status:
-            break
-    if not isinstance(hfm_status, dict):
-        fail(errors, "api contract must include /api/hfm-crypto/status")
-    else:
-        variants = hfm_status.get("queryVariants") or []
-        summary = next(
-            (
-                variant
-                for variant in variants
-                if isinstance(variant, dict) and variant.get("query") == "view=summary"
-            ),
-            None,
+    crypto_only = [
+        endpoint
+        for endpoint in endpoints
+        if any(marker in endpoint.lower() for marker in CRYPTO_ONLY_ENDPOINT_MARKERS)
+    ]
+    if crypto_only:
+        fail(errors, f"forex-only contract contains crypto-only endpoint(s): {crypto_only[:8]}")
+    crypto_groups = [
+        str(group.get("name"))
+        for group in contract.get("endpointGroups", [])
+        if isinstance(group, dict)
+        and any(
+            token in str(group.get("name") or "").lower()
+            for token in ("crypto", "bitcoin", "btc", "hyperliquid", "moss")
         )
-        if not summary:
-            fail(errors, "api contract must document /api/hfm-crypto/status?view=summary")
-        summary_text = json.dumps(summary or {}, ensure_ascii=False)
-        status_text = json.dumps(hfm_status, ensure_ascii=False)
-        if "brokerSymbolDiagnostics" not in status_text or "brokerSymbolDiagnostics" not in summary_text:
-            fail(errors, "HFM summary contract must preserve brokerSymbolDiagnostics")
-        if "operatorChecklist" not in status_text or "operatorChecklist" not in summary_text:
-            fail(errors, "HFM summary contract must preserve operatorChecklist")
-        if "safety" not in summary_text:
-            fail(errors, "HFM summary contract must preserve safety flags")
+    ]
+    if crypto_groups:
+        fail(errors, f"forex-only contract contains crypto-only group(s): {crypto_groups[:8]}")
 
     safety = contract.get("safetyDefaults") or contract.get("safety") or {}
     if not isinstance(safety, dict):
@@ -304,23 +349,49 @@ def check_live_lane_doctrine(root: Path, errors: list[str]) -> None:
         return
     text = read_text(safety_path)
     required_terms = [
+        "当前没有 live lane",
+        "executionLaneExists=false",
         "USDJPYc / RSI_Reversal / LONG",
         "MA_Cross",
         "USDJPY_NIGHT_REVERSION_SAFE",
         "SHADOW",
         "TESTER_ONLY",
         "PAPER_LIVE_SIM",
-        "topLiveEligiblePolicy",
+        "topAdvisoryPolicy",
+        "broker mutation",
         "order-send",
         "live-preset-mutation",
     ]
     for term in required_terms:
         if term not in text:
-            fail(errors, f"docs/backend/safety-boundaries.md must preserve live lane doctrine term: {term}")
-    if "非 RSI" not in text and "non-RSI" not in text:
-        fail(errors, "docs/backend/safety-boundaries.md must state non-RSI routes remain non-live")
+            fail(errors, f"docs/backend/safety-boundaries.md must preserve Shadow-only doctrine term: {term}")
+    if "不例外" not in text:
+        fail(errors, "docs/backend/safety-boundaries.md must state RSI is not an execution exception")
     if "单独执行 lane RFC" not in text and "separate execution lane RFC" not in text:
-        fail(errors, "docs/backend/safety-boundaries.md must require a separate execution lane RFC for non-RSI/HFM live execution")
+        fail(errors, "docs/backend/safety-boundaries.md must require a separate execution lane RFC for any future execution")
+    if "当前唯一允许保留为 live" in text or "topLiveEligiblePolicy" in text:
+        fail(errors, "docs/backend/safety-boundaries.md must not preserve the retired live-route doctrine")
+
+
+def check_active_shadow_doctrine(root: Path, errors: list[str]) -> None:
+    for rel in ACTIVE_SHADOW_DOCTRINE_DOCS:
+        path = root / rel
+        if not path.exists():
+            continue
+        text = read_text(path)
+        if not any(marker in text for marker in ACTIVE_SHADOW_BOUNDARY_MARKERS):
+            fail(errors, f"{rel} must state the permanent Shadow/ReadOnly no-execution boundary")
+        for pattern in FORBIDDEN_ACTIVE_EXECUTION_PATTERNS:
+            if pattern.search(text):
+                fail(errors, f"{rel} contains retired active-execution doctrine: {pattern.pattern}")
+
+    for rel in RETIRED_LIVE_RUNBOOKS:
+        path = root / rel
+        if not path.exists():
+            continue
+        heading = "\n".join(read_text(path).splitlines()[:8])
+        if "Historical / Retired" not in heading or "已退役" not in heading:
+            fail(errors, f"{rel} must be explicitly marked Historical / Retired and 已退役 near the top")
 
 
 def main() -> int:
@@ -338,6 +409,7 @@ def main() -> int:
     check_api_contract_markdown_sync(root, errors)
     check_phase_docs(root, errors)
     check_live_lane_doctrine(root, errors)
+    check_active_shadow_doctrine(root, errors)
 
     if errors:
         print("QuantGodDocs quality gate failed:", file=sys.stderr)

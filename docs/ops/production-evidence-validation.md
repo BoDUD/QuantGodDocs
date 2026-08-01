@@ -7,7 +7,7 @@ It validates five evidence areas:
 1. Core runtime evidence integrity.
 2. USDJPY historical data production status.
 3. Strategy JSON / Python / EA parity coverage by strategy family.
-4. Live and shadow execution feedback field coverage.
+4. Shadow evaluation and historical execution-feedback compatibility coverage.
 5. GA multi-generation stability evidence.
 
 It also imports Case Memory taxonomy coverage from the core runtime evidence manifest. If Case Memory is missing required categories or target sample counts, P4-6 must remain blocked even when the evidence files themselves are present and hashed.
@@ -173,7 +173,7 @@ SHADOW_RESEARCH_ONLY
 WATCH
 ```
 
-`PASS` means the live-eligible route or direct parity evidence is covered. `SHADOW_RESEARCH_ONLY` means the family has Strategy JSON backtest coverage but remains a research candidate and cannot seize the USDJPY RSI live lane. `WATCH` means partial shadow adapter evidence exists and should be observed.
+`PASS` means direct parity evidence is covered. `SHADOW_RESEARCH_ONLY` means the family has Strategy JSON backtest coverage but remains a research candidate. `WATCH` means partial shadow adapter evidence exists and should be observed. None of these states creates execution authority; `executionLaneExists=false`.
 
 ## Execution Feedback Coverage
 

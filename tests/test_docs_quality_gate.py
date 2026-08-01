@@ -44,19 +44,6 @@ class DocsQualityGateTests(unittest.TestCase):
             root = Path(tmp)
             (root / "docs/contracts").mkdir(parents=True)
             endpoints = [{"path": f"/api/example/{idx}", "mode": "read-only"} for idx in range(100)]
-            endpoints.append(
-                {
-                    "path": "/api/hfm-crypto/status",
-                    "mode": "read-only",
-                    "queryVariants": [
-                        {
-                            "query": "view=summary",
-                            "description": "Preserves operatorChecklist, brokerSymbolDiagnostics and safety for compact first paint.",
-                        }
-                    ],
-                    "description": "HFM status includes operatorChecklist and brokerSymbolDiagnostics.",
-                }
-            )
             contract = {
                 "endpointGroups": [{"name": "example", "endpoints": endpoints}],
                 "safetyDefaults": {
@@ -74,7 +61,34 @@ class DocsQualityGateTests(unittest.TestCase):
             module.check_api_contract(root, errors)
             self.assertEqual(errors, [])
 
-    def test_api_contract_rejects_missing_hfm_summary_contract(self):
+    def test_api_contract_allows_standard_local_health_endpoints(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "docs/contracts").mkdir(parents=True)
+            endpoints = [{"path": f"/api/example/{idx}", "mode": "read-only"} for idx in range(100)]
+            endpoints.extend([
+                {"path": "/healthz", "mode": "read-only"},
+                {"path": "/readyz", "mode": "read-only"},
+            ])
+            contract = {
+                "endpointGroups": [{"name": "example", "endpoints": endpoints}],
+                "safetyDefaults": {
+                    "orderSendAllowed": False,
+                    "closeAllowed": False,
+                    "cancelAllowed": False,
+                    "credentialStorageAllowed": False,
+                    "livePresetMutationAllowed": False,
+                    "canOverrideKillSwitch": False,
+                    "telegramCommandExecutionAllowed": False,
+                },
+            }
+            (root / "docs/contracts/api-contract.json").write_text(json.dumps(contract), encoding="utf-8")
+            errors = []
+            module.check_api_contract(root, errors)
+            self.assertEqual(errors, [])
+
+    def test_api_contract_rejects_crypto_only_endpoint(self):
         module = load_module()
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -96,7 +110,37 @@ class DocsQualityGateTests(unittest.TestCase):
             (root / "docs/contracts/api-contract.json").write_text(json.dumps(contract), encoding="utf-8")
             errors = []
             module.check_api_contract(root, errors)
-            self.assertTrue(any("status?view=summary" in error for error in errors))
+            self.assertTrue(any("crypto-only endpoint" in error for error in errors))
+
+    def test_api_contract_rejects_crypto_only_group(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "docs/contracts").mkdir(parents=True)
+            contract = {
+                "endpointGroups": [
+                    {
+                        "name": "bitcoin-research",
+                        "endpoints": [
+                            {"path": f"/api/example/{idx}", "mode": "read-only"}
+                            for idx in range(100)
+                        ],
+                    }
+                ],
+                "safetyDefaults": {
+                    "orderSendAllowed": False,
+                    "closeAllowed": False,
+                    "cancelAllowed": False,
+                    "credentialStorageAllowed": False,
+                    "livePresetMutationAllowed": False,
+                    "canOverrideKillSwitch": False,
+                    "telegramCommandExecutionAllowed": False,
+                },
+            }
+            (root / "docs/contracts/api-contract.json").write_text(json.dumps(contract), encoding="utf-8")
+            errors = []
+            module.check_api_contract(root, errors)
+            self.assertTrue(any("crypto-only group" in error for error in errors))
 
     def test_api_contract_requires_endpoint_modes(self):
         module = load_module()
@@ -104,7 +148,7 @@ class DocsQualityGateTests(unittest.TestCase):
             root = Path(tmp)
             (root / "docs/contracts").mkdir(parents=True)
             endpoints = [{"path": f"/api/example/{idx}", "mode": "read-only"} for idx in range(100)]
-            endpoints.append({"path": "/api/hfm-crypto/status"})
+            endpoints.append({"path": "/api/example/no-mode"})
             contract = {
                 "endpointGroups": [{"name": "example", "endpoints": endpoints}],
                 "safetyDefaults": {
@@ -122,7 +166,7 @@ class DocsQualityGateTests(unittest.TestCase):
             module.check_api_contract(root, errors)
             self.assertTrue(any("endpoint mode missing" in error for error in errors))
 
-    def test_live_lane_doctrine_accepts_current_freeze(self):
+    def test_live_lane_doctrine_accepts_permanent_shadow_boundary(self):
         module = load_module()
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -132,9 +176,10 @@ class DocsQualityGateTests(unittest.TestCase):
                 "\n".join(
                     [
                         "# Backend 安全边界",
-                        "当前唯一 live lane 是 USDJPYc / RSI_Reversal / LONG。",
-                        "MA_Cross 与 USDJPY_NIGHT_REVERSION_SAFE 等非 RSI 路线只能保留在 SHADOW、TESTER_ONLY、PAPER_LIVE_SIM。",
-                        "它们不能抢 topLiveEligiblePolicy。",
+                        "当前没有 live lane，executionLaneExists=false。",
+                        "USDJPYc / RSI_Reversal / LONG 也不例外，只能生成 topAdvisoryPolicy。",
+                        "MA_Cross 与 USDJPY_NIGHT_REVERSION_SAFE 只能保留在 SHADOW、TESTER_ONLY、PAPER_LIVE_SIM。",
+                        "活动 EA 已物理移除 broker mutation 原语。",
                         "未来必须单独执行 lane RFC，且 order-send 与 live-preset-mutation 继续为 false。",
                     ]
                 ),
@@ -144,19 +189,64 @@ class DocsQualityGateTests(unittest.TestCase):
             module.check_live_lane_doctrine(root, errors)
             self.assertEqual(errors, [])
 
-    def test_live_lane_doctrine_rejects_soft_non_rsi_boundary(self):
+    def test_live_lane_doctrine_rejects_retired_live_route_boundary(self):
         module = load_module()
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             safety = root / "docs/backend/safety-boundaries.md"
             safety.parent.mkdir(parents=True)
             safety.write_text(
-                "# Backend 安全边界\n新增策略经过治理后可进入实盘。\n",
+                "# Backend 安全边界\n当前唯一允许保留为 live 的路线是 USDJPYc / RSI_Reversal / LONG，其他策略经过治理后可进入实盘。\n",
                 encoding="utf-8",
             )
             errors = []
             module.check_live_lane_doctrine(root, errors)
-            self.assertTrue(any("live lane doctrine" in error for error in errors))
+            self.assertTrue(
+                any("Shadow-only doctrine" in error or "retired live-route doctrine" in error for error in errors)
+            )
+
+    def test_active_shadow_doctrine_accepts_current_runbooks(self):
+        module = load_module()
+        errors = []
+
+        module.check_active_shadow_doctrine(ROOT, errors)
+
+        self.assertEqual(errors, [])
+
+    def test_active_shadow_doctrine_rejects_live_lane_and_auto_lot_instructions(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            readme = root / "README.md"
+            readme.write_text(
+                "\n".join(
+                    [
+                        "# QuantGodDocs",
+                        "Shadow / ReadOnly research with executionLaneExists=false.",
+                        "Live Lane: USDJPYc / RSI_Reversal / LONG",
+                        "QG_AUTO_MAX_LOT=2.0",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            errors = []
+
+            module.check_active_shadow_doctrine(root, errors)
+
+            self.assertTrue(any("retired active-execution doctrine" in error for error in errors))
+
+    def test_retired_live_runbook_requires_bilingual_retired_marker(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runbook = root / "docs/ops/mt5-hfm-live-pilot.md"
+            runbook.parent.mkdir(parents=True)
+            runbook.write_text("# MT5 / HFM Live Pilot\n\nCurrent operations.\n", encoding="utf-8")
+            errors = []
+
+            module.check_active_shadow_doctrine(root, errors)
+
+            self.assertTrue(any("Historical / Retired" in error for error in errors))
 
     def test_api_contract_markdown_sync_accepts_rendered_markdown(self):
         module = load_module()

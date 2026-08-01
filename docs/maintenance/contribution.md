@@ -6,7 +6,7 @@ QuantGod 现在是四仓库体系。提交前先判断改动归属。
 
 - MQL5、Python tools、Node API、AI、Governance、ParamLab：改 `QuantGodBackend`。
 - Vue 页面、service wrapper、Kline、Monaco、Ant Design：改 `QuantGodFrontend`。
-- workspace、dist 同步、Cloudflare、部署脚本：改 `QuantGodInfra`。
+- workspace、dist 同步、本地部署脚本：改 `QuantGodInfra`。
 - 文档、API contract、runbook、phase 状态：改 `QuantGodDocs`。
 
 ## API 变化流程

@@ -1,6 +1,6 @@
 # USDJPY Evidence OS
 
-USDJPY Evidence OS is the first Perfect Edition evidence layer. It connects the Strategy JSON backtest, Python replay, MQL5 EA diagnostics, live execution feedback, Case Memory, and a push-only Telegram Gateway into one auditable chain.
+USDJPY Evidence OS is the first Perfect Edition evidence layer. It connects the Strategy JSON backtest, Python replay, MQL5 EA diagnostics, Shadow evaluation / historical feedback compatibility, Case Memory, and a push-only Telegram Gateway into one auditable chain.
 
 It is still a research and audit plane. It does not send orders, close positions, cancel orders, mutate live presets, connect external real-money market access, or receive Telegram trading commands.
 
@@ -11,7 +11,7 @@ QuantGod_MT5RuntimeSnapshot_USDJPYc.json
 → SQLite K-line ingest
 → Strategy JSON backtest
 → Strategy JSON / Python Replay / MQL5 EA parity
-→ Live execution feedback
+→ Shadow evaluation / historical feedback compatibility
 → Case Memory
 → GA fitness evidence
 → Telegram Gateway push-only summary
@@ -48,20 +48,20 @@ python3 tools/run_telegram_gateway.py --runtime-dir ./runtime enqueue --text '�
 python3 tools/run_telegram_gateway.py --runtime-dir ./runtime dispatch
 ```
 
-## Execution Feedback
+## Shadow / Historical Feedback Compatibility
 
-Execution feedback now reads multiple local evidence sources when present:
+The `LiveExecutionFeedback` filenames and schema identifier are retained only for backward compatibility. Current production EA code has no order-send, close, cancel, or modify primitives and therefore cannot generate new broker mutation events. Evidence OS may read these local sources when present:
 
-- `QuantGod_LiveExecutionFeedback.jsonl` written by `QuantGod_MultiStrategy.mq5` in real time from order-send results and `OnTradeTransaction`.
-- `QuantGod_LiveExecutionFeedbackHistory.jsonl` rebuilt by the EA from broker trade history during dashboard export.
+- `QuantGod_LiveExecutionFeedback.jsonl` from retired/historical runs; read-only and never treated as proof of a current execution lane.
+- `QuantGod_LiveExecutionFeedbackHistory.jsonl` from existing historical broker records, when available.
 - `QuantGod_RuntimeTradeEvents.jsonl` from the MT5 fast lane exporter.
-- `live/QuantGod_USDJPYLiveLoopLedger.csv`.
+- `live/QuantGod_USDJPYLiveLoopLedger.csv`, whose directory name is also a compatibility name.
 - trade journal, trade event link, outcome label, close history, and EA dry-run ledgers.
-- latest live-loop status as a low-fidelity fallback.
+- latest Shadow Advisory status as a low-fidelity fallback.
 
-The EA emits the standard `quantgod.live_execution_feedback.v1` schema with `feedbackId`, `eventType`, `policyId`, `strategyId`, `intentId`, `expectedPrice`, `fillPrice`, `slippagePips`, `spreadAtEntry`, `latencyMs`, `retcode`, `rejectReason`, `exitReason`, `profitR`, `profitUSC`, `mfeR`, and `maeR`. The report normalizes fills, closes, accepted order requests, rejects, retcodes, slippage, latency, profitR, MFE/MAE, policy mismatch, and execution quality gates. It also derives `dominantRejectReason`, `acceptedWithoutFillCount`, `maxLatencyMs`, reject rate, slippage gates, latency gates, and accepted-without-fill gates. It appends stable feedback IDs to `runtime/evidence_os/QuantGod_LiveExecutionFeedback.jsonl` so repeated runs do not duplicate rows.
+The compatibility schema `quantgod.live_execution_feedback.v1` may contain `feedbackId`, `eventType`, price, slippage, latency, reject, and outcome fields from historical or simulated evidence. The report normalizes those fields and appends stable IDs without duplicating rows. Current Shadow output must not fabricate fills, accepts, rejects, broker retcodes, or other real-execution claims.
 
-GA fitness consumes these execution quality fields. High reject rate, excessive slippage, high latency, accepted-without-fill drift, or policy mismatch increase `executionFeedback.penalty`; repeated execution cases add a bounded `caseMemory.penalty`. This keeps GA from promoting strategies that only look good in replay but degrade when the real EA/broker feedback is poor.
+GA fitness may consume clearly sourced historical or simulated quality fields. Missing current broker evidence is expected and cannot be “fixed” by enabling execution. These fields can lower research confidence, but they never gate entry into a live lane because no such lane exists.
 
 ## Case Memory
 

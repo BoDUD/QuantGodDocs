@@ -29,7 +29,7 @@ Node API contract test 不能使用 `check=False`，也不能依赖 shell glob�
 
 `verify` 应该检查：
 
-- Backend 不含 `frontend/` 和 `cloudflare/`。
+- Backend 不含 `frontend/` 或基础设施源码。
 - Frontend 不含 `MQL5/`、`Dashboard/`、`tools/`。
 - Infra 不含交易代码和 Vue 页面实现。
 - Docs 不含 runtime 文件和执行代码。

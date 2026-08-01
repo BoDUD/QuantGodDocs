@@ -27,10 +27,11 @@ Should the next generation use elite-guided mutation or expand search?
 
 ## Safety
 
-This layer only organizes research evidence. It cannot change the Live Lane:
+This layer only organizes research evidence. The current product has no Live Lane:
 
 ```text
-Live Lane = USDJPYc / RSI_Reversal / LONG
+executionLaneExists=false
+existingEaOwnsExecution=false
 ```
 
-GA Factory output can support shadow and tester work, but cannot directly approve micro-live or live-limited execution.
+GA Factory output can support Shadow and tester work only. It cannot approve, indirectly prepare, or create broker execution.

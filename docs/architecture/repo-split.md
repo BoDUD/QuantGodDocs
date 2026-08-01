@@ -28,7 +28,7 @@ Backend 负责本地交易研究与受控执行面：
 - `tools/` Python 工具，包括 AI、ParamLab、Governance、Vibe Coding、notify。
 - `tests/` 后端测试、Node API contract 测试、safety guard。
 
-Backend 不应该再包含 Vue 源码、Cloudflare 源码或长篇文档中心。
+Backend 不应该再包含 Vue 源码、基础设施源码或长篇文档中心。
 
 ## Frontend 保留内容
 
@@ -47,7 +47,7 @@ Infra 负责四仓库联动：
 - workspace 配置和 helper。
 - 批量 pull/status/test/build。
 - 前端 dist 同步到 Backend `Dashboard/vue-dist`。
-- Cloudflare 或其他部署配置。
+- 本地部署与进程编排配置。
 
 Infra 不应该包含交易策略、EA、Vue 页面实现或运行时凭据。
 

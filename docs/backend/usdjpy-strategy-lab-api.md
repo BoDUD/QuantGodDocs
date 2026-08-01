@@ -28,16 +28,15 @@
 | `GET /api/usdjpy-strategy-lab/walk-forward/status` | USDJPY walk-forward 稳定性筛选报告 |
 | `POST /api/usdjpy-strategy-lab/walk-forward/build` | 重建 walk-forward 报告、参数选择和治理提案 |
 | `GET /api/usdjpy-strategy-lab/walk-forward/selection` | 读取 train / validation / forward 后的参数选择 |
-| `GET /api/usdjpy-strategy-lab/walk-forward/proposal` | 读取 stage-gated live config proposal |
+| `GET /api/usdjpy-strategy-lab/walk-forward/proposal` | 读取兼容旧文件名的 stage-gated Shadow 配置建议；不修改 preset |
 | `GET /api/usdjpy-strategy-lab/walk-forward/telegram-text` | walk-forward 中文 Telegram 文案 |
 | `GET /api/usdjpy-strategy-lab/autonomous-agent/state` | USDJPY 自主治理 Agent 当前阶段和 patch 状态 |
 | `POST /api/usdjpy-strategy-lab/autonomous-agent/run` | 运行自主治理门；只写受控 patch 和回滚证据 |
 | `GET /api/usdjpy-strategy-lab/autonomous-agent/decision` | 读取自主晋级决策 |
 | `GET /api/usdjpy-strategy-lab/autonomous-agent/patch` | 读取受控 config patch |
-| `GET /api/usdjpy-strategy-lab/autonomous-agent/lifecycle` | 读取 v2.5 三车道自主生命周期 |
-| `GET /api/usdjpy-strategy-lab/autonomous-agent/lanes` | 读取 Live / MT5 Shadow / HFM Crypto CFD Shadow 三车道摘要 |
+| `GET /api/usdjpy-strategy-lab/autonomous-agent/lifecycle` | 读取 USDJPY 自主生命周期 |
+| `GET /api/usdjpy-strategy-lab/autonomous-agent/lanes` | 读取兼容旧 schema 的外汇车道摘要；当前所有车道均为 Shadow / ReadOnly |
 | `GET /api/usdjpy-strategy-lab/autonomous-agent/mt5-shadow` | 读取 MT5 多策略模拟车道排名 |
-| `GET /api/usdjpy-strategy-lab/autonomous-agent/hfm-crypto-shadow` | 读取 HFM Crypto CFD 品种证据、Moss 回测 profile 和 shadow-only 状态 |
 | `GET /api/usdjpy-strategy-lab/autonomous-agent/ea-repro` | 读取 EA source / preset / input / ex5 对账证据 |
 | `GET /api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2` | 读取 Daily Autopilot 2.0 中文计划和复盘 |
 | `POST /api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2/run` | 重建 Daily Autopilot 2.0 |
@@ -62,7 +61,7 @@
 | `GET /api/usdjpy-strategy-lab/evidence-os/status` | 读取 Strategy JSON / Python Replay / MQL5 EA parity、执行反馈、Case Memory 和 Telegram Gateway 状态 |
 | `POST /api/usdjpy-strategy-lab/evidence-os/run` | 生成完整 USDJPY evidence OS 审计包 |
 | `GET /api/usdjpy-strategy-lab/evidence-os/parity` | 重建 Strategy JSON / Python Replay / MQL5 EA parity report |
-| `GET /api/usdjpy-strategy-lab/evidence-os/execution-feedback` | 重建 live execution feedback / execution quality report |
+| `GET /api/usdjpy-strategy-lab/evidence-os/execution-feedback` | 重建影子评估及历史执行反馈兼容报告；不会产生新的 broker 事件 |
 | `GET /api/usdjpy-strategy-lab/evidence-os/case-memory` | 重建 Case Memory，总结错失、早出和执行偏差 |
 | `GET /api/usdjpy-strategy-lab/evidence-os/telegram-text` | 生成 evidence OS 中文 Telegram 文案，走 push-only Gateway |
 | `GET /api/case-memory/status` | 读取 P4-7 Case Memory → Strategy JSON candidate / GA seed hint 状态 |
@@ -72,14 +71,12 @@
 | `POST /api/strategy-ga-factory/build` | 生成 elite archive、strategy graveyard、lineage tree、reflection report 和 factory ledger |
 | `GET /api/strategy-ga-factory/intent-plan` | 读取自然语言 Strategy Factory intent plan |
 | `POST /api/strategy-ga-factory/intent-plan/build?prompt=...` | 从大白话生成 shadow-only Strategy JSON seed、五维信号计划、30+ 参数和性格锁进化计划 |
-| `GET /api/strategy-ga-factory/hyperliquid-shadow` | 读取 Hyperliquid/Moss 只读影子车道状态 |
-| `POST /api/strategy-ga-factory/hyperliquid-shadow/build?targetAgentUrl=...&targetAgentProfileJson=...` | 写入 Moss agent 链接和可选本地 profile JSON 到只读 shadow mapping，不授权钱包、不下单 |
 | `GET /api/strategy-ga-factory/telegram-text` | 生成 GA Factory 中文 Telegram 文案 |
 | `GET /api/ga-factory/status` | `strategy-ga-factory/status` 的短别名 |
 | `POST /api/ga-factory/build` | `strategy-ga-factory/build` 的短别名 |
 | `GET /api/ga-factory/telegram-text` | `strategy-ga-factory/telegram-text` 的短别名 |
 | `GET /api/telegram-gateway/status` | 读取 P4-5 Telegram Gateway 运维观测状态 |
-| `POST /api/telegram-gateway/collect` | 收集日报、GA、Agent 和 HFM Crypto CFD 报告进入 push-only Gateway 队列 |
+| `POST /api/telegram-gateway/collect` | 收集外汇日报、GA 和 Agent 报告进入 push-only Gateway 队列 |
 | `GET /api/telegram-gateway/telegram-text` | 生成 Telegram Gateway 运维中文预览 |
 | `GET /api/usdjpy-strategy-lab/agent-ops-health` | 读取 Agent ops health 状态别名 |
 | `GET /api/usdjpy-strategy-lab/agent-ops-health/status` | 读取 Agent loop、Evidence OS、Telegram Gateway 和 runtime 健康状态 |
@@ -100,7 +97,7 @@
 - `QuantGod_GALineage.json` 记录 case-memory origin、mutation parent 和 crossover parents；
 - `QuantGod_GARunLimiter.json` 记录最近一次 generation，部署可用 `QG_GA_MIN_RUN_INTERVAL_SECONDS` 控制频率；
 - 候选只能进入 MT5 Shadow、tester-only、paper-live-sim 或 autonomous evidence；
-- GA 不得直接进入 live、不得改 live preset、不得发 MT5 订单、不得打开 HFM Crypto CFD 执行授权。
+- GA 永远停留在 Shadow / tester / paper research，不得改 preset 或发送 MT5 订单。
 
 ## v2.8 Strategy JSON → EA 只读契约端点
 
@@ -118,7 +115,7 @@
 - contract mode 只允许 `SHADOW_EVALUATION_ONLY`、`TESTER_EVALUATION_ONLY`、`PAPER_LIVE_SIM_EVALUATION_ONLY`；
 - EA 只读取 `QuantGod_StrategyJsonEAContract_EA.txt` 并回写 `QuantGod_StrategyJsonEAContractEAStatus.json`；
 - 不下单、不平仓、不撤单、不写 `OrderRequest`、不修改 live preset；
-- GA 产物即使表现优秀，也只能先进入 shadow/tester/paper lane，不会直接抢 `USDJPYc / RSI_Reversal / LONG` 实盘路线。
+- GA 产物即使表现优秀，也只能进入 shadow/tester/paper research；当前不存在可被其占用的实盘路线。
 
 ## P3-19 因果回放端点
 
@@ -141,24 +138,26 @@
 - Agent 只能写 `QuantGod_AutonomousConfigPatch.json`；
 - 连续亏损、日亏损、runtime 陈旧、快通道异常、点差异常和高冲击新闻会自动暂停或回滚；
 - 普通新闻风险进入 Daily Autopilot 和 replay 复盘，但不作为常态硬阻断；
-- DeepSeek 只解释，不批准 live、不取消回滚、不提高仓位上限；
-- HFM Crypto CFD 永远 shadow-only。
+- DeepSeek 只解释，不产生执行授权、不取消回滚、不提高研究建议上限；
+- 非外汇品种不得进入研究、模拟或执行链；HFM 仅保留外汇 broker 角色。
 
-## P3-21 三车道自主生命周期端点
+## P3-21 生命周期端点的当前兼容解释
 
-`autonomous-agent/lifecycle` 系列端点把 v2.5 的三车道语义合并到同一个 operator view：
+`autonomous-agent/lifecycle` 系列端点保留 v2.5 的字段名，当前必须按永久 Shadow / ReadOnly 契约解释：
 
-- Live Lane 只允许 `USDJPYc / RSI_Reversal / LONG` 进入 `MICRO_LIVE` 或 `LIVE_LIMITED`；
+- 当前没有 Live Lane；`USDJPYc / RSI_Reversal / LONG` 也只能产生 `topAdvisoryPolicy` / `topShadowPolicy`；
 - MT5 Shadow Lane 继续跑多策略模拟、回放、tester 和 ranking；
-- HFM Crypto CFD Shadow Lane 只做本地品种证据扫描、Moss 回测 profile 映射和 shadow-only 研究；
-- 美分账户加速允许更快采样，但不能绕过 runtime、fastlane、spread、高冲击新闻和亏损回滚；
-- `patchWritable=true` 只表示 Agent 可以写受控 patch，`liveMutationAllowed=false` 表示不能直接改 live preset；
+- 其他外汇品种只有在完成数据、成本、回测与 parity 验证后才能加入 shadow lane；
+- 美分账户标识只影响研究统计口径，不能解锁仓位、下单或 broker mutation；
+- `patchWritable=true` 只表示 Agent 可以写受控研究 patch，`liveMutationAllowed=false`；
+- 旧 artifact 中的 `MICRO_LIVE` / `LIVE_LIMITED` 只能降级显示为历史阶段标签，不是当前能力；
+- 所有响应必须保持 `executionLaneExists=false`、`existingEaOwnsExecution=false`；
 - Daily Autopilot 2.0 生成中文早盘计划、Agent 今日待办、Agent 每日复盘和 Telegram 文案，不执行交易。
 - `strategyJsonTodo`、`gaEvolutionTodo`、`telegramGatewayTodo` 是下一阶段任务，状态保持 `WAITING_NEXT_PHASE`，不会被假装成已完成能力。
 
 ## v2.6.1 Strategy JSON USDJPY 回测端点
 
-`strategy-backtest` 端点把 Strategy JSON 从“可审计种子”推进为“可执行研究契约”：
+`strategy-backtest` 端点把 Strategy JSON 从“可审计种子”推进为“可运行的研究契约”：
 
 - 只处理 `USDJPYc`；
 - 读取安全的 `quantgod.strategy.v1`；
@@ -176,10 +175,10 @@
 
 ## Perfect Edition Evidence OS 端点
 
-`evidence-os` 端点把 Strategy JSON 回测、Python replay、MQL5 EA 诊断、执行反馈、Case Memory 和 Telegram Gateway 串成同一份审计证据：
+`evidence-os` 端点把 Strategy JSON 回测、Python replay、MQL5 EA 诊断、影子评估/历史反馈、Case Memory 和 Telegram Gateway 串成同一份审计证据：
 
 - `QuantGod_StrategyParityReport.json`：Strategy JSON / Python Replay / MQL5 EA parity，包含 SQLite 持久化、live-loop policy 和 EA RSI 诊断一致性检查；
-- `QuantGod_LiveExecutionQualityReport.json` 和 `QuantGod_LiveExecutionFeedback.jsonl`：优先读取 EA 实时写出的 `QuantGod_LiveExecutionFeedback.jsonl` 与历史重建 `QuantGod_LiveExecutionFeedbackHistory.jsonl`，再合并 fastlane trade events、live-loop ledger、trade journal、close history 和 EA dry-run ledger，归一化成交、平仓、订单接受、拒单、滑点、延迟、profitR / MFE / MAE；
+- `QuantGod_LiveExecutionQualityReport.json` 和 `QuantGod_LiveExecutionFeedback.jsonl`：文件名仅为兼容。当前只合并 Shadow 评估、EA dry-run 与已存在的历史只读反馈；生产 EA 不再生成 order-send、平仓或改单事件；
 - `QuantGod_CaseMemory.jsonl` 和 summary：错失机会、早出场、新闻损伤、执行偏差、GA 过拟合风险转成 GA mutation 线索；
 - `QuantGod_NotificationEventQueue.jsonl`、`QuantGod_TelegramGatewayLedger.jsonl` 和 `QuantGod_TelegramGatewayStatus.json`：独立中文 push-only Gateway，统一队列、去重、限频、投递 ledger，不接命令。
 
@@ -190,7 +189,7 @@
 返回内容必须中文优先，并明确显示：
 
 - 新策略是否 shadow-only
-- 是否允许真实下单
+- `executionLaneExists=false`、`existingEaOwnsExecution=false`
 - 当前候选信号来自哪条路线
 - 缺少哪些证据
 - 下一步是回测、等待采样还是治理复核
@@ -207,4 +206,4 @@
 - 接收 Telegram 交易命令
 - 写入凭据
 
-新增策略想进入实盘，必须先通过 USDJPY 自主治理门和受控 patch 阶梯；这些 API 本身不会执行交易。
+所有策略（包括 RSI LONG）都保持 Shadow / ReadOnly。这些 API 不能创建 execution lane，受控 patch 也不能改变该边界。

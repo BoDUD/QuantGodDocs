@@ -19,4 +19,4 @@ runtime/production_validation/QuantGod_GAMultiGenerationStabilityLedger.csv
 
 本功能只读验证，不下单、不平仓、不撤单、不修改 MT5 live preset，不写 MT5 OrderRequest，也不接收 Telegram 交易命令。
 
-GA 候选仍然只能进入 `SHADOW / FAST_SHADOW / TESTER_ONLY / PAPER_LIVE_SIM`，不能直接进入实盘。
+GA 候选只能进入 `SHADOW / FAST_SHADOW / TESTER_ONLY / PAPER_LIVE_SIM`，不能直接或间接创建实盘执行能力；当前 `executionLaneExists=false`。

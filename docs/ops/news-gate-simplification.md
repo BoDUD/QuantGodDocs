@@ -21,22 +21,23 @@ QG_NEWS_HARD_BLOCK_MINUTES_AFTER=30
 
 ## Risk Levels
 
-| Level | Meaning | Live Lane behavior |
+| Level | Meaning | Shadow Advisory behavior |
 |---|---|---|
 | `NONE` | No news risk | No effect |
-| `SOFT` | Ordinary or medium-risk news | Do not block; downgrade stage and reduce lot |
-| `HARD` | BOJ/FOMC/CPI/NFP/rate-decision style high-impact window | Block live entry; shadow and replay continue |
-| `UNKNOWN` | News source unavailable or parse failed | Do not block; light lot downgrade and record data quality issue |
+| `SOFT` | Ordinary or medium-risk news | Downgrade research stage and suggested weight |
+| `HARD` | BOJ/FOMC/CPI/NFP/rate-decision style high-impact window | Block a fresh advisory; replay may continue |
+| `UNKNOWN` | News source unavailable or parse failed | Mark data quality warning and lower advisory confidence |
 
-## Live Lane
+## 当前 Shadow Advisory 边界
 
-The Live Lane remains limited to:
+当前没有 Live Lane；RSI LONG 也不例外：
 
 ```text
-USDJPYc / RSI_Reversal / LONG
+executionLaneExists=false
+existingEaOwnsExecution=false
 ```
 
-News behavior:
+News behavior only changes research/advisory evidence:
 
 ```text
 SOFT + NONE      -> no change
@@ -49,12 +50,12 @@ OFF              -> news is recorded only
 
 ## Shadow And Replay
 
-MT5 Shadow Lane and replay continue under ordinary news. They record:
+MT5 Shadow Lane and replay continue under ordinary news. They may retain this compatibility field:
 
 ```text
 newsRiskLevel
 newsImpactTag
-wouldBlockLive
+wouldBlockLive  # historical schema name; does not imply a current live lane
 ```
 
 Replay writes:
@@ -82,10 +83,9 @@ fastlane DEGRADED
 spread abnormal
 lossStreak >= 2
 dailyLossR <= -1R
-non-USDJPY live
-non-RSI live
+broker mutation primitives present
+executionLaneExists != false
 external market real-money
-maxLot > 2.0
 ```
 
 ## Telegram And Frontend
@@ -103,4 +103,3 @@ All operator-facing text should use Chinese wording:
 ```
 
 Avoid legacy wording that implies every news flag is a hard block.
-
