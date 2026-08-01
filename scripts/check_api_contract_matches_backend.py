@@ -25,7 +25,6 @@ OPTIONAL_SAFETY_FALSE_KEYS = [
 
 REQUIRED_ENDPOINT_GROUPS = {
     "backend-core-and-control",
-    "hfm-crypto-cfd",
     "live-automation-readiness",
     "mt5-readonly",
     "ai-analysis-v1",
@@ -33,6 +32,14 @@ REQUIRED_ENDPOINT_GROUPS = {
     "notify",
     "phase3-vibe-ai-kline",
 }
+
+CRYPTO_ONLY_ENDPOINT_MARKERS = (
+    "crypto",
+    "hyperliquid",
+    "bitcoin",
+    "/btc",
+    "moss",
+)
 
 ALLOWED_ENDPOINT_MODES = {
     "advisory",
@@ -69,7 +76,9 @@ def contract_endpoints(contract: dict) -> set[str]:
         for endpoint in group.get("endpoints", []):
             path = endpoint.get("path")
             method = endpoint.get("method")
-            if not isinstance(path, str) or not path.startswith("/api/"):
+            if not isinstance(path, str) or not (
+                path.startswith("/api/") or path in {"/healthz", "/readyz"}
+            ):
                 raise ValueError(f"invalid endpoint path: {path!r}")
             if not isinstance(method, str) or method.upper() not in {
                 "GET",
@@ -111,41 +120,20 @@ def check_safety(contract: dict) -> list[str]:
     return errors
 
 
-def check_hfm_summary_contract(contract: dict) -> list[str]:
+def check_forex_only_contract(contract: dict) -> list[str]:
     errors: list[str] = []
-    status_endpoint = None
     for group in endpoint_groups(contract):
         if not isinstance(group, dict):
             continue
+        group_name = str(group.get("name") or "")
+        if any(token in group_name.lower() for token in ("crypto", "bitcoin", "hyperliquid", "moss")):
+            errors.append(f"crypto-only endpoint group is forbidden: {group_name}")
         for endpoint in group.get("endpoints", []):
-            if isinstance(endpoint, dict) and endpoint.get("path") == "/api/hfm-crypto/status":
-                status_endpoint = endpoint
-                break
-        if status_endpoint:
-            break
-
-    if not isinstance(status_endpoint, dict):
-        return ["missing /api/hfm-crypto/status endpoint"]
-
-    variants = status_endpoint.get("queryVariants") or []
-    summary_variant = next(
-        (
-            variant
-            for variant in variants
-            if isinstance(variant, dict) and variant.get("query") == "view=summary"
-        ),
-        None,
-    )
-    if not summary_variant:
-        errors.append("missing /api/hfm-crypto/status?view=summary query variant")
-    status_text = json.dumps(status_endpoint, ensure_ascii=False)
-    summary_text = json.dumps(summary_variant or {}, ensure_ascii=False)
-    if "brokerSymbolDiagnostics" not in status_text or "brokerSymbolDiagnostics" not in summary_text:
-        errors.append("HFM summary contract must preserve brokerSymbolDiagnostics")
-    if "operatorChecklist" not in status_text or "operatorChecklist" not in summary_text:
-        errors.append("HFM summary contract must preserve operatorChecklist")
-    if "safety" not in summary_text:
-        errors.append("HFM summary contract must preserve safety flags")
+            if not isinstance(endpoint, dict):
+                continue
+            path = str(endpoint.get("path") or "")
+            if any(marker in path.lower() for marker in CRYPTO_ONLY_ENDPOINT_MARKERS):
+                errors.append(f"crypto-only endpoint is forbidden: {path}")
     return errors
 
 
@@ -307,7 +295,7 @@ def validate_contract(contract: dict, min_endpoints: int = 100) -> list[str]:
     errors.extend(check_required_groups(contract))
     errors.extend(check_safety(contract))
     errors.extend(check_endpoint_modes(contract))
-    errors.extend(check_hfm_summary_contract(contract))
+    errors.extend(check_forex_only_contract(contract))
     return errors
 
 

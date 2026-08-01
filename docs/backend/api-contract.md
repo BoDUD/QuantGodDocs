@@ -5,7 +5,7 @@
 
 ## Contract 摘要
 
-- Endpoint 总数：`383`。
+- Endpoint 总数：`351`。
 - Backend API base：`http://127.0.0.1:8080/api`。
 - Backend `/api/*` route surface 以 `QuantGodBackend/tools/api_route_registry.py` 输出为准。
 - 任何新增、删除或重命名 `/api/*` route，都必须同步更新 JSON contract、本文档和 Frontend service wrapper。
@@ -36,7 +36,7 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 ### backend-core-and-control
 
 - Phase / Domain：`backend-core`。
-- Endpoint 数量：`23`。
+- Endpoint 数量：`18`。
 
 | Method | Path | Mode | Notes |
 |---|---|---|---|
@@ -58,47 +58,6 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | POST | `/api/mt5-adaptive-control/run` | `guarded-control` | Run adaptive control under backend safety controls. |
 | GET | `/api/mt5-platform` | `read-only` | MT5 platform store base endpoint. |
 | ANY | `/api/mt5-platform/:endpoint` | `guarded-control` | MT5 platform store sub-endpoints; not a direct order API. |
-| GET | `/api/mt5-trading` | `guarded-control` | MT5 trading bridge status; defaults locked by dryRun/killSwitch. |
-| ANY | `/api/mt5-trading/:endpoint` | `guarded-control` | MT5 trading bridge sub-endpoint; must remain guarded by backend and EA controls. |
-| GET | `/api/mt5` | `guarded-control` | Compatibility alias for MT5 trading status. |
-| ANY | `/api/mt5/:endpoint` | `guarded-control` | Compatibility alias for MT5 trading bridge sub-endpoints. |
-| DELETE | `/api/mt5/order/:ticket` | `guarded-control` | Order cancel route; must remain blocked/guarded unless explicitly authorized. |
-
-### hfm-crypto-cfd
-
-- Phase / Domain：`backend-core`。
-- Endpoint 数量：`28`。
-
-| Method | Path | Mode | Notes |
-|---|---|---|---|
-| GET | `/api/hfm-crypto` | `read-only` | HFM Crypto CFD shadow lane status alias; scans local MT5/HFM symbol evidence and Moss backtest profile metadata. |
-| GET | `/api/hfm-crypto/status` | `read-only` | Read HFM Crypto CFD shadow lane status, detected crypto CFD symbols, Moss backtest profile summary, account brokerSymbolDiagnostics, operatorChecklist, blockers, and safety flags. Frontend first paint must use the compact view=summary variant and may pass scope=secondary/live16 to use the HFM Live16 crypto CFD account. Query variants: `?view=summary`: Preserves status, statusZh, nextRequiredActionZh, operatorChecklist, symbolEvidence.brokerSymbolDiagnostics, blockers, sourceFiles, and safety while omitting bulky review bundles for fast account diagnostics.; `?view=summary&scope=secondary`: Uses the configured secondary/Live16 MT5 Files directory for HFM crypto CFD evidence while preserving the same read-only safety boundary. Aliases include scope=live16 and scope=hfm-live16. |
-| GET | `/api/hfm-crypto/symbols` | `read-only` | Read detected HFM Crypto CFD symbol evidence from local MT5 Bases roots; no order execution. |
-| GET | `/api/hfm-crypto/contract-spec-export` | `read-only` | Read the HFM Crypto CFD contract-spec export that converts MT5 symbol registry data into review input. |
-| GET | `/api/hfm-crypto/execution-spec` | `read-only` | Read the HFM Crypto CFD contract-spec review generated from local MT5/HFM broker symbol specs. |
-| GET | `/api/hfm-crypto/simulation-profile` | `read-only` | Read the HFM Crypto CFD simulation-profile review for ROI, Sharpe, drawdown, trade count, and liquidation evidence. |
-| GET | `/api/hfm-crypto/evidence-kit` | `read-only` | Read the HFM Crypto CFD evidence kit with contract-spec templates and read-only collection commands. |
-| GET | `/api/hfm-crypto/evidence-bootstrap` | `read-only` | Read the HFM evidence bootstrap artifact with draft input paths, filled-input validation, and sim-to-live blocker summary. |
-| GET | `/api/hfm-crypto/mt5-exporter-review` | `read-only` | Read the MT5 EA exporter review that checks whether the installed QuantGod EA can emit HFM crypto symbol specs. |
-| GET | `/api/hfm-crypto/mt5-upgrade-bundle` | `read-only` | Read the staged MT5 EA exporter upgrade bundle manifest; it is manual-only and does not mutate MT5 files. |
-| GET | `/api/hfm-crypto/mt5-exporter-deploy-plan` | `read-only` | Read the manual MT5 exporter deploy and rollback plan; it describes operator steps only and does not copy files, compile, or mutate MT5. |
-| GET | `/api/hfm-crypto/standalone-exporter-bundle` | `read-only` | Read the standalone read-only HFM crypto symbol-spec exporter bundle for manual MT5 review; it does not select symbols, send orders, or change presets. |
-| GET | `/api/hfm-crypto/mt5-post-upgrade-verify` | `read-only` | Read the post-upgrade verifier that checks installed EA source, compiled ex5, exported HFM crypto specs, and contract-spec review status. |
-| GET | `/api/hfm-crypto/post-upgrade-controller` | `read-only` | Read the HFM post-upgrade controller that coordinates exporter review, manual upgrade bundle, post-upgrade verify, and local contract-spec refresh. |
-| GET | `/api/hfm-crypto/filled-input-validator` | `read-only` | Read the HFM review-input validator that checks manual filled specs/profile or passing contract-spec/simulation review artifacts before promotion review. |
-| POST | `/api/hfm-crypto/build` | `read-only` | Rebuild HFM Crypto CFD shadow state and optional Moss backtest profile mapping; writes local evidence only. |
-| POST | `/api/hfm-crypto/contract-spec-export/build` | `read-only` | Build a local HFM Crypto CFD contract-spec export from MT5 symbol registry JSON or optional live read-only MT5 registry access. |
-| POST | `/api/hfm-crypto/execution-spec/build` | `read-only` | Build the HFM Crypto CFD contract-spec review from a local JSON/CSV export; does not create MT5 order requests. |
-| POST | `/api/hfm-crypto/simulation-profile/build` | `read-only` | Build the HFM Crypto CFD simulation-profile review from an explicit local Moss/backtest JSON or auto-discovered saved HFM profile artifact; does not unlock execution. |
-| POST | `/api/hfm-crypto/evidence-kit/build` | `read-only` | Write local HFM Crypto CFD evidence-kit JSON/CSV templates; no MT5 mutation or broker call is made. |
-| POST | `/api/hfm-crypto/evidence-bootstrap/build` | `read-only` | Write local HFM evidence bootstrap drafts and review artifact summaries without writing filled inputs, MT5 request files, or broker calls. |
-| POST | `/api/hfm-crypto/mt5-exporter-review/build` | `read-only` | Build the local MT5 EA exporter review; it does not copy files into MT5, compile an EA, change presets, or send orders. |
-| POST | `/api/hfm-crypto/mt5-upgrade-bundle/build` | `read-only` | Stage the reviewed QuantGod EA source and manifest under runtime for manual MT5 upgrade; no installed files are modified. |
-| POST | `/api/hfm-crypto/mt5-exporter-deploy-plan/build` | `read-only` | Build the manual MT5 exporter deploy and rollback plan; it writes local review evidence only and does not mutate MT5. |
-| POST | `/api/hfm-crypto/standalone-exporter-bundle/build` | `read-only` | Build the standalone read-only HFM crypto symbol-spec exporter bundle for manual review; it writes local review evidence only and cannot send orders. |
-| POST | `/api/hfm-crypto/mt5-post-upgrade-verify/build` | `read-only` | Build the post-upgrade verifier and, when specs are present, refresh local contract-spec review artifacts without mutating MT5 or sending orders. |
-| POST | `/api/hfm-crypto/post-upgrade-controller/build` | `read-only` | Run the HFM post-upgrade controller; it may write local review artifacts but never copies into MT5, compiles an EA, changes presets, or sends orders. |
-| POST | `/api/hfm-crypto/filled-input-validator/build` | `read-only` | Build the HFM review-input validator artifact from manual filled specs/profile or already passing auto review artifacts; it writes review evidence only and cannot create order requests. |
 
 ### profit-target-tracker
 
@@ -108,8 +67,8 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | Method | Path | Mode | Notes |
 |---|---|---|---|
 | GET | `/api/profit-target` | `local-advisory-control` | Profit target tracker status alias; may refresh local runtime evidence but cannot place, close, cancel, or modify orders. |
-| GET | `/api/profit-target/status` | `local-advisory-control` | Refresh and read the combined forex/HFM crypto profit-target tracker for review; it writes local evidence only and preserves all execution safety flags. |
-| POST | `/api/profit-target/build` | `local-advisory-control` | Build the local profit-target tracker report for review; no MT5 order files, broker calls, wallet authorization, or live preset changes are allowed. |
+| GET | `/api/profit-target/status` | `local-advisory-control` | Refresh and read the local forex profit-target tracker for review; it writes local evidence only and preserves all execution safety flags. |
+| POST | `/api/profit-target/build` | `local-advisory-control` | Build the local forex profit-target tracker report for review; no MT5 order files, broker calls, or live preset changes are allowed. |
 
 ### live-automation-readiness
 
@@ -119,8 +78,8 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | Method | Path | Mode | Notes |
 |---|---|---|---|
 | GET | `/api/live-automation` | `read-only` | Live automation readiness dossier alias; summarizes sim-to-live review status without writing orders. |
-| GET | `/api/live-automation/status` | `read-only` | Build a current read-only live automation readiness dossier from USDJPY MT5 gates and HFM crypto shadow evidence; HFM account-no-crypto blockers, accountCryptoAvailability, and operatorChecklist must pass through without enabling execution. |
-| GET | `/api/live-automation/readiness` | `read-only` | Build a transient live automation readiness view from USDJPY MT5 gates and HFM crypto shadow evidence. |
+| GET | `/api/live-automation/status` | `read-only` | Build a current read-only automation readiness dossier from USDJPY MT5 gates and local forex evidence; blockers and operatorChecklist must pass through without enabling execution. |
+| GET | `/api/live-automation/readiness` | `read-only` | Build a transient automation readiness view from USDJPY MT5 gates and local forex evidence. |
 | POST | `/api/live-automation/build` | `read-only` | Write a local readiness dossier for review; must keep orderSendAllowed and live preset mutation disabled. |
 | GET | `/api/live-automation/review-packet` | `read-only` | Read the local live execution review packet with dry-run order intent specs and blockers. |
 | POST | `/api/live-automation/review-packet/build` | `read-only` | Write a local live execution review packet; it must not create MT5 order requests, presets, or credentials. |
@@ -142,7 +101,7 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | POST | `/api/live-automation/pipeline/build` | `read-only` | Run the full sim-to-live review pipeline and write local review artifacts; it still cannot write MT5 request files or broker calls. |
 | GET | `/api/live-automation/adapter-review` | `read-only` | Read the execution adapter review shell that validates future request and receipt contracts without side effects. |
 | POST | `/api/live-automation/adapter-review/build` | `read-only` | Build the execution adapter review shell from the sim-to-live pipeline and MT5 request contract; no request files or broker calls are produced. |
-| GET | `/api/live-automation/evidence-intake` | `read-only` | Read the live evidence intake summary for missing HFM crypto files, review artifacts, MT5 dashboard evidence, and safe refresh commands. |
+| GET | `/api/live-automation/evidence-intake` | `read-only` | Read the local evidence intake summary for missing forex evidence, review artifacts, MT5 dashboard evidence, and safe refresh commands. |
 | POST | `/api/live-automation/evidence-intake/build` | `read-only` | Build the live evidence intake artifact and optional local review artifacts; it cannot write MT5 request files or make broker calls. |
 | GET | `/api/live-automation/promotion-candidates` | `read-only` | Read the live promotion candidate selector that ranks simulation-qualified lanes for operator review without enabling execution. |
 | POST | `/api/live-automation/promotion-candidates/build` | `read-only` | Build the live promotion candidate selector from readiness, evidence intake, review packet, and pipeline artifacts; no order request files or broker calls are produced. |
@@ -365,6 +324,17 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | GET | `/api/state/vibe-strategies` | `read-only` | Research-only Vibe strategy index from SQLite. |
 | GET | `/api/state/notifications` | `read-only` | Push-only notification event index from SQLite. |
 
+### local-health-and-operator-overview
+
+- Phase / Domain：`backend-core`。
+- Endpoint 数量：`3`。
+
+| Method | Path | Mode | Notes |
+|---|---|---|---|
+| GET | `/healthz` | `read-only` | Fast process liveness for the loopback-only Shadow/ReadOnly backend; never implies broker, data, strategy, or execution readiness. |
+| GET | `/readyz` | `read-only` | Fail-closed local operational readiness across canonical runtime, MT5 writer, broker authorization, quote/session, history, automation, evidence, and disk. |
+| GET | `/api/operator/overview` | `read-only` | Single-generation operator overview with independent service, MT5, market, data, automation, evidence, disk, and immutable Shadow safety axes. |
+
 ### p3-12-automation-chain-runner
 
 - Phase / Domain：`phase3`。
@@ -380,7 +350,7 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 ### P3-14 USDJPY 单品种多策略实验室
 
 - Phase / Domain：`unknown`。
-- Endpoint 数量：`117`。
+- Endpoint 数量：`115`。
 
 | Method | Path | Mode | Notes |
 |---|---|---|---|
@@ -428,10 +398,9 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | POST | `/api/usdjpy-strategy-lab/autonomous-agent/run` | `research-only` | 运行 USDJPY 自主治理门；只写受控 patch 和回滚证据，不执行交易。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/decision` | `read-only` | 读取 USDJPY 自主晋级决策。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/patch` | `read-only` | 读取 USDJPY 受控 config patch。 |
-| GET | `/api/usdjpy-strategy-lab/autonomous-agent/lifecycle` | `read-only` | 读取 QuantGod v2.5 三车道自主生命周期，包含 Live Lane、MT5 Shadow Lane、HFM Crypto CFD Shadow Lane、美分账户、EA 对账摘要和下一阶段任务状态。 |
-| GET | `/api/usdjpy-strategy-lab/autonomous-agent/lanes` | `read-only` | 读取 Live / MT5 Shadow / HFM Crypto CFD Shadow 三车道摘要；实盘只允许 USDJPY RSI LONG，模拟继续多策略。 |
+| GET | `/api/usdjpy-strategy-lab/autonomous-agent/lifecycle` | `read-only` | 读取 USDJPY 本地自主生命周期，包含受控外汇路线、MT5 Shadow、美分账户、EA 对账摘要和下一阶段任务状态。 |
+| GET | `/api/usdjpy-strategy-lab/autonomous-agent/lanes` | `read-only` | 读取 USDJPY 受控外汇路线与 MT5 Shadow 摘要；模拟研究继续保持多策略和本地证据约束。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/mt5-shadow` | `read-only` | 读取 MT5 多策略模拟车道排名和升降级阶段；shadow 策略不能直接进入实盘路线。 |
-| GET | `/api/usdjpy-strategy-lab/autonomous-agent/hfm-crypto-shadow` | `read-only` | 读取 HFM Crypto CFD 品种证据、Moss 回测 profile 和 shadow-only 状态；不连接钱包、不保存 broker 凭证、不下单。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/ea-repro` | `read-only` | 读取 EA source、preset、input 和 ex5 hash 对账证据，帮助确认当前实盘 EA 是否来自受控版本。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2` | `read-only` | 读取 Daily Autopilot 2.0 中文早盘计划、夜盘复盘、三车道今日动作，以及 Strategy JSON GA Trace 状态和 Telegram Gateway 下一阶段任务。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2/status` | `read-only` | 读取 Daily Autopilot 2.0 状态别名，包含下一阶段任务等待状态。 |
@@ -477,17 +446,16 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/telegram-text` | `push-preview` | 生成或发送 USDJPY 自主治理中文 Telegram 文案。 |
 | GET | `/api/telegram-gateway` | `read-only` | 读取 P4-5 Telegram Gateway 运维观测状态别名；只做 push-only 队列、去重、限频、ledger 观测。 |
 | GET | `/api/telegram-gateway/status` | `read-only` | 读取 P4-5 Telegram Gateway 运维观测状态，包含队列、待投递、真实发送、抑制、失败和 topic 视图。 |
-| POST | `/api/telegram-gateway/collect` | `push-preview` | 收集 Daily Autopilot、GA、Agent 和 HFM Crypto CFD 报告进入 push-only Gateway 队列；不接收 Telegram 命令。 |
+| POST | `/api/telegram-gateway/collect` | `push-preview` | 收集 Daily Autopilot、GA、Agent 和本地外汇证据报告进入 push-only Gateway 队列；不接收 Telegram 命令。 |
 | GET | `/api/telegram-gateway/telegram-text` | `push-preview` | 生成 Telegram Gateway 运维中文预览；仍只推送，不接 Telegram 命令。 |
 | GET | `/api/usdjpy-strategy-lab/agent-ops-health` | `read-only` | 读取 USDJPY Agent operations health 状态别名；只汇总本地证据与心跳，不执行交易。 |
 | GET | `/api/usdjpy-strategy-lab/agent-ops-health/status` | `read-only` | 读取 USDJPY Agent loop、Evidence OS、Telegram Gateway 和本地 runtime 健康状态。 |
+| POST | `/api/usdjpy-strategy-lab/agent-ops-health/refresh` | `local-advisory-control` | 刷新 USDJPY Agent operations health 并写入本地证据；不创建或修改交易。 |
 | GET | `/api/strategy-ga-factory` | `read-only` | 读取 P4-4 Strategy JSON GA Factory 状态别名；只做工厂归档，不执行交易。 |
 | GET | `/api/strategy-ga-factory/status` | `read-only` | 读取 GA Factory state、elite archive、strategy graveyard 和 lineage tree 摘要。 |
 | POST | `/api/strategy-ga-factory/build` | `read-only` | 生成 GA Factory state、elite archive、strategy graveyard、lineage tree、reflection report 和 ledger；不下单、不改 preset。 |
 | GET | `/api/strategy-ga-factory/intent-plan` | `read-only` | 读取自然语言 Strategy Factory intent plan；只生成 shadow-only Strategy JSON 和性格锁计划。 |
 | POST | `/api/strategy-ga-factory/intent-plan/build` | `read-only` | 从大白话生成 shadow-only Strategy JSON seed、五维信号计划、30+ 参数和性格锁进化计划；不触发交易。 |
-| GET | `/api/strategy-ga-factory/hyperliquid-shadow` | `read-only` | 读取 Hyperliquid/Moss 只读影子车道状态。 |
-| POST | `/api/strategy-ga-factory/hyperliquid-shadow/build` | `read-only` | 写入 Moss agent 链接和可选本地 profile JSON 到只读 shadow mapping；不授权钱包、不下单。 |
 | GET | `/api/strategy-ga-factory/telegram-text` | `push-preview` | 生成 GA Factory 中文 Telegram 文案；push-only，不接交易命令。 |
 | GET | `/api/ga-factory` | `read-only` | 读取 GA Factory 状态短别名；等同 /api/strategy-ga-factory。 |
 | GET | `/api/ga-factory/status` | `read-only` | 读取 GA Factory 状态短别名；等同 /api/strategy-ga-factory/status。 |

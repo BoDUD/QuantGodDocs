@@ -30,7 +30,7 @@ MT5 trading bridge 即使存在 action route，也必须默认被 dryRun、Kill 
 
 `MA_Cross`、`USDJPY_NIGHT_REVERSION_SAFE`、东京突破、H4 回调、BB、MACD、SR 以及任何非 RSI 策略都只能进入 `SHADOW`、`FAST_SHADOW`、`TESTER_ONLY` 或 `PAPER_LIVE_SIM` 研究 lane。它们不能抢占 `topLiveEligiblePolicy`，也不能通过 GA、Case Memory、Dashboard 或 Telegram 文案直接升级为 live。
 
-如果未来要开放非 RSI 或 HFM Crypto CFD 的真实执行，必须另开单独执行 lane RFC，完成 API contract、runtime preflight、request/receipt contract、EA request reader、broker send wrapper、rollback 和 operator approval 的独立评审；在该 RFC 合并前，所有 order-send、request-write 和 live-preset-mutation flag 必须保持 `false`。
+如果未来要开放非 RSI 或其他外汇品种的真实执行，必须另开单独执行 lane RFC，完成 API contract、runtime preflight、request/receipt contract、EA request reader、broker send wrapper、rollback 和 operator approval 的独立评审；在该 RFC 合并前，所有 order-send、request-write 和 live-preset-mutation flag 必须保持 `false`。Bitcoin、HFM Crypto CFD、Moss 与 Hyperliquid 不在产品范围内；HFM 只作为外汇 broker 保留。
 
 ## AI 边界
 

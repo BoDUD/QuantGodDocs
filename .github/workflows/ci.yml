@@ -51,7 +51,6 @@ jobs:
           test ! -d Dashboard
           test ! -d tools/ai_analysis
           test ! -d frontend
-          test ! -d cloudflare
 
       - name: Secret hygiene
         run: |

@@ -1,10 +1,10 @@
-# QuantGod v2.5 三车道自主 Agent
+# QuantGod v2.5 USDJPY 自主 Agent
 
 QuantGod v2.5 的总纲是：实盘要窄，模拟要宽，升降级要快，回滚要硬。
 
-这版把 USDJPY 美分账户主线、自主治理 Agent、MT5 多策略模拟、HFM Crypto CFD shadow-only 研究、Agent 今日待办、Agent 每日复盘和下一阶段工程任务收到同一套生命周期里。取消人工审核不等于取消风控；Agent 只能写受控 patch，不能改源码、不能改 live preset，也不能绕过硬门禁。
+这版把 USDJPY 美分账户主线、自主治理 Agent、MT5 多策略模拟、Agent 今日待办、Agent 每日复盘和下一阶段工程任务收到同一套生命周期里。取消人工审核不等于取消风控；Agent 只能写受控 patch，不能改源码、不能改 live preset，也不能绕过硬门禁。2026-08-01 起系统范围为 forex-only，HFM 仅作为外汇 broker 保留。
 
-## 三车道
+## 两条外汇车道
 
 ### Live Lane
 
@@ -37,12 +37,6 @@ USDJPY_H4_TREND_PULLBACK
 
 这些策略可以进入 shadow、fast shadow、tester-only 和 paper live sim，但不能抢 `topLiveEligiblePolicy`。影子第一名只代表研究价值，不代表实盘资格。
 
-### HFM Crypto CFD Shadow Lane
-
-HFM Crypto CFD 只做本地 HFM/MT5 品种证据扫描、Moss 回测 profile 映射和 shadow-only 研究。它不连接钱包，不保存 broker 凭证，不下单、不平仓、不撤单、不改仓。
-
-前端统一展示为“品种证据 / Moss 回测 / 安全边界”，避免误解成已经具备实盘执行能力。
-
 ## 美分账户加速
 
 默认配置：
@@ -67,7 +61,6 @@ QG_CENT_STANDARD_LOT=0.35
 runtime/agent/QuantGod_AutonomousLifecycle.json
 runtime/agent/QuantGod_MT5ShadowStrategyRanking.json
 runtime/agent/QuantGod_MT5ShadowStrategyLedger.csv
-runtime/agent/QuantGod_HFMCryptoShadowLane.json
 runtime/agent/QuantGod_EABuildReproducibility.json
 runtime/agent/QuantGod_DailyAutopilotV2.json
 ```
@@ -80,7 +73,6 @@ cd C:\QuantGod\QuantGodBackend
 python tools\run_usdjpy_autonomous_agent.py --runtime-dir .\runtime lifecycle --write
 python tools\run_usdjpy_autonomous_agent.py --runtime-dir .\runtime lanes --write
 python tools\run_usdjpy_autonomous_agent.py --runtime-dir .\runtime mt5-shadow --write
-python tools\run_usdjpy_autonomous_agent.py --runtime-dir .\runtime hfm-crypto-shadow --write
 python tools\run_usdjpy_autonomous_agent.py --runtime-dir .\runtime ea-repro --write
 python tools\run_daily_autopilot_v2.py --runtime-dir .\runtime build --write
 python tools\run_daily_autopilot_v2.py --runtime-dir .\runtime daily-todo --write
@@ -112,7 +104,6 @@ historyProductionStatus.promotionGateStatus=PASS/BLOCKED
 ```text
 LIVE
 MT5_SHADOW
-HFM_CRYPTO_CFD_SHADOW
 ```
 
 状态由 Agent 自动更新：
@@ -156,7 +147,7 @@ requiresAutonomousGovernance=true
 - 高冲击新闻窗口；
 - 连续亏损达到阈值；
 - 当日亏损达到阈值；
-- HFM Crypto CFD 下单、平仓、撤单或改仓；
+- 非外汇品种进入研究、模拟或执行链；
 - 修改 EA 源码或 live preset。
 
 ## Frontend
@@ -165,7 +156,6 @@ requiresAutonomousGovernance=true
 
 - Live Lane；
 - MT5 Shadow Lane；
-- HFM Crypto CFD Shadow Lane；
 - 美分账户状态；
 - 当前执行阶段；
 - 自动回滚状态；
@@ -180,4 +170,4 @@ DeepSeek 只解释晋级、回滚、参数变化和日报，不批准 live，不
 
 ## 下一阶段边界
 
-当前已经完成的是三车道自主生命周期和 Agent 化日报闭环。完整 Strategy JSON DSL、GA population / mutation / crossover / fitness，以及独立 Telegram Gateway 属于下一阶段，不在 v2.5 里假装完成。
+当前已经完成的是 USDJPY 两车道自主生命周期和 Agent 化日报闭环。完整 Strategy JSON DSL、GA population / mutation / crossover / fitness，以及独立 Telegram Gateway 属于下一阶段，不在 v2.5 里假装完成。

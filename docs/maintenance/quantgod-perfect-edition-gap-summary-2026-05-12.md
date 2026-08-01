@@ -4,15 +4,16 @@
 对照范围：当前本地代码主线与此前《QuantGod Perfect Edition 设计书 v1.0》及后续 v2.5/v2.6 设计目标。  
 代码范围：`QuantGodBackend`、`QuantGodFrontend`、`QuantGodDocs`、`QuantGodInfra`。
 
+> 历史记录说明：本文保留 2026-05-12 的外汇工程完成度判断，但已按 2026-08-01 的 forex-only 决策删除当时的加密货币路线。本文不是当前启动或接口清单；当前范围以 README 和全系统完善设计书为准。
+
 ## 结论摘要
 
 QuantGod 现在已经完成了“USDJPY 自进化交易 OS”的主体工程骨架：
 
 - USDJPY-only 实盘主线已经收口。
 - MT5 多策略 shadow lane 已保留并接入 Strategy JSON / EA shadow adapter。
-- HFM Crypto CFD 已保持 shadow-only，只做本地品种证据和 Moss 回测 profile 映射。
 - Strategy JSON、GA trace、SQLite backtest、walk-forward、Deep Parity、Execution Feedback、Case Memory、Telegram Gateway 都已经有代码主线。
-- 前端已收敛到 Dashboard / MT5 / Evolution / HFM Crypto CFD 的 operator workbench。
+- 前端目标工作区为 Dashboard / MT5 / Evolution 的外汇 operator workbench。
 
 但还不能说“Perfect Edition 全部完成”。剩余缺口主要不是大架构，而是：
 
@@ -27,7 +28,7 @@ QuantGod 现在已经完成了“USDJPY 自进化交易 OS”的主体工程骨�
 | 仓库 | 当前观察到的主线能力 |
 |---|---|
 | Backend | Strategy JSON、GA、SQLite backtest、Parity、Execution Feedback、Case Memory、Telegram Gateway、Daily Autopilot、News Gate、EA contract adapter、Evidence OS |
-| Frontend | Dashboard / MT5 / Evolution / HFM Crypto CFD 主工作区，GA 审计、Evidence OS、Telegram Gateway、history production、deep parity 可视化 |
+| Frontend | Dashboard / MT5 / Evolution 主工作区，GA 审计、Evidence OS、Telegram Gateway、history production、deep parity 可视化 |
 | Docs | Strategy JSON、Backtest、Evidence OS、Telegram Gateway、Agent lifecycle 等维护文档 |
 | Infra | Agent loop / Telegram dispatch / runtime automation 相关启动配置 |
 
@@ -74,22 +75,6 @@ QuantGod 现在已经完成了“USDJPY 自进化交易 OS”的主体工程骨�
 
 - 需要继续观察真实 EA shadow ledger 是否长期稳定产出 `SHADOW_OBSERVE / SHADOW_WOULD_ENTER`。
 - 需要确保每个策略族的 family-specific 参数在 Python backtest 与 MQL5 shadow adapter 中完全一致。
-
-### 3. HFM Crypto CFD Shadow Lane
-
-状态：shadow-only 主体完成。
-
-已实现：
-
-- HFM Crypto CFD 继续作为本地品种证据扫描、Moss 回测 profile 映射和 shadow-only 研究。
-- 不连接真实钱包。
-- 不签名、不下单、不撤单、不赎回。
-- Daily Autopilot / Telegram / frontend 中已体现 shadow/quarantine 语义。
-
-剩余缺口：
-
-- HFM Crypto CFD symbol scan plan 仍需要持续观察，确认黄字待办不会长期滞留。
-- HFM Crypto CFD profile 与 USDJPY 风险提示之间的影响仍是软参考，不是完整跨市场因子模型。
 
 ### 4. News Gate v2.5.1
 
@@ -236,17 +221,16 @@ QuantGod 现在已经完成了“USDJPY 自进化交易 OS”的主体工程骨�
 
 已实现：
 
-- 三车道状态汇总。
+- USDJPY Live / MT5 Shadow 两车道状态汇总。
 - Agent Daily Todo。
 - Daily Review。
 - 自动升降级/回滚摘要。
-- GA / history production / Telegram Gateway / HFM Crypto CFD symbol scan 状态接入。
+- GA / history production / Telegram Gateway 状态接入。
 - 不再以人工审批作为主流程。
 
 剩余缺口：
 
 - Daily Autopilot 是否每天稳定定时跑，需要继续观察调度周期。
-- HFM Crypto CFD symbol scan 的 WARN 语义已经收口过，但仍需确认不再长期滞留。
 
 ### 12. Telegram Gateway
 
@@ -259,7 +243,7 @@ QuantGod 现在已经完成了“USDJPY 自进化交易 OS”的主体工程骨�
 - Dedupe / suppress 语义。
 - 最近真实发送 / 最近抑制。
 - Dashboard 健康卡。
-- Daily / GA / rollback / HFM Crypto CFD symbol scan 等 topic 可进入统一投递链路。
+- Daily / GA / rollback 等外汇 topic 可进入统一投递链路。
 
 剩余缺口：
 
@@ -276,7 +260,6 @@ QuantGod 现在已经完成了“USDJPY 自进化交易 OS”的主体工程骨�
   - Dashboard
   - MT5
   - Evolution
-  - HFM Crypto CFD
 - MT5 首屏显示：
   - Live Loop
   - RSI diagnostics
@@ -289,7 +272,6 @@ QuantGod 现在已经完成了“USDJPY 自进化交易 OS”的主体工程骨�
   - lineage
   - backtest metrics
   - Strategy JSON / parity / case memory
-- HFM Crypto CFD 文案已向 shadow-only / 品种证据靠拢。
 
 剩余缺口：
 
@@ -323,8 +305,7 @@ QuantGod 现在已经完成了“USDJPY 自进化交易 OS”的主体工程骨�
 1. Case Memory → GA seed hint 的长期有效性。
 2. Daily Autopilot 定时调度稳定性。
 3. Telegram Gateway 真实发送长期稳定性。
-4. HFM Crypto CFD symbol scan plan 不再长期黄字滞留。
-5. EA build / ex5 / preset hash 与 GitHub commit 的长期对账。
+4. EA build / ex5 / preset hash 与 GitHub commit 的长期对账。
 
 ### P2：前端与文档收口
 
@@ -339,7 +320,7 @@ QuantGod 现在已经完成了“USDJPY 自进化交易 OS”的主体工程骨�
 
 - GA 不能直接进入 live。
 - Strategy JSON 不能包含任意代码。
-- HFM Crypto CFD 不保存 broker 凭证、不下单。
+- 非外汇品种不进入系统；HFM 仅保留外汇 broker 角色。
 - Telegram 不接交易命令。
 - Frontend 不提供交易按钮。
 - DeepSeek 不批准 live、不取消回滚、不提高 maxLot。
@@ -368,7 +349,6 @@ QuantGod 现在已经完成了“USDJPY 自进化交易 OS”的主体工程骨�
 |---|---:|
 | USDJPY Live Lane 安全主线 | 85% |
 | MT5 Shadow Lane 多策略 | 80% |
-| HFM Crypto CFD Shadow Lane | 75% |
 | Strategy JSON 契约 | 70% |
 | USDJPY SQLite Backtest | 70% |
 | GA Evolution Engine | 65% |

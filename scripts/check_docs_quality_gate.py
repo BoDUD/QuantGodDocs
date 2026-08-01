@@ -87,6 +87,14 @@ SECRET_PATTERNS = [
     re.compile(r"TELEGRAM_BOT_TOKEN\s*=\s*['\"][^'\"]+['\"]", re.I),
 ]
 
+CRYPTO_ONLY_ENDPOINT_MARKERS = (
+    "crypto",
+    "hyperliquid",
+    "bitcoin",
+    "/btc",
+    "moss",
+)
+
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
@@ -185,9 +193,13 @@ def check_api_contract(root: Path, errors: list[str]) -> None:
     endpoints = collect_endpoints(contract)
     if len(endpoints) < 100:
         fail(errors, f"api contract endpoint count too low: {len(endpoints)} < 100")
-    invalid = [endpoint for endpoint in endpoints if not endpoint.startswith("/api/")]
+    invalid = [
+        endpoint
+        for endpoint in endpoints
+        if not endpoint.startswith("/api/") and endpoint not in {"/healthz", "/readyz"}
+    ]
     if invalid:
-        fail(errors, f"api contract contains non-/api endpoint(s): {invalid[:5]}")
+        fail(errors, f"api contract contains unsupported endpoint(s): {invalid[:5]}")
     missing_modes: list[str] = []
     invalid_modes: list[str] = []
     for group in contract.get("endpointGroups", []):
@@ -207,38 +219,24 @@ def check_api_contract(root: Path, errors: list[str]) -> None:
         fail(errors, f"api contract endpoint mode missing: {missing_modes[:8]}")
     if invalid_modes:
         fail(errors, f"api contract endpoint mode invalid: {invalid_modes[:8]}")
-    hfm_status = None
-    for group in contract.get("endpointGroups", []):
-        if not isinstance(group, dict):
-            continue
-        for endpoint in group.get("endpoints", []):
-            if isinstance(endpoint, dict) and endpoint.get("path") == "/api/hfm-crypto/status":
-                hfm_status = endpoint
-                break
-        if hfm_status:
-            break
-    if not isinstance(hfm_status, dict):
-        fail(errors, "api contract must include /api/hfm-crypto/status")
-    else:
-        variants = hfm_status.get("queryVariants") or []
-        summary = next(
-            (
-                variant
-                for variant in variants
-                if isinstance(variant, dict) and variant.get("query") == "view=summary"
-            ),
-            None,
+    crypto_only = [
+        endpoint
+        for endpoint in endpoints
+        if any(marker in endpoint.lower() for marker in CRYPTO_ONLY_ENDPOINT_MARKERS)
+    ]
+    if crypto_only:
+        fail(errors, f"forex-only contract contains crypto-only endpoint(s): {crypto_only[:8]}")
+    crypto_groups = [
+        str(group.get("name"))
+        for group in contract.get("endpointGroups", [])
+        if isinstance(group, dict)
+        and any(
+            token in str(group.get("name") or "").lower()
+            for token in ("crypto", "bitcoin", "btc", "hyperliquid", "moss")
         )
-        if not summary:
-            fail(errors, "api contract must document /api/hfm-crypto/status?view=summary")
-        summary_text = json.dumps(summary or {}, ensure_ascii=False)
-        status_text = json.dumps(hfm_status, ensure_ascii=False)
-        if "brokerSymbolDiagnostics" not in status_text or "brokerSymbolDiagnostics" not in summary_text:
-            fail(errors, "HFM summary contract must preserve brokerSymbolDiagnostics")
-        if "operatorChecklist" not in status_text or "operatorChecklist" not in summary_text:
-            fail(errors, "HFM summary contract must preserve operatorChecklist")
-        if "safety" not in summary_text:
-            fail(errors, "HFM summary contract must preserve safety flags")
+    ]
+    if crypto_groups:
+        fail(errors, f"forex-only contract contains crypto-only group(s): {crypto_groups[:8]}")
 
     safety = contract.get("safetyDefaults") or contract.get("safety") or {}
     if not isinstance(safety, dict):
@@ -320,7 +318,7 @@ def check_live_lane_doctrine(root: Path, errors: list[str]) -> None:
     if "非 RSI" not in text and "non-RSI" not in text:
         fail(errors, "docs/backend/safety-boundaries.md must state non-RSI routes remain non-live")
     if "单独执行 lane RFC" not in text and "separate execution lane RFC" not in text:
-        fail(errors, "docs/backend/safety-boundaries.md must require a separate execution lane RFC for non-RSI/HFM live execution")
+        fail(errors, "docs/backend/safety-boundaries.md must require a separate execution lane RFC for non-RSI live execution")
 
 
 def main() -> int:
