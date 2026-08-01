@@ -83,7 +83,7 @@ QuantGod 已经具备一个外汇量化研究与交易治理系统的主要工�
 |---|---|---|
 | Backend | Node API 在 `127.0.0.1:8080` 运行；核心 profile 已由 launchd 管理 | 服务在线，MT5 只读端点已独立验证 freshness |
 | Frontend | Vite 在 `127.0.0.1:5173` 运行；生产 `dist` 已原子同步到 Backend | 5173 与 8080 使用同代源码产物 |
-| MT5/EA | HFM 主账号已连接；0 持仓、0 挂单；EA 为 Shadow + ReadOnly；活动源码无 broker mutation 原语 | 当前只读状态可信；下一次启动必须通过 fresh compile provenance gate，真实执行物理不可达 |
+| MT5/EA | HFM 主账号已连接；0 持仓、0 挂单；EA 为 Shadow + ReadOnly；活动源码无 broker mutation 原语 | 已完成受控重启并通过 fresh compile provenance gate；只读 writer 新鲜、broker 已连接且账号已授权，真实执行物理不可达 |
 | 第二账号 | 可选车道默认禁用；旧登录验证为无效账号且终端已停止 | 不参与主账号健康汇总，不产生假阻断 |
 | Agent | 可选 agent profile 未加载 | 核心本地运行不依赖可选 agent |
 | MT5 核心快照 | 文件时间、EA 内嵌时间与 heartbeat 三项共同校验，TTL 180 秒 | `FRESH`；复制或 touch 旧 JSON 不能伪造新鲜状态 |
@@ -629,7 +629,7 @@ CI 按 release lock checkout 四仓精确 SHA，然后执行：
 - 产品范围收敛为本地外汇系统；退役业务的源码、页面、API、配置、测试器输入、运行证据和旧日志已移出 active tree。旧 URL 只保留单向迁移 alias，不能恢复退役 workspace。
 - 公网展示、远端同步和边缘代理从 active Infra、launchd、环境变量和运行进程中移除；8080/5173 仅监听 `127.0.0.1`。
 - 日常 `local-shadow` profile 只加载 Backend、MT5 Shadow supervisor、历史同步、advisory automation、健康、日志与本地备份；Vite、legacy daily、AI 和 Telegram 均保持未加载。
-- HFM 主账号继续作为本地只读证据源；本轮没有热替换或重启已登录终端。活动 EA 源码已移除 broker mutation 原语；下一次启动必须重新编译并通过 fresh-output gate，旧 EX5 会先被隔离，失败时终端不会启动。
+- HFM 主账号继续作为本地只读证据源；本轮已完成受控重启，启动器先隔离旧 EX5，再重新编译、验证 fresh-output provenance 并原子安装。终端重新授权后只读 writer 已恢复新鲜，broker 已连接、账号已授权，平台确认 0 持仓、0 挂单；周末休市与研究证据门禁不会再被误报为账号不可用。
 - 仓库 synthetic preset 不再覆盖本地账号：启动脚本从已登录 portable terminal hydration 私有 Shadow config，LoginOnly 身份、精确 HFM server、`0600` 权限与无 Password 落盘均由启动前门禁验证。
 - Backend 已移除 `/api/mt5-trading*`、兼容 `/api/mt5*` 与撤单别名，Python compatibility shim 不再包含 broker login/order-send 调用；本地委托链只保留 `DRY_RUN_ACCEPTED` 的 Shadow 模拟与审计，任何 live 请求永久 fail closed。
 - Mac 启动路径只接受 `shadow/off`，并只向真实终端复制 `QuantGod_MT5_HFM_Shadow.set`；不再全量同步可能被 GUI 误加载的 tester/live presets。Windows 的通用、Shadow 和 LivePilot 三个 tracked launcher 均已退役，直接以非零退出且无副作用。
@@ -638,14 +638,15 @@ CI 按 release lock checkout 四仓精确 SHA，然后执行：
 - MT5 进程归属、dashboard writer freshness、可选第二账号、只读前端文案和生产 artifact 漂移已经修复；supervisor 持有并等待精确 Wine child，退出后原子写回 `STOPPED/FAILED`，singleton 初始化与回收均 fail closed。
 - MT5 platform store 已改为只接受、保存和返回外汇品种；入库时会根据 broker symbol 重新归类，调用方不能通过伪报 Forex 绕过。旧 SQLite 已完整备份，活动数据库重建后包含 44 个外汇品种、0 个非外汇品种、0 个待处理订单和 0 个平台持仓。
 - 历史退役证据采用可恢复归档，不做不可逆删除；活动秘密、日志和归档权限收紧为文件 `0600`、目录 `0700`。
-- 本地日志维护覆盖 Backend runtime、真实 MT5 evidence 与 launchd 三个受限根目录；备份任务在新快照逐文件验证后保留最近 3 份已验证快照，未验证目录永不参与 retention 清理。
+- 本地日志维护覆盖 Backend runtime、真实 MT5 evidence 与 launchd 三个受限根目录；同秒重名产生的编号 `.log.gz/.jsonl.gz` 也纳入过期与容量清理。备份任务在新快照逐文件验证后保留最近 3 份已验证快照，未验证目录永不参与 retention 清理；更早的 legacy 快照保留 manifest 后转为权限 `0600` 的可恢复压缩归档。
+- Frontend 锁文件已应用非破坏性安全补丁，`npm audit` 的 production 与完整依赖结果均为 0 vulnerabilities；guard、单测与 production build 已在锁文件变更后重新全量通过。
 - Backend 与 legacy 的 Dashboard、readonly bridge、Phase 2 freshness、tester gate 和 USDJPY data loader 已恢复兼容一致。
 
 自动化验收结果：
 
 | 范围 | 结果 |
 |---|---|
-| Backend Python | 672 passed，1 skipped，另含 105 个 subtests |
+| Backend Python | 673 passed，1 skipped，另含 105 个 subtests |
 | Backend Node | 162/162 passed |
 | Frontend Node guards | 155/155 passed |
 | Frontend unit | 70/70 passed；contract/API/lint/format/style/unit toolchain 全通过 |

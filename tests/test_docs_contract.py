@@ -207,7 +207,20 @@ class DocsContractTests(unittest.TestCase):
 
     def test_backend_route_scan_includes_production_evidence_validation(self) -> None:
         root = Path(__file__).resolve().parents[1]
-        backend = root.parent / "QuantGodBackend"
+        backend_candidates = (
+            root / "backend-checkout",
+            root.parent / "QuantGodBackend",
+        )
+        backend = next(
+            (
+                candidate
+                for candidate in backend_candidates
+                if (candidate / "tools" / "api_route_registry.py").is_file()
+            ),
+            None,
+        )
+        if backend is None:
+            self.skipTest("Backend route registry checkout is unavailable")
         paths = api_check.backend_paths(backend)
 
         self.assertIn("/api/production-evidence-validation/status", paths)
