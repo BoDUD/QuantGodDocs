@@ -82,7 +82,7 @@ QuantGod 已经具备一个外汇量化研究与交易治理系统的主要工�
 | 项目 | 审计观察 | 判定 |
 |---|---|---|
 | Backend | Node API 在 `127.0.0.1:8080` 运行；核心 profile 已由 launchd 管理 | 服务在线，MT5 只读端点已独立验证 freshness |
-| Frontend | Vite 在 `127.0.0.1:5173` 运行；生产 `dist` 已原子同步到 Backend | 5173 与 8080 使用同代源码产物 |
+| Frontend | 生产 `dist` 已原子同步并由 Backend 在 `127.0.0.1:8080/vue/` 提供；可选 Vite 5173 开发服务未加载 | 本地运行只依赖 8080 的已验证生产产物，避免开发服务器与生产页面代际漂移 |
 | MT5/EA | HFM 主账号已连接；0 持仓、0 挂单；EA 为 Shadow + ReadOnly；活动源码无 broker mutation 原语 | 已完成受控重启并通过 fresh compile provenance gate；只读 writer 新鲜、broker 已连接且账号已授权，真实执行物理不可达 |
 | 第二账号 | 可选车道默认禁用；旧登录验证为无效账号且终端已停止 | 不参与主账号健康汇总，不产生假阻断 |
 | Agent | 可选 agent profile 未加载 | 核心本地运行不依赖可选 agent |
