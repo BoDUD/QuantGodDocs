@@ -507,7 +507,7 @@ QUEUED -> VALIDATING -> RUNNING -> COMMITTING -> SUCCEEDED
 
 2026-08-02，用户明确要求旧本地 `QuantGod` 目录不再隔离、直接清理。删除前已确认：
 
-1. 精确目标为 `/Users/bowen/Desktop/Quard/QuantGod`，不是四个 active 拆分仓库；目标不是符号链接。
+1. 精确目标为已删除的 legacy monorepo 目录，不是四个 active 拆分仓库；目标不是符号链接。
 2. 目录约 578MB，Git 工作区有 191 个未提交或未跟踪状态项；用户已明确接受直接清理，不制作归档。
 3. launchd、Backend、MT5 和 8080 Frontend 均未引用旧目录；活动根目录分别指向 `QuantGodBackend`、`QuantGodFrontend`、`QuantGodInfra` 和 `QuantGodDocs`。
 4. 四个活动仓库删除前后均与各自 `origin/main` 同步且工作区干净。
