@@ -54,6 +54,7 @@ Observe broadly. Advise narrowly. Execute nowhere. Fail closed.
 | Strategy GA Factory | [Strategy GA Factory](docs/ops/strategy-ga-factory.md) |
 | USDJPY GA Factory | [USDJPY GA Factory](docs/ops/usdjpy-ga-factory.md) |
 | Telegram Gateway observability | [Telegram Gateway observability](docs/ops/telegram-gateway-observability.md) |
+| Telegram 中文消息合同 | [Telegram 中文消息合同](docs/ops/telegram-message-contract.md) |
 | Strategy JSON USDJPY backtest | [Strategy JSON USDJPY backtest](docs/ops/strategy-json-usdjpy-backtest.md) |
 | Strategy JSON → EA contract | [Strategy JSON EA contract adapter](docs/ops/strategy-json-ea-contract-adapter.md) |
 | USDJPY Evidence OS | [USDJPY Evidence OS](docs/ops/usdjpy-evidence-os.md) |

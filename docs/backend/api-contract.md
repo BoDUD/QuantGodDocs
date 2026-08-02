@@ -272,11 +272,11 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 |---|---|---|---|
 | GET | `/api/notify/config` | `read-only` | Notification config status; no secret values. |
 | GET | `/api/notify/history` | `read-only` | Notification delivery history. |
-| POST | `/api/notify/test` | `push-only` | Send one test notification; never accepts trading commands. |
-| POST | `/api/notify/daily-digest` | `push-only` | Trigger AI ops daily digest push; advisory-only output. |
-| POST | `/api/notify/runtime-scan` | `push-only` | Trigger runtime scan notification; never accepts trading commands. |
+| POST | `/api/notify/test` | `push-only` | Preview one test notification by default; external push requires explicit send=true and dryRun=false, and never accepts trading commands. |
+| POST | `/api/notify/daily-digest` | `push-only` | Build an advisory-only daily digest in preview mode by default; external push requires explicit send=true and dryRun=false. |
+| POST | `/api/notify/runtime-scan` | `push-only` | Run a notification scan in preview mode by default; external push requires explicit send=true and dryRun=false, and never accepts trading commands. |
 | GET | `/api/notify/mt5-ai-monitor/config` | `read-only` | MT5 AI monitor config status; no secret values. |
-| POST | `/api/notify/mt5-ai-monitor/run` | `push-only` | Run MT5 AI monitor analysis; advisory-only, push-only. |
+| POST | `/api/notify/mt5-ai-monitor/run` | `push-only` | Run MT5 AI monitor analysis in dry-run/non-force mode by default; external push requires explicit send=true and dryRun=false and remains advisory-only/push-only. |
 
 ### phase3-vibe-ai-kline
 
@@ -286,7 +286,7 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | Method | Path | Mode | Notes |
 |---|---|---|---|
 | GET | `/api/ai-analysis/deepseek-telegram/config` | `read-only` | DeepSeek-Telegram fusion config status. |
-| POST | `/api/ai-analysis/deepseek-telegram/run` | `advisory` | Run DeepSeek-Telegram fusion analysis. |
+| POST | `/api/ai-analysis/deepseek-telegram/run` | `advisory` | Run DeepSeek-Telegram fusion analysis in dry-run/non-force mode by default; any push requires explicit send=true and dryRun=false. |
 | GET | `/api/ai-analysis/deepseek-telegram/latest` | `read-only` | Latest DeepSeek-Telegram fusion result. |
 | GET | `/api/vibe-coding` | `research-only` | Vibe Coding config alias. |
 | GET | `/api/vibe-coding/config` | `research-only` | Vibe Coding config. |
@@ -344,8 +344,8 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 |---|---|---|---|
 | GET | `/api/automation-chain` | `read-only` | Automation chain status alias; no trading execution. |
 | GET | `/api/automation-chain/status` | `read-only` | Latest automation chain status and missing evidence. |
-| GET | `/api/automation-chain/telegram-text` | `push-preview` | Chinese Telegram preview text for automation chain. |
-| POST | `/api/automation-chain/run` | `local-advisory-control` | Run local evidence chain; writes runtime evidence but does not place orders. |
+| GET | `/api/automation-chain/telegram-text` | `push-preview` | Preview-only Chinese Telegram text for the automation chain; this GET never sends. |
+| POST | `/api/automation-chain/run` | `local-advisory-control` | Run the local evidence chain in preview/dry-run mode by default; any Telegram push requires a JSON body with send=true and dryRun=false. It writes runtime evidence but does not place orders. |
 
 ### P3-14 USDJPY 单品种多策略实验室
 
@@ -358,7 +358,7 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | GET | `/api/usdjpy-strategy-lab/status` | `read-only` | 读取 USDJPY-only 策略政策状态。 |
 | GET | `/api/usdjpy-strategy-lab/scoreboard` | `read-only` | 读取 USDJPY 多策略评分矩阵。 |
 | GET | `/api/usdjpy-strategy-lab/dry-run` | `read-only` | 生成或读取 USDJPY EA 干跑决策。 |
-| GET | `/api/usdjpy-strategy-lab/telegram-text` | `push-preview` | 生成 USDJPY 策略政策的中文 Telegram 文案。 |
+| GET | `/api/usdjpy-strategy-lab/telegram-text` | `push-preview` | 仅生成 USDJPY 策略政策中文 Telegram 预览；此 GET 绝不发送。 |
 | POST | `/api/usdjpy-strategy-lab/run` | `research-only` | 运行 USDJPY 策略政策生成；不执行交易。 |
 | GET | `/api/usdjpy-strategy-lab/catalog` | `read-only` | 读取 USDJPY 策略工厂目录，包含东京突破、夜盘回归和 H4 回调三条新增 shadow 策略。 |
 | GET | `/api/usdjpy-strategy-lab/signals` | `read-only` | 读取 USDJPY shadow 候选信号，用于确认新增策略是否正在采样。 |
@@ -371,28 +371,28 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | GET | `/api/usdjpy-strategy-lab/risk-check` | `read-only` | 读取 USDJPY 策略工厂风险检查结果。 |
 | GET | `/api/usdjpy-strategy-lab/imported-backtests` | `read-only` | 读取已导入的 USDJPY 回测结果账本。 |
 | POST | `/api/usdjpy-strategy-lab/import-backtest` | `research-only` | 导入本机 USDJPY 回测 CSV/JSON 结果；只写研究证据，不执行交易。 |
-| GET | `/api/usdjpy-strategy-lab/live-loop` | `read-only` | 读取 USDJPY 实盘 EA 恢复状态、阻断原因和下一步自动动作。 |
-| POST | `/api/usdjpy-strategy-lab/live-loop/run` | `local-advisory-control` | 重建 USDJPY 实盘闭环 evidence；只写本地状态和 intent，不直接执行交易。 |
-| GET | `/api/usdjpy-strategy-lab/live-loop/telegram-text` | `push-preview` | 生成或发送 USDJPY 实盘闭环中文 Telegram 文案。 |
+| GET | `/api/usdjpy-strategy-lab/live-loop` | `read-only` | 读取 USDJPY Shadow / ReadOnly 闭环状态、阻断原因和下一步证据动作。 |
+| POST | `/api/usdjpy-strategy-lab/live-loop/run` | `local-advisory-control` | 重建 USDJPY Shadow / ReadOnly 闭环 evidence；只写本地证据和 advisory intent，不执行交易。 |
+| GET | `/api/usdjpy-strategy-lab/live-loop/telegram-text` | `push-preview` | 仅生成 USDJPY Shadow / ReadOnly 闭环中文 Telegram 预览；此 GET 绝不发送。 |
 | GET | `/api/usdjpy-strategy-lab/evolution` | `read-only` | 读取 USDJPY 自学习闭环状态别名，包含数据集、回放、参数候选和配置提案。 |
 | GET | `/api/usdjpy-strategy-lab/evolution/status` | `read-only` | 读取 USDJPY 自学习闭环状态，包含数据集、回放、参数候选和配置提案。 |
 | POST | `/api/usdjpy-strategy-lab/evolution/build` | `research-only` | 重建 USDJPY 运行数据集、回放、参数候选和配置提案；只写本地研究证据。 |
 | GET | `/api/usdjpy-strategy-lab/evolution/replay` | `read-only` | 读取或刷新 USDJPY 回放复盘，解释错失机会和过早出场。 |
 | GET | `/api/usdjpy-strategy-lab/evolution/tune` | `read-only` | 读取或刷新 USDJPY tester-only 参数候选；不会自动应用到实盘。 |
 | GET | `/api/usdjpy-strategy-lab/evolution/proposal` | `read-only` | 读取或刷新 USDJPY 实盘配置提案；提案进入自主治理门，stage-gated，不再等待人工审批。 |
-| GET | `/api/usdjpy-strategy-lab/evolution/telegram-text` | `push-preview` | 生成或发送 USDJPY 自学习闭环中文 Telegram 文案。 |
+| GET | `/api/usdjpy-strategy-lab/evolution/telegram-text` | `push-preview` | 仅生成 USDJPY 自学习闭环中文 Telegram 预览；此 GET 绝不发送。 |
 | GET | `/api/usdjpy-strategy-lab/bar-replay` | `read-only` | 读取 USDJPY 因果 bar/tick 回放报告别名；等同 status。 |
 | GET | `/api/usdjpy-strategy-lab/bar-replay/status` | `read-only` | 读取 USDJPY 因果 bar/tick 回放报告；后验窗口只用于评分，不参与入场触发。 |
 | POST | `/api/usdjpy-strategy-lab/bar-replay/build` | `research-only` | 重建 USDJPY 因果回放报告、入场候选对比、出场候选对比和 replay ledger；不会执行交易。 |
 | GET | `/api/usdjpy-strategy-lab/bar-replay/entry` | `read-only` | 读取 USDJPY current vs relaxed_entry_v1 入场候选对比；硬门禁不会放宽。 |
 | GET | `/api/usdjpy-strategy-lab/bar-replay/exit` | `read-only` | 读取 USDJPY current vs let_profit_run_v1 出场持有候选对比；只重估已发生入场的出场表现。 |
-| GET | `/api/usdjpy-strategy-lab/bar-replay/telegram-text` | `push-preview` | 生成或发送 USDJPY 因果回放中文 Telegram 文案；后续由 P3-20 自主治理门评估。 |
+| GET | `/api/usdjpy-strategy-lab/bar-replay/telegram-text` | `push-preview` | 仅生成 USDJPY 因果回放中文 Telegram 预览；此 GET 绝不发送，后续只由自主治理门做只读评估。 |
 | GET | `/api/usdjpy-strategy-lab/walk-forward` | `read-only` | 读取 USDJPY walk-forward 稳定性筛选报告别名。 |
 | GET | `/api/usdjpy-strategy-lab/walk-forward/status` | `read-only` | 读取 USDJPY train / validation / forward 三段稳定性筛选报告。 |
 | POST | `/api/usdjpy-strategy-lab/walk-forward/build` | `research-only` | 重建 USDJPY walk-forward 报告、参数选择和 stage-gated 提案；不执行交易。 |
 | GET | `/api/usdjpy-strategy-lab/walk-forward/selection` | `read-only` | 读取 USDJPY walk-forward 参数选择结果。 |
 | GET | `/api/usdjpy-strategy-lab/walk-forward/proposal` | `read-only` | 读取 USDJPY stage-gated live config proposal。 |
-| GET | `/api/usdjpy-strategy-lab/walk-forward/telegram-text` | `push-preview` | 生成或发送 USDJPY walk-forward 中文 Telegram 文案。 |
+| GET | `/api/usdjpy-strategy-lab/walk-forward/telegram-text` | `push-preview` | 仅生成 USDJPY walk-forward 中文 Telegram 预览；此 GET 绝不发送。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent` | `read-only` | 读取 USDJPY 自主治理 Agent 状态别名。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/state` | `read-only` | 读取 USDJPY 自主治理 Agent 当前阶段、受控 patch 和回滚状态。 |
 | POST | `/api/usdjpy-strategy-lab/autonomous-agent/run` | `research-only` | 运行 USDJPY 自主治理门；只写受控 patch 和回滚证据，不执行交易。 |
@@ -405,12 +405,12 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2` | `read-only` | 读取 Daily Autopilot 2.0 中文早盘计划、夜盘复盘、三车道今日动作，以及 Strategy JSON GA Trace 状态和 Telegram Gateway 下一阶段任务。 |
 | GET | `/api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2/status` | `read-only` | 读取 Daily Autopilot 2.0 状态别名，包含下一阶段任务等待状态。 |
 | POST | `/api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2/run` | `research-only` | 重建 Daily Autopilot 2.0 中文计划、复盘和下一阶段任务；只写本地证据，不执行交易。 |
-| GET | `/api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2/telegram-text` | `push-preview` | 生成或发送 Daily Autopilot 2.0 中文 Telegram 文案，并说明 Strategy JSON / GA Trace 已进入 shadow/tester 过程审计，Telegram Gateway 等待下一阶段；Telegram 仍只推送，不接命令。 |
+| GET | `/api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2/telegram-text` | `push-preview` | 仅生成 Daily Autopilot 中文 Telegram 短预览；此 GET 绝不发送，Telegram 只出站推送且不接命令。 |
 | GET | `/api/usdjpy-strategy-lab/strategy-backtest` | `read-only` | 读取 USDJPY Strategy JSON SQLite 回测状态别名；只展示本地研究证据，不执行交易。 |
 | GET | `/api/usdjpy-strategy-lab/strategy-backtest/status` | `read-only` | 读取 USDJPY Strategy JSON SQLite 回测状态、K线数量、最新报告和只读安全边界。 |
 | POST | `/api/usdjpy-strategy-lab/strategy-backtest/sample` | `research-only` | 写入确定性 USDJPY H1 示例 K线到本地 SQLite，用于本地 smoke 和测试；不触达 MT5 交易。 |
 | POST | `/api/usdjpy-strategy-lab/strategy-backtest/run` | `research-only` | 运行 USDJPY Strategy JSON 回测，输出 report、trades、equity curve 和 GA 可读 fitness evidence。 |
-| GET | `/api/usdjpy-strategy-lab/strategy-backtest/telegram-text` | `push-preview` | 生成或发送中文 Strategy JSON 回测摘要；Telegram 仍只推送，不接命令。 |
+| GET | `/api/usdjpy-strategy-lab/strategy-backtest/telegram-text` | `push-preview` | 仅生成中文 Strategy JSON 回测预览；此 GET 绝不发送，Telegram 只出站推送且不接命令。 |
 | POST | `/api/usdjpy-strategy-lab/strategy-backtest/sync-klines` | `research-only` | 从 MT5 Python 或 MQL5 CopyRates CSV 增量同步 USDJPY M1/M5/M15/H1 K线到本地 SQLite；只写回测证据。 |
 | GET | `/api/usdjpy-strategy-lab/strategy-backtest/production-status` | `read-only` | 读取 USDJPY SQLite 历史数据生产验收状态，包含 M1/M5/M15/H1 覆盖深度、K线密度、最新延迟和后台同步来源。 |
 | GET | `/api/usdjpy-strategy-lab/strategy-backtest/quality` | `read-only` | 读取 USDJPY Strategy JSON SQLite 回测质量状态，包含历史覆盖、数据来源和同步目标满足情况；只展示回测证据。 |
@@ -420,11 +420,11 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | GET | `/api/usdjpy-strategy-lab/evidence-os/parity` | `read-only` | 重建并读取 Strategy JSON / Python Replay / MQL5 EA parity report。 |
 | GET | `/api/usdjpy-strategy-lab/evidence-os/execution-feedback` | `read-only` | 重建并读取 USDJPY live execution feedback / execution quality report。 |
 | GET | `/api/usdjpy-strategy-lab/evidence-os/case-memory` | `read-only` | 重建并读取 USDJPY Case Memory，总结错失机会、早出、执行偏差和下一代 GA 线索。 |
-| GET | `/api/usdjpy-strategy-lab/evidence-os/telegram-text` | `push-preview` | 生成 USDJPY evidence OS 中文 Telegram 文案；走 push-only Gateway，不接命令。 |
+| GET | `/api/usdjpy-strategy-lab/evidence-os/telegram-text` | `push-preview` | 仅生成 USDJPY evidence OS 中文 Telegram 预览；此 GET 绝不发送，Gateway 不接命令。 |
 | GET | `/api/case-memory` | `read-only` | 读取 P4-7 Case Memory → shadow Strategy JSON candidate / GA seed hint 状态别名；不执行交易。 |
 | GET | `/api/case-memory/status` | `read-only` | 读取 Case Memory strategy structure report、parity gate、shadow Strategy JSON candidate 和 GA seed 线索。 |
 | POST | `/api/case-memory/build` | `read-only` | 把 Case Memory root cause 转成 proposed mutation、shadow Strategy JSON candidate 和 GA seed hint；PARITY_FAIL 会阻断。 |
-| GET | `/api/case-memory/telegram-text` | `push-preview` | 生成 Case Memory 策略结构候选中文 Telegram 文案；push-only，不接交易命令。 |
+| GET | `/api/case-memory/telegram-text` | `push-preview` | 仅生成 Case Memory 策略结构候选中文 Telegram 预览；此 GET 绝不发送且不接命令。 |
 | GET | `/api/usdjpy-strategy-lab/ga` | `read-only` | 读取 USDJPY Strategy JSON GA 总状态别名；只展示 GA 过程审计，不直接进入实盘。 |
 | GET | `/api/usdjpy-strategy-lab/ga/status` | `read-only` | 读取 USDJPY Strategy JSON GA 当前代数、种群、最佳 fitness、阻断数量和下一步动作。 |
 | POST | `/api/usdjpy-strategy-lab/ga/run-generation` | `research-only` | 运行一代 USDJPY Strategy JSON GA，写入 generation、candidate、elite、blocker 和 evolution path 证据；不下单、不改 preset。 |
@@ -434,20 +434,20 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | GET | `/api/usdjpy-strategy-lab/ga/candidate/:seedId` | `read-only` | 读取单个 GA seed 的 Strategy JSON、父代来源、fitness 分解、replay/walk-forward 状态和阻断解释。 |
 | GET | `/api/usdjpy-strategy-lab/ga/evolution-path` | `read-only` | 读取 GA 进化路径，展示每代 bestFitness、bestStrategy、avgFitness 和阻断趋势。 |
 | GET | `/api/usdjpy-strategy-lab/ga/blockers` | `read-only` | 读取 GA blocker summary，解释 schema、safety、样本、walk-forward、过拟合、max adverse 等失败原因。 |
-| GET | `/api/usdjpy-strategy-lab/ga/telegram-text` | `push-preview` | 生成或发送中文 GA 进化报告；Telegram 仍只推送，不接收交易命令。 |
+| GET | `/api/usdjpy-strategy-lab/ga/telegram-text` | `push-preview` | 仅生成中文 GA 进化短预览；此 GET 绝不发送，Telegram 只出站推送且不接收命令。 |
 | GET | `/api/usdjpy-strategy-lab/daily-todo` | `read-only` | 读取 Agent 今日待办，含车道、状态、指标、升降级、回滚状态和下一阶段任务；无需人工回灌。 |
 | GET | `/api/usdjpy-strategy-lab/daily-todo/status` | `read-only` | 读取 Agent 今日待办状态别名，包含下一阶段任务等待状态。 |
 | POST | `/api/usdjpy-strategy-lab/daily-todo/run` | `research-only` | 由 Agent 重建并写入今日待办和下一阶段任务；只写本地证据，不执行交易。 |
-| GET | `/api/usdjpy-strategy-lab/daily-todo/telegram-text` | `push-preview` | 生成或发送 Agent 今日待办中文 Telegram 文案，包含下一阶段任务；Telegram 仍只推送，不接命令。 |
+| GET | `/api/usdjpy-strategy-lab/daily-todo/telegram-text` | `push-preview` | 仅生成 Agent 今日状态中文 Telegram 预览；此 GET 绝不发送，Telegram 只出站推送且不接命令。 |
 | GET | `/api/usdjpy-strategy-lab/daily-review` | `read-only` | 读取 Agent 每日复盘，含净 R、最大不利 R、错失机会、早出场、升降级、回滚状态和下一阶段任务。 |
 | GET | `/api/usdjpy-strategy-lab/daily-review/status` | `read-only` | 读取 Agent 每日复盘状态别名，包含下一阶段任务等待状态。 |
 | POST | `/api/usdjpy-strategy-lab/daily-review/run` | `research-only` | 由 Agent 重建并写入每日复盘和下一阶段任务；只写本地证据，不执行交易。 |
-| GET | `/api/usdjpy-strategy-lab/daily-review/telegram-text` | `push-preview` | 生成或发送 Agent 每日复盘中文 Telegram 文案，包含下一阶段任务；Telegram 仍只推送，不接命令。 |
-| GET | `/api/usdjpy-strategy-lab/autonomous-agent/telegram-text` | `push-preview` | 生成或发送 USDJPY 自主治理中文 Telegram 文案。 |
+| GET | `/api/usdjpy-strategy-lab/daily-review/telegram-text` | `push-preview` | 仅生成 Agent 每日复盘中文 Telegram 预览；此 GET 绝不发送，Telegram 只出站推送且不接命令。 |
+| GET | `/api/usdjpy-strategy-lab/autonomous-agent/telegram-text` | `push-preview` | 仅生成 USDJPY 自主治理中文 Telegram 预览；此 GET 绝不发送。 |
 | GET | `/api/telegram-gateway` | `read-only` | 读取 P4-5 Telegram Gateway 运维观测状态别名；只做 push-only 队列、去重、限频、ledger 观测。 |
 | GET | `/api/telegram-gateway/status` | `read-only` | 读取 P4-5 Telegram Gateway 运维观测状态，包含队列、待投递、真实发送、抑制、失败和 topic 视图。 |
 | POST | `/api/telegram-gateway/collect` | `push-preview` | 收集 Daily Autopilot、GA、Agent 和本地外汇证据报告进入 push-only Gateway 队列；不接收 Telegram 命令。 |
-| GET | `/api/telegram-gateway/telegram-text` | `push-preview` | 生成 Telegram Gateway 运维中文预览；仍只推送，不接 Telegram 命令。 |
+| GET | `/api/telegram-gateway/telegram-text` | `push-preview` | 仅生成 Telegram Gateway 运维中文预览；此 GET 绝不发送且不接命令。 |
 | GET | `/api/usdjpy-strategy-lab/agent-ops-health` | `read-only` | 读取 USDJPY Agent operations health 状态别名；只汇总本地证据与心跳，不执行交易。 |
 | GET | `/api/usdjpy-strategy-lab/agent-ops-health/status` | `read-only` | 读取 USDJPY Agent loop、Evidence OS、Telegram Gateway 和本地 runtime 健康状态。 |
 | POST | `/api/usdjpy-strategy-lab/agent-ops-health/refresh` | `local-advisory-control` | 刷新 USDJPY Agent operations health 并写入本地证据；不创建或修改交易。 |
@@ -456,19 +456,19 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | POST | `/api/strategy-ga-factory/build` | `read-only` | 生成 GA Factory state、elite archive、strategy graveyard、lineage tree、reflection report 和 ledger；不下单、不改 preset。 |
 | GET | `/api/strategy-ga-factory/intent-plan` | `read-only` | 读取自然语言 Strategy Factory intent plan；只生成 shadow-only Strategy JSON 和性格锁计划。 |
 | POST | `/api/strategy-ga-factory/intent-plan/build` | `read-only` | 从大白话生成 shadow-only Strategy JSON seed、五维信号计划、30+ 参数和性格锁进化计划；不触发交易。 |
-| GET | `/api/strategy-ga-factory/telegram-text` | `push-preview` | 生成 GA Factory 中文 Telegram 文案；push-only，不接交易命令。 |
+| GET | `/api/strategy-ga-factory/telegram-text` | `push-preview` | 仅生成 GA Factory 中文 Telegram 预览；此 GET 绝不发送且不接命令。 |
 | GET | `/api/ga-factory` | `read-only` | 读取 GA Factory 状态短别名；等同 /api/strategy-ga-factory。 |
 | GET | `/api/ga-factory/status` | `read-only` | 读取 GA Factory 状态短别名；等同 /api/strategy-ga-factory/status。 |
 | POST | `/api/ga-factory/build` | `read-only` | 构建 GA Factory 短别名；等同 /api/strategy-ga-factory/build。 |
-| GET | `/api/ga-factory/telegram-text` | `push-preview` | 生成 GA Factory 中文 Telegram 文案短别名。 |
+| GET | `/api/ga-factory/telegram-text` | `push-preview` | 仅生成 GA Factory 中文 Telegram 预览的短别名；此 GET 绝不发送。 |
 | GET | `/api/usdjpy-strategy-lab/telegram-gateway/status` | `read-only` | 读取独立 Telegram Gateway 队列、ledger、去重、限频和 push-only 状态。 |
 | POST | `/api/usdjpy-strategy-lab/telegram-gateway/test-event` | `push-only` | 写入中文测试 NotificationEvent 到 Gateway 队列；不发送交易命令。 |
-| POST | `/api/usdjpy-strategy-lab/telegram-gateway/dispatch` | `push-only` | 处理 Gateway 队列；默认只写 ledger，send=1 时仍要求 push allowed 且 commands disabled。 |
+| POST | `/api/usdjpy-strategy-lab/telegram-gateway/dispatch` | `push-only` | 处理 Gateway 队列，默认只预览并写 ledger；外发必须在 JSON body 中同时提供 send=true 和 dryRun=false，query send=1 会被拒绝，且仍要求 push allowed 与 commands disabled。 |
 | GET | `/api/usdjpy-strategy-lab/telegram-gateway` | `read-only` | 读取独立 Telegram Gateway 状态兼容别名。 |
 | GET | `/api/usdjpy-strategy-lab/strategy-contract` | `read-only` | 读取 Strategy JSON → MQL5 EA 只读契约状态兼容别名；只用于 shadow/tester/paper lane 评估。 |
 | GET | `/api/usdjpy-strategy-lab/strategy-contract/status` | `read-only` | 读取 Strategy JSON → MQL5 EA 只读契约状态、所选 seed、fingerprint 和 EA 回执；只用于 shadow/tester/paper lane 评估。 |
 | POST | `/api/usdjpy-strategy-lab/strategy-contract/build` | `review-only-build` | 生成 EA 可读取的 Strategy JSON contract 文件；不下单、不改 live preset。 |
-| GET | `/api/usdjpy-strategy-lab/strategy-contract/telegram-text` | `push-preview` | 生成 Strategy JSON → EA 只读契约中文摘要；Telegram 仍只推送，不接命令。 |
+| GET | `/api/usdjpy-strategy-lab/strategy-contract/telegram-text` | `push-preview` | 仅生成 Strategy JSON → EA 只读契约中文 Telegram 预览；此 GET 绝不发送且不接命令。 |
 
 ### P4-6 Production Evidence Validation
 
@@ -486,7 +486,7 @@ Phase 1/2/3 的 API contract 必须保持本地优先和安全受控：
 | GET | `/api/production-evidence-validation/rsi-lineage-closure` | `read-only` | Read the guarded RSI lineage closure evidence without enabling execution. |
 | GET | `/api/production-evidence-validation/rsi-lineage-closure/status` | `read-only` | Read the guarded RSI lineage closure status without enabling execution. |
 | POST | `/api/production-evidence-validation/rsi-lineage-closure/run` | `review-only-build` | Build local guarded RSI lineage closure evidence; review-only and must not write orders, mutate presets, or call a broker. |
-| GET | `/api/production-evidence-validation/telegram-text` | `read-only` | Preview production evidence Telegram text; push preview only, no command execution. |
+| GET | `/api/production-evidence-validation/telegram-text` | `read-only` | Preview-only production evidence Telegram text; this GET never sends and cannot execute commands. |
 
 ## 更新清单
 

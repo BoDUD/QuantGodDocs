@@ -1175,19 +1175,19 @@
           "method": "POST",
           "path": "/api/notify/test",
           "mode": "push-only",
-          "description": "Send one test notification; never accepts trading commands."
+          "description": "Preview one test notification by default; external push requires explicit send=true and dryRun=false, and never accepts trading commands."
         },
         {
           "method": "POST",
           "path": "/api/notify/daily-digest",
           "mode": "push-only",
-          "description": "Trigger AI ops daily digest push; advisory-only output."
+          "description": "Build an advisory-only daily digest in preview mode by default; external push requires explicit send=true and dryRun=false."
         },
         {
           "method": "POST",
           "path": "/api/notify/runtime-scan",
           "mode": "push-only",
-          "description": "Trigger runtime scan notification; never accepts trading commands."
+          "description": "Run a notification scan in preview mode by default; external push requires explicit send=true and dryRun=false, and never accepts trading commands."
         },
         {
           "method": "GET",
@@ -1199,7 +1199,7 @@
           "method": "POST",
           "path": "/api/notify/mt5-ai-monitor/run",
           "mode": "push-only",
-          "description": "Run MT5 AI monitor analysis; advisory-only, push-only."
+          "description": "Run MT5 AI monitor analysis in dry-run/non-force mode by default; external push requires explicit send=true and dryRun=false and remains advisory-only/push-only."
         }
       ]
     },
@@ -1217,7 +1217,7 @@
           "method": "POST",
           "path": "/api/ai-analysis/deepseek-telegram/run",
           "mode": "advisory",
-          "description": "Run DeepSeek-Telegram fusion analysis."
+          "description": "Run DeepSeek-Telegram fusion analysis in dry-run/non-force mode by default; any push requires explicit send=true and dryRun=false."
         },
         {
           "method": "GET",
@@ -1439,13 +1439,13 @@
           "method": "GET",
           "path": "/api/automation-chain/telegram-text",
           "mode": "push-preview",
-          "description": "Chinese Telegram preview text for automation chain."
+          "description": "Preview-only Chinese Telegram text for the automation chain; this GET never sends."
         },
         {
           "method": "POST",
           "path": "/api/automation-chain/run",
           "mode": "local-advisory-control",
-          "description": "Run local evidence chain; writes runtime evidence but does not place orders."
+          "description": "Run the local evidence chain in preview/dry-run mode by default; any Telegram push requires a JSON body with send=true and dryRun=false. It writes runtime evidence but does not place orders."
         }
       ]
     },
@@ -1525,7 +1525,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/telegram-text",
-          "description": "生成 USDJPY 策略政策的中文 Telegram 文案。",
+          "description": "仅生成 USDJPY 策略政策中文 Telegram 预览；此 GET 绝不发送。",
           "safety": {
             "localOnly": true,
             "readOnlyDataPlane": true,
@@ -1754,7 +1754,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/live-loop",
-          "description": "读取 USDJPY 实盘 EA 恢复状态、阻断原因和下一步自动动作。",
+          "description": "读取 USDJPY Shadow / ReadOnly 闭环状态、阻断原因和下一步证据动作。",
           "safety": {
             "localOnly": true,
             "advisoryOnly": true,
@@ -1767,15 +1767,15 @@
             "canOverrideKillSwitch": false,
             "canMutateGovernanceDecision": false,
             "telegramCommandExecutionAllowed": false,
-            "dryRunOnly": false,
-            "shadowTradingOnly": false
+            "dryRunOnly": true,
+            "shadowTradingOnly": true
           },
           "mode": "read-only"
         },
         {
           "method": "POST",
           "path": "/api/usdjpy-strategy-lab/live-loop/run",
-          "description": "重建 USDJPY 实盘闭环 evidence；只写本地状态和 intent，不直接执行交易。",
+          "description": "重建 USDJPY Shadow / ReadOnly 闭环 evidence；只写本地证据和 advisory intent，不执行交易。",
           "safety": {
             "localOnly": true,
             "advisoryOnly": true,
@@ -1789,14 +1789,14 @@
             "canMutateGovernanceDecision": false,
             "telegramCommandExecutionAllowed": false,
             "dryRunOnly": false,
-            "shadowTradingOnly": false
+            "shadowTradingOnly": true
           },
           "mode": "local-advisory-control"
         },
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/live-loop/telegram-text",
-          "description": "生成或发送 USDJPY 实盘闭环中文 Telegram 文案。",
+          "description": "仅生成 USDJPY Shadow / ReadOnly 闭环中文 Telegram 预览；此 GET 绝不发送。",
           "safety": {
             "localOnly": true,
             "advisoryOnly": true,
@@ -1809,8 +1809,8 @@
             "canOverrideKillSwitch": false,
             "canMutateGovernanceDecision": false,
             "telegramCommandExecutionAllowed": false,
-            "dryRunOnly": false,
-            "shadowTradingOnly": false
+            "dryRunOnly": true,
+            "shadowTradingOnly": true
           },
           "mode": "push-preview"
         },
@@ -1943,7 +1943,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/evolution/telegram-text",
-          "description": "生成或发送 USDJPY 自学习闭环中文 Telegram 文案。",
+          "description": "仅生成 USDJPY 自学习闭环中文 Telegram 预览；此 GET 绝不发送。",
           "safety": {
             "localOnly": true,
             "advisoryOnly": true,
@@ -2074,7 +2074,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/bar-replay/telegram-text",
-          "description": "生成或发送 USDJPY 因果回放中文 Telegram 文案；后续由 P3-20 自主治理门评估。",
+          "description": "仅生成 USDJPY 因果回放中文 Telegram 预览；此 GET 绝不发送，后续只由自主治理门做只读评估。",
           "safety": {
             "localOnly": true,
             "advisoryOnly": true,
@@ -2201,7 +2201,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/walk-forward/telegram-text",
-          "description": "生成或发送 USDJPY walk-forward 中文 Telegram 文案。",
+          "description": "仅生成 USDJPY walk-forward 中文 Telegram 预览；此 GET 绝不发送。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -2522,7 +2522,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/autonomous-agent/daily-autopilot-v2/telegram-text",
-          "description": "生成或发送 Daily Autopilot 2.0 中文 Telegram 文案，并说明 Strategy JSON / GA Trace 已进入 shadow/tester 过程审计，Telegram Gateway 等待下一阶段；Telegram 仍只推送，不接命令。",
+          "description": "仅生成 Daily Autopilot 中文 Telegram 短预览；此 GET 绝不发送，Telegram 只出站推送且不接命令。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -2639,7 +2639,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/strategy-backtest/telegram-text",
-          "description": "生成或发送中文 Strategy JSON 回测摘要；Telegram 仍只推送，不接命令。",
+          "description": "仅生成中文 Strategy JSON 回测预览；此 GET 绝不发送，Telegram 只出站推送且不接命令。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -2833,7 +2833,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/evidence-os/telegram-text",
-          "description": "生成 USDJPY evidence OS 中文 Telegram 文案；走 push-only Gateway，不接命令。",
+          "description": "仅生成 USDJPY evidence OS 中文 Telegram 预览；此 GET 绝不发送，Gateway 不接命令。",
           "safety": {
             "localOnly": true,
             "focusSymbol": "USDJPYc",
@@ -2923,7 +2923,7 @@
           "method": "GET",
           "path": "/api/case-memory/telegram-text",
           "mode": "push-preview",
-          "description": "生成 Case Memory 策略结构候选中文 Telegram 文案；push-only，不接交易命令。",
+          "description": "仅生成 Case Memory 策略结构候选中文 Telegram 预览；此 GET 绝不发送且不接命令。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -3156,7 +3156,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/ga/telegram-text",
-          "description": "生成或发送中文 GA 进化报告；Telegram 仍只推送，不接收交易命令。",
+          "description": "仅生成中文 GA 进化短预览；此 GET 绝不发送，Telegram 只出站推送且不接收命令。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -3254,7 +3254,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/daily-todo/telegram-text",
-          "description": "生成或发送 Agent 今日待办中文 Telegram 文案，包含下一阶段任务；Telegram 仍只推送，不接命令。",
+          "description": "仅生成 Agent 今日状态中文 Telegram 预览；此 GET 绝不发送，Telegram 只出站推送且不接命令。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -3354,7 +3354,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/daily-review/telegram-text",
-          "description": "生成或发送 Agent 每日复盘中文 Telegram 文案，包含下一阶段任务；Telegram 仍只推送，不接命令。",
+          "description": "仅生成 Agent 每日复盘中文 Telegram 预览；此 GET 绝不发送，Telegram 只出站推送且不接命令。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -3379,7 +3379,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/autonomous-agent/telegram-text",
-          "description": "生成或发送 USDJPY 自主治理中文 Telegram 文案。",
+          "description": "仅生成 USDJPY 自主治理中文 Telegram 预览；此 GET 绝不发送。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -3465,7 +3465,7 @@
           "method": "GET",
           "path": "/api/telegram-gateway/telegram-text",
           "mode": "push-preview",
-          "description": "生成 Telegram Gateway 运维中文预览；仍只推送，不接 Telegram 命令。",
+          "description": "仅生成 Telegram Gateway 运维中文预览；此 GET 绝不发送且不接命令。",
           "safety": {
             "localOnly": true,
             "readOnlyDataPlane": true,
@@ -3684,7 +3684,7 @@
           "method": "GET",
           "path": "/api/strategy-ga-factory/telegram-text",
           "mode": "push-preview",
-          "description": "生成 GA Factory 中文 Telegram 文案；push-only，不接交易命令。",
+          "description": "仅生成 GA Factory 中文 Telegram 预览；此 GET 绝不发送且不接命令。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -3800,7 +3800,7 @@
           "method": "GET",
           "path": "/api/ga-factory/telegram-text",
           "mode": "push-preview",
-          "description": "生成 GA Factory 中文 Telegram 文案短别名。",
+          "description": "仅生成 GA Factory 中文 Telegram 预览的短别名；此 GET 绝不发送。",
           "safety": {
             "localOnly": true,
             "focusOnly": true,
@@ -3862,12 +3862,13 @@
         {
           "method": "POST",
           "path": "/api/usdjpy-strategy-lab/telegram-gateway/dispatch",
-          "description": "处理 Gateway 队列；默认只写 ledger，send=1 时仍要求 push allowed 且 commands disabled。",
+          "description": "处理 Gateway 队列，默认只预览并写 ledger；外发必须在 JSON body 中同时提供 send=true 和 dryRun=false，query send=1 会被拒绝，且仍要求 push allowed 与 commands disabled。",
           "safety": {
             "localOnly": true,
             "readOnlyDataPlane": true,
             "advisoryOnly": true,
-            "dryRunOnly": true,
+            "defaultDryRun": true,
+            "explicitSendRequired": true,
             "orderSendAllowed": false,
             "closeAllowed": false,
             "cancelAllowed": false,
@@ -3947,7 +3948,7 @@
         {
           "method": "GET",
           "path": "/api/usdjpy-strategy-lab/strategy-contract/telegram-text",
-          "description": "生成 Strategy JSON → EA 只读契约中文摘要；Telegram 仍只推送，不接命令。",
+          "description": "仅生成 Strategy JSON → EA 只读契约中文 Telegram 预览；此 GET 绝不发送且不接命令。",
           "safety": {
             "localOnly": true,
             "readOnlyDataPlane": true,
@@ -4036,7 +4037,7 @@
           "method": "GET",
           "path": "/api/production-evidence-validation/telegram-text",
           "mode": "read-only",
-          "description": "Preview production evidence Telegram text; push preview only, no command execution."
+          "description": "Preview-only production evidence Telegram text; this GET never sends and cannot execute commands."
         }
       ]
     }
