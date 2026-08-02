@@ -58,7 +58,7 @@ QuantGod 已经具备一个外汇量化研究与交易治理系统的主要工�
 
 检查范围包括：
 
-- 四个拆分仓库和旧 `QuantGod` 目录的文件、Git 状态及重复关系。
+- 四个拆分仓库，以及审计时仍存在的旧 `QuantGod` 目录的文件、Git 状态及重复关系。
 - Backend、Frontend、launchd、screen、MT5 相关进程和端口。
 - 本地 `127.0.0.1:8080`、`127.0.0.1:5173` API 与工作台页面。
 - Backend Python/Node 测试、Frontend 单元测试与构建、Infra 测试、Docs 质量门和 API contract。
@@ -73,7 +73,7 @@ QuantGod 已经具备一个外汇量化研究与交易治理系统的主要工�
 - 没有下单、平仓、撤单、改单、修改持仓或启用 live execution；所有 MT5 操作都停留在登录、只读快照和 Shadow 证据验证范围。
 - 没有发送 Telegram 测试消息。
 - 除用户已授权并登录的 HFM MT5 broker 会话外，没有连接、调用或写入其他外部服务，也没有上传本地代码或证据。
-- 没有删除旧 `QuantGod` 兼容仓库；退役模块与旧运行证据被移出 active tree 并保存在桌面权限收紧的归档目录中。
+- 2026-08-01 审计阶段没有删除旧 `QuantGod` 兼容仓库；2026-08-02 经用户明确授权后，该旧目录已直接清理且未归档。退役运行证据仍按独立备份策略保存，不依赖旧仓库。
 
 ## 3. 当前系统基线
 
@@ -188,7 +188,7 @@ QuantGod 已经具备一个外汇量化研究与交易治理系统的主要工�
 | QG-P1-10 | Telegram ledger 保存完整 API response | 本地日志暴露 chat/channel/message metadata，异常还可能携带 token URL | 只保存 message ID、状态和脱敏错误码；token 不进入 argv、URL 或异常文本 |
 | QG-P1-11 | 四仓没有精确版本锁 | 同一版本可能由不同 commit 与 dist 组合构成 | 签名的 `quantgod.release-lock.json` 记录四仓 SHA、schema、artifact hash |
 | QG-P1-12 | 无正式备份、恢复和演练 | SQLite/runtime 覆盖或本地卷删除后无法证明恢复 | SQLite 在线备份、WAL/checksum、本地加密副本、RPO/RTO 和自动 restore test |
-| QG-P1-13 | 旧 `QuantGod` 与 Backend 双份目录并存 | 人员或脚本可能从旧目录启动，造成证据分叉 | 不删除；标记只读兼容，启动脚本只接受 release lock 指定的 canonical path |
+| QG-P1-13 | 旧 `QuantGod` 与 Backend 双份目录并存 | 人员或脚本可能从旧目录启动，造成证据分叉 | 用户已明确授权删除旧目录；workspace verifier 要求 active 四仓使用 canonical path，旧 monorepo 不再存在 |
 
 ### 5.4 P2/P3 缺陷
 
@@ -503,19 +503,17 @@ QUEUED -> VALIDATING -> RUNNING -> COMMITTING -> SUCCEEDED
 - 每月自动在临时目录执行 restore test。
 - 目标：RPO 不超过 5 分钟，RTO 不超过 1 小时。
 
-## 14. 旧 `QuantGod` 目录的处理
+## 14. 旧 `QuantGod` 目录的处理结果
 
-旧目录当前与 `QuantGodBackend` 有大量相同文件，也有少量差异。活跃 Backend/Frontend 进程使用拆分后的仓库，但旧目录尚未上传或归档。
+2026-08-02，用户明确要求旧本地 `QuantGod` 目录不再隔离、直接清理。删除前已确认：
 
-本设计明确：
+1. 精确目标为 `/Users/bowen/Desktop/Quard/QuantGod`，不是四个 active 拆分仓库；目标不是符号链接。
+2. 目录约 578MB，Git 工作区有 191 个未提交或未跟踪状态项；用户已明确接受直接清理，不制作归档。
+3. launchd、Backend、MT5 和 8080 Frontend 均未引用旧目录；活动根目录分别指向 `QuantGodBackend`、`QuantGodFrontend`、`QuantGodInfra` 和 `QuantGodDocs`。
+4. 四个活动仓库删除前后均与各自 `origin/main` 同步且工作区干净。
+5. 删除后 Backend、Frontend、MT5 Shadow writer、broker 连接和账号授权继续正常；该旧目录不可从本机直接恢复。
 
-1. 不删除旧目录。
-2. 不自动覆盖旧目录或从旧目录覆盖 Backend。
-3. 生成差异 manifest，记录相同、仅旧版、仅新版和内容不同的文件。
-4. 所有启动器通过 release lock 选择 canonical Backend。
-5. 旧目录只做只读兼容和人工追溯，直到用户明确批准归档方案。
-
-这能保持系统继续运行，同时消除误启动双主线的风险。
+旧 monorepo 已不再存在，双主线误启动风险从“隔离控制”升级为“目录物理不存在”。运行证据和 SQLite 继续由 `.quantgod` 下的已验证备份独立保护。
 
 ## 15. 测试与质量门
 
@@ -615,7 +613,7 @@ CI 按 release lock checkout 四仓精确 SHA，然后执行：
 ## 18. 关键决策记录
 
 1. 本地代码和本地运行状态是本次整改事实源，GitHub 只作为未来发布目标。
-2. 旧 `QuantGod` 目录保留，不删除、不覆盖。
+2. 旧 `QuantGod` 目录在 2026-08-02 经用户明确授权后直接删除；四个拆分仓库成为唯一代码事实源。
 3. 当前没有足够正期望证据，所有改造保持 no-live-execution。
 4. 先修假绿、默认安全和命令可信度，再增加策略或页面。
 5. 外部上传和公网展示已经退役；当前与后续本地版本均不得隐式恢复。
@@ -626,6 +624,7 @@ CI 按 release lock checkout 四仓精确 SHA，然后执行：
 
 本轮已经落地、不是仅写在路线图中的项目：
 
+- 旧本地 `QuantGod` monorepo 已按用户明确指令直接清理，未制作归档；活动 launchd/MT5/Backend/Frontend 在删除后继续通过运行验收。
 - 产品范围收敛为本地外汇系统；退役业务的源码、页面、API、配置、测试器输入、运行证据和旧日志已移出 active tree。旧 URL 只保留单向迁移 alias，不能恢复退役 workspace。
 - 公网展示、远端同步和边缘代理从 active Infra、launchd、环境变量和运行进程中移除；8080/5173 仅监听 `127.0.0.1`。
 - 日常 `local-shadow` profile 只加载 Backend、MT5 Shadow supervisor、历史同步、advisory automation、健康、日志与本地备份；Vite、legacy daily、AI 和 Telegram 均保持未加载。
