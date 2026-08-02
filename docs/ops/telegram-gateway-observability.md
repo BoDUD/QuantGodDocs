@@ -2,6 +2,8 @@
 
 P4-5 turns the existing push-only Telegram Gateway into an operator-facing observability surface. It does not add Telegram commands and does not change trading logic.
 
+All previews and outbound reports follow the [Telegram 中文消息合同](telegram-message-contract.md): conclusion first, at most four key values, at most two reasons, one next action, timestamp, and an immutable Shadow footer. Automatic messages are capped at 700 characters.
+
 ## Runtime Evidence
 
 ```text
@@ -43,6 +45,8 @@ POST /api/telegram-gateway/collect
 
 `collect` only queues scheduled operator reports through the existing Gateway. It does not accept Telegram commands.
 
+`GET /api/telegram-gateway/telegram-text` is preview-only and never sends a message. A successful preview or queue operation must not be displayed as “已投递”; only an acknowledged delivery with a receipt or delivery timestamp qualifies.
+
 ## Safety
 
 Telegram Gateway remains push-only:
@@ -58,3 +62,5 @@ externalMarketRealMoneyAllowed = false
 ```
 
 The frontend panel is read-only plus a local collect button. It cannot submit orders, close positions, cancel orders, mutate MT5 live presets, or connect a external wallet.
+
+The ledger stores only compact delivery metadata and a short preview. Full business payloads, Telegram chat objects, and echoed message text are not operational evidence and must not be persisted.

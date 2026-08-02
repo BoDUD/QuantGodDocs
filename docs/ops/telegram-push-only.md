@@ -2,6 +2,8 @@
 
 P3-2 只做 Telegram push-only 通知关联和测试发送。它不新增 Email、不新增入站 Webhook、不接收 Telegram 交易命令、不接 broker adapter、不保存凭据、不开放 public ingress、不引入用户系统 / billing / credits，也不修改 live preset。
 
+消息内容必须遵守 [Telegram 中文消息合同](telegram-message-contract.md)。任何 `GET .../telegram-text` 都只是本地预览，不会发送。
+
 ## 安全边界
 
 - Telegram 只做出站推送。
@@ -48,10 +50,16 @@ python tools\run_telegram_notifier.py get-me
 python tools\run_telegram_notifier.py link --open --poll-seconds 60 --write-env --enable-push
 ```
 
-发送 push-only 测试消息：
+先生成 push-only 测试预览（默认不会发送）：
 
 ```powershell
 python tools\run_telegram_notifier.py test
+```
+
+确认预览后，真实发送一次必须同时显式请求 `--send`，并确保本机 push 开关已经开启：
+
+```powershell
+python tools\run_telegram_notifier.py test --send
 python tools\run_state_store.py notifications --limit 10
 ```
 
@@ -69,40 +77,11 @@ MT5 read-only snapshot / runtime ledger
 
 它只读本地 MT5/QuantGod 证据，不下单、不平仓、不撤单、不修改 live preset，也不会接收 Telegram 命令。默认是 dry-run，只记录 evidence；必须显式加 `--send`，且 `.env.telegram.local` 里 `QG_TELEGRAM_PUSH_ALLOWED=1` 后才会发到 Telegram。
 
-### MT5 全中文报告格式
+### MT5 全中文短报告
 
-MT5 智能推送采用全中文报告式结构，避免只发一行日志，也避免在用户侧暴露 `HOLD`、`Bid`、`Kill Switch`、`live preset` 这类半英文状态。符号名和产品名例如 `USDJPYc`、`MT5` 保持原样，其他说明尽量中文化。
+MT5 智能推送只生成 Shadow 观察摘要。结论必须在首屏显示，整条消息不超过 700 个字符；最多保留方向观察、置信度、风险、关键价格、失效原因和一个下一步。它不得使用“实盘建议”“交易计划”或暗示 Telegram 能触发执行的措辞。
 
-```text
-【QuantGod MT5 智能监控报告】
-品种、方向、信号等级、置信度、一句话结论
-
-【一、报告信息】
-触发原因、报告时间、观察周期、证据质量
-
-【二、行情与账户快照】
-买价、卖价、最新价、点差、数据来源、证据状态、证据年龄、当前持仓、熔断状态
-
-【三、盘面结构】
-15分钟、1小时、4小时、日线趋势、均线信号、相对强弱、关键压力、关键支撑
-
-【四、智能综合评分】
-综合方向、技术方向、风险等级、多头强度、空头强度、新闻风险、情绪仓位
-
-【五、多空推演】
-多头剧本、空头剧本、关键因子
-
-【六、交易计划】
-建议方向、入场区间、目标一、目标二、目标三、防守位置、盈亏比、仓位上限、失效条件、模型说明
-
-【七、风险明细】
-本地风险因子与阻断原因
-
-【八、执行与风控边界】
-执行状态、消息系统边界、系统不会下单/平仓/撤单/修改实盘参数/解除熔断/放宽风控门禁
-```
-
-这条消息可以给出交易建议，但建议只作为观察证据。实际是否入场仍由程序、交易时段、新闻过滤、点差、风控门禁、熔断、治理规则和实盘参数共同决定。
+即使观察门禁通过，消息也只是本地研究证据。系统没有订单执行通道，Telegram 不参与任何入场决定。
 
 ### DeepSeek 分析层
 
@@ -138,8 +117,7 @@ python tools\run_mt5_ai_telegram_monitor.py scan-once `
 ```powershell
 python tools\run_mt5_ai_telegram_monitor.py scan-once `
   --symbols USDJPYc `
-  --send `
-  --force
+  --send
 ```
 
 本地轮询三次：
@@ -233,7 +211,7 @@ Remove-Item C:\QuantGod\QuantGodBackend\.env.telegram.local -ErrorAction Silentl
 Remove-Item C:\QuantGod\QuantGodInfra\docker\.env.local -ErrorAction SilentlyContinue
 ```
 
-然后回滚 Backend、Infra、Docs 的 P3-2 提交。本次 Telegram-only 范围不应该存在 Frontend 提交。
+然后回滚对应的 Backend、Frontend、Infra 或 Docs 提交。前端投递状态必须与后端回执合同同步回滚，不能只回滚其中一侧。
 
 ## MT5 runtime evidence bridge
 

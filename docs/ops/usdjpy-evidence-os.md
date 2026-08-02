@@ -97,7 +97,7 @@ POST /api/usdjpy-strategy-lab/telegram-gateway/test-event
 POST /api/usdjpy-strategy-lab/telegram-gateway/dispatch
 ```
 
-`dispatch?send=1` only sends when `QG_TELEGRAM_PUSH_ALLOWED=1`, token/chat ID are present, and command execution remains disabled.
+`dispatch` defaults to preview-only processing. An external push requires a JSON body containing both `send=true` and `dryRun=false`; the legacy `dispatch?send=1` query is rejected. Delivery still requires `QG_TELEGRAM_PUSH_ALLOWED=1`, token/chat ID, a safe local environment, and disabled command execution.
 
 ## Parity Deepening
 

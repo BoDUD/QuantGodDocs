@@ -11,6 +11,62 @@ from scripts import format_docs_readability as formatter
 
 
 class DocsContractTests(unittest.TestCase):
+    def test_get_telegram_text_endpoints_are_preview_only(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        contract = json.loads((root / "docs/contracts/api-contract.json").read_text(encoding="utf-8"))
+        endpoints = [
+            endpoint
+            for group in contract.get("endpointGroups", [])
+            for endpoint in group.get("endpoints", [])
+            if isinstance(endpoint, dict)
+            and endpoint.get("method") == "GET"
+            and str(endpoint.get("path") or "").endswith("/telegram-text")
+        ]
+        self.assertGreaterEqual(len(endpoints), 10)
+        for endpoint in endpoints:
+            with self.subTest(path=endpoint.get("path")):
+                description = str(endpoint.get("description") or "").lower()
+                self.assertTrue("预览" in description or "preview" in description)
+                self.assertTrue("绝不发送" in description or "never sends" in description)
+
+    def test_notification_posts_document_explicit_send_contract(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        contract = json.loads((root / "docs/contracts/api-contract.json").read_text(encoding="utf-8"))
+        required_paths = {
+            "/api/automation-chain/run",
+            "/api/notify/test",
+            "/api/notify/daily-digest",
+            "/api/notify/runtime-scan",
+            "/api/notify/mt5-ai-monitor/run",
+            "/api/ai-analysis/deepseek-telegram/run",
+            "/api/usdjpy-strategy-lab/telegram-gateway/dispatch",
+        }
+        endpoints = {
+            endpoint.get("path"): endpoint
+            for group in contract.get("endpointGroups", [])
+            for endpoint in group.get("endpoints", [])
+            if isinstance(endpoint, dict) and endpoint.get("path") in required_paths
+        }
+        self.assertEqual(set(endpoints), required_paths)
+        for path, endpoint in endpoints.items():
+            with self.subTest(path=path):
+                description = str(endpoint.get("description") or "")
+                self.assertIn("send=true", description)
+                self.assertIn("dryRun=false", description)
+
+        for path in {
+            "/api/automation-chain/run",
+            "/api/usdjpy-strategy-lab/telegram-gateway/dispatch",
+        }:
+            with self.subTest(path=path):
+                description = str(endpoints[path].get("description") or "").lower()
+                self.assertTrue("default" in description or "默认" in description)
+        dispatch_description = str(
+            endpoints["/api/usdjpy-strategy-lab/telegram-gateway/dispatch"].get("description") or ""
+        )
+        self.assertIn("query send=1", dispatch_description)
+        self.assertTrue("拒绝" in dispatch_description or "reject" in dispatch_description.lower())
+
     def test_overlay_scripts_are_not_collapsed(self) -> None:
         root = Path(__file__).resolve().parents[1]
         for rel in [
