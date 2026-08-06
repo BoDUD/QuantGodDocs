@@ -42,6 +42,7 @@ Observe broadly. Advise narrowly. Execute nowhere. Fail closed.
 | API contract | [Backend API contract](docs/backend/api-contract.md) |
 | Safety boundaries | [Backend safety boundaries](docs/backend/safety-boundaries.md) |
 | Local runbook | [Local runbook](docs/ops/runbook-local.md) |
+| Automatic disk maintenance | [Local automatic disk maintenance](docs/ops/automatic-disk-maintenance.md) |
 | Frontend workbench | [Frontend workbench](docs/frontend/workbench.md) |
 | Infra automation | [Workspace automation](docs/infra/workspace-automation.md) |
 
